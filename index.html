@@ -352,7 +352,7 @@ const FISH = [
 // Wikipedia fish image cache
 var FISH_IMG_CACHE = {};
 
-// Search Wikipedia for fish images
+// Search Wikipedia for fish images (Chinese Wikipedia first)
 async function loadFishImages() {
   var g = document.getElementById('fishGrid');
   if (!g) return;
@@ -361,21 +361,40 @@ async function loadFishImages() {
     var sciName = FISH[i][5];
     if (!sciName) continue;
     try {
-      var r = await fetch('https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(sciName)+'&prop=pageimages&format=json&origin=*&pithumbsize=300');
+      // Try Chinese Wikipedia first (more accurate for HK fish)
+      var r = await fetch('https://zh.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(sciName)+'&prop=pageimages&format=json&origin=*&pithumbsize=300');
       var data = await r.json();
       var pages = data.query && data.query.pages;
+      var imgUrl = null;
       if (pages) {
         for (var pid in pages) {
-          if (pages[pid].thumbnail) {
-            var imgUrl = pages[pid].thumbnail.source;
-            var img = '<img src="'+imgUrl+'" style="width:100%;height:100%;object-fit:contain" onerror="this.parentNode.innerHTML=\'\'" alt="">';
-            var existing = cards[i].querySelector('.fi-img-wrap');
-            if (existing) existing.innerHTML = img;
-            break;
+          if (pages[pid].thumbnail) { imgUrl = pages[pid].thumbnail.source; break; }
+        }
+      }
+      // Fallback: try English Wikipedia
+      if (!imgUrl) {
+        var r2 = await fetch('https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(sciName)+'&prop=pageimages&format=json&origin=*&pithumbsize=300');
+        var data2 = await r2.json();
+        var pages2 = data2.query && data2.query.pages;
+        if (pages2) {
+          for (var pid2 in pages2) {
+            if (pages2[pid2].thumbnail) { imgUrl = pages2[pid2].thumbnail.source; break; }
           }
         }
       }
-    } catch(e) {}
+      if (imgUrl) {
+        var img = '<img src="'+imgUrl+'" style="width:100%;height:100%;object-fit:contain" alt="'+FISH[i][0]+'">';
+        var existing = cards[i].querySelector('.fi-img-wrap');
+        if (existing) existing.innerHTML = img;
+      } else {
+        // No image found - clean empty state
+        var existing = cards[i].querySelector('.fi-img-wrap');
+        if (existing) existing.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:28px;color:#334">🐟</div>';
+      }
+    } catch(e) {
+      var existing = cards[i].querySelector('.fi-img-wrap');
+      if (existing) existing.innerHTML = '';
+    }
   }
 }
 
