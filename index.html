@@ -18,7 +18,7 @@ h1{text-align:center;font-size:20px;padding:16px;background:linear-gradient(135d
 .sc{font-size:13px;color:#8899aa;text-align:center;line-height:1.6}
 .fr{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.fi{background:rgba(10,61,98,0.3);border-radius:12px;padding:10px;text-align:center;border:1px solid #1a3a5a;transition:all 0.2s}
+.fi{background:#0f2a45;border-radius:12px;padding:12px;text-align:center;border:1px solid #1a3a5a;position:relative;overflow:hidden}
 .fi:active{transform:scale(0.96)}
 .fi-img{width:100%;height:80px;display:flex;align-items:center;justify-content:center;background:rgba(10,61,98,0.2);border-radius:6px;margin-bottom:4px;font-size:40px;overflow:hidden}
 .fi-img img{width:100%;height:100%;object-fit:contain}
@@ -347,19 +347,27 @@ const FISH = [
   ["白杉","White Grouper","25-60cm","夏秋","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Epinephelus_akaara.jpg/200px-Epinephelus_akaara.jpg"],
 ];
 
-// Render fish with images
+// Render fish cards (no external images needed)
 (function(){
   var g=document.getElementById('fishGrid');
-  var lvlColors = {"初級":"#2ecc71","中級":"#f39c12","進階":"#e67e22","專家":"#e74c3c"};
-  var lvlIcons = {"初級":"🟢","中級":"🟡","進階":"🟠","專家":"🔴"};
-  g.innerHTML=FISH.map(function(f){
-    var img = f[5] ? '<img src="'+f[5]+'" style="width:100%;height:80px;object-fit:contain;border-radius:6px;background:rgba(10,61,98,0.3);margin-bottom:4px" onerror="this.style.display=\'none\'" alt="">' : '';
+  var lvlColors = {"初級":"#1a8a4a","中級":"#b8860b","進階":"#cc5500","專家":"#aa2222"};
+  var lvlBg = {"初級":"rgba(26,138,74,0.15)","中級":"rgba(184,134,11,0.15)","進階":"rgba(204,85,0,0.15)","專家":"rgba(170,34,34,0.15)"};
+  var fishIcons = ["🐟","🐠","🐡","🦈"];
+  g.innerHTML=FISH.map(function(f, idx){
     var lvl = f[4];
-    var lc = lvlColors[lvl] || '#8899aa';
-    var li = lvlIcons[lvl] || '⚪';
-    var emoji = f[0].includes('蟹')?'🦀':f[0].includes('蝦')?'🦐':f[0].includes('魷')||f[0].includes('墨')||f[0].includes('八爪')?'🦑':f[0].includes('魚')||f[0].includes('泡')?'🐡':f[0].includes('䱽')||f[0].includes('𩶘')||f[0].includes('鱲')?'🐟':'🐟';
-    var imgHtml = f[5] ? '<div class="fi-img"><img src="'+f[5]+'" onerror="this.parentNode.innerHTML=\''+emoji+'\'" alt=""></div>' : '<div class="fi-img" style="display:flex;align-items:center;justify-content:center;font-size:40px">'+emoji+'</div>';
-    return '<div class="fi">'+imgHtml+'<div class="fn">'+f[0]+'</div><div class="ft">'+f[1]+'<br>'+f[2]+' · '+f[3]+' · <span style="color:'+lc+'">'+li+' '+lvl+'</span></div></div>';
+    var lc = lvlColors[lvl] || '#556';
+    var lb = lvlBg[lvl] || 'rgba(85,85,102,0.15)';
+    var icon = fishIcons[idx % fishIcons.length];
+    return '<div class="fi" style="border-color:'+lc+'40;position:relative;overflow:hidden">' +
+      '<div style="position:absolute;top:-10px;right:-10px;font-size:60px;opacity:0.06">'+icon+'</div>' +
+      '<div style="font-size:18px;font-weight:700;color:#fff;margin:4px 0 2px">'+f[0]+'</div>' +
+      '<div style="font-size:10px;color:#8899aa;margin-bottom:6px">'+f[1]+'</div>' +
+      '<div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:4px 0">' +
+        '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(10,61,98,0.4);color:#8899aa">'+f[2]+'</span>' +
+        '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(10,61,98,0.4);color:#8899aa">'+f[3]+'</span>' +
+      '</div>' +
+      '<div style="font-size:10px;padding:3px 10px;border-radius:12px;background:'+lb+';color:'+lc+';font-weight:600;display:inline-block;margin:2px auto">'+lvl+'</div>' +
+      '</div>';
   }).join('');
 })();
 
