@@ -406,15 +406,18 @@ function renderWeather(data, marineData) {
   var msgs=["😢 唔係好適合釣魚","😐 麻麻地","👌 一般，可以一試","👍 唔錯，可以出發","🏆 極佳！今日好適合釣魚！"];
   document.getElementById('scoreMsg').textContent=msgs[Math.min(4,Math.floor(score/25))]+'  🌬️'+bf+'級 🌊'+wvAvg.toFixed(2)+'m 🌡️'+t.toFixed(1)+'°C';
   
-  // 3-day forecast
+  // 7-day forecast
   var days=["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
-  var fr='';for(var i=0;i<Math.min(3,data.daily.time.length);i++){
+  var fr='<div style="max-height:260px;overflow-y:auto">';
+  for(var i=0;i<Math.min(7,data.daily.time.length);i++){
     var d=new Date(data.daily.time[i]+'T12:00:00'),mx=data.daily.temperature_2m_max[i],mn=data.daily.temperature_2m_min[i];
     var wf=Math.min(12,Math.round((data.daily.wind_speed_10m_max[i]||0)/10));
     var pp2=data.daily.precipitation_probability_max ? (data.daily.precipitation_probability_max[i]||0) : 0;
     var icon2 = pp2 > 60 ? '🌧️' : pp2 > 20 ? '🌦️' : '☀️';
-    fr+='<div class="fr"><span style="font-size:14px">'+icon2+'</span><b>'+(d.getMonth()+1)+'/'+d.getDate()+'('+days[d.getDay()]+')</b><span>'+mn.toFixed(0)+'-'+mx.toFixed(0)+'°C</span><span>💨'+wf+'級</span><span>🌧️'+pp2+'%</span></div>';
+    var label = i==0?'今日':i==1?'明日':(d.getMonth()+1)+'/'+d.getDate()+'('+days[d.getDay()]+')';
+    fr+='<div class="fr"><span style="font-size:14px">'+icon2+'</span><b>'+label+'</b><span>'+mn.toFixed(0)+'-'+mx.toFixed(0)+'°C</span><span>💨'+wf+'級</span><span>🌧️'+pp2+'%</span></div>';
   }
+  fr+='</div>';
   document.getElementById('forecastRows').innerHTML=fr;
   
   var n=new Date();document.getElementById('updateTime').textContent=n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate()+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
@@ -434,13 +437,13 @@ async function refreshWeather(){
   await fetchHKO();
   
   try{
-    var w=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+HK_LAT+'&longitude='+HK_LON+'&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max,precipitation_probability_max,sunrise,sunset&timezone=Asia/Hong_Kong&forecast_days=3').then(function(r){return r.json();});
+    var w=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+HK_LAT+'&longitude='+HK_LON+'&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max,precipitation_probability_max,sunrise,sunset&timezone=Asia/Hong_Kong&forecast_days=7').then(function(r){return r.json();});
     
     // Fetch marine data for multiple HK regions
     var marineKeys = Object.keys(MARINE_SPOTS);
     var marinePromises = marineKeys.map(function(key) {
       var spot = MARINE_SPOTS[key];
-      return fetch('https://marine-api.open-meteo.com/v1/marine?latitude='+spot[0]+'&longitude='+spot[1]+'&hourly=wave_height,wave_direction,swell_wave_height,wind_wave_height&timezone=Asia/Hong_Kong&forecast_days=2').then(function(r){return r.json();}).then(function(d){MARINE_CACHE[key]=d;}).catch(function(){});
+      return fetch('https://marine-api.open-meteo.com/v1/marine?latitude='+spot[0]+'&longitude='+spot[1]+'&hourly=wave_height,wave_direction,swell_wave_height,wind_wave_height&timezone=Asia/Hong_Kong&forecast_days=7').then(function(r){return r.json();}).then(function(d){MARINE_CACHE[key]=d;}).catch(function(){});
     });
     
     await Promise.all(marinePromises);
