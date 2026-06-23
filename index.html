@@ -223,10 +223,10 @@ function renderTideExtremes(exList, stationCode, spotName) {
   
   // Region buttons
   var regionKeys = Object.keys(SPOT_REGIONS);
-  var activeRegion = null;
+  var activeRegion = ACTIVE_REGION;
   
-  // Check if current spot is in a region
-  if (spotName) {
+  // If a spot is selected and no region set, find its region
+  if (spotName && !activeRegion) {
     for (var r in SPOT_REGIONS) {
       if (SPOT_REGIONS[r].indexOf(spotName) >= 0) { activeRegion = r; break; }
     }
@@ -240,7 +240,7 @@ function renderTideExtremes(exList, stationCode, spotName) {
   h += '</div>';
   
   // Show spots in active region
-  if (activeRegion) {
+  if (activeRegion && SPOT_REGIONS[activeRegion]) {
     h += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 10px">';
     SPOT_REGIONS[activeRegion].forEach(function(s) {
       var stn = FISHING_SPOTS[s];
