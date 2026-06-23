@@ -28,20 +28,22 @@ h1{text-align:center;font-size:20px;padding:16px;background:linear-gradient(135d
 .loading{text-align:center;padding:20px;color:#8899aa}
 /* Tide styles */
 .tsel{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}
-.tsel button{padding:5px 10px;border:1px solid #1a3a5a;border-radius:14px;background:#0f2a45;color:#3dc1d3;font-size:11px;cursor:pointer}
+.tsel button{padding:7px 14px;border:1px solid #1a3a5a;border-radius:18px;background:#0f2a45;color:#3dc1d3;font-size:14px;cursor:pointer}
 .tsel button.act{border-color:#3dc1d3;background:rgba(61,193,211,0.15)}
-.te{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}
-.tei{flex:1;min-width:80px;background:rgba(10,61,98,0.3);border-radius:10px;padding:10px;text-align:center;border:1px solid #1a3a5a}
-.ticon{font-size:20px}
-.ttime{font-size:11px;color:#8899aa;margin:2px 0}
-.theight{font-size:18px;font-weight:700;color:#fff}
-.ttype{font-size:10px;color:#8899aa}
-.tch{display:flex;align-items:flex-end;height:60px;gap:2px;margin:10px 0;padding:4px 0}
+.tdrop{width:100%;padding:10px 12px;border:1px solid #1a3a5a;border-radius:10px;background:#0f2a45;color:#e0e8f0;font-size:15px;cursor:pointer;margin:4px 0 10px;appearance:auto;-webkit-appearance:auto}
+.tdrop option{background:#0a1628;color:#e0e8f0;padding:8px}
+.te{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.tei{flex:1;min-width:90px;background:rgba(10,61,98,0.3);border-radius:12px;padding:12px;text-align:center;border:1px solid #1a3a5a}
+.ticon{font-size:24px}
+.ttime{font-size:13px;color:#8899aa;margin:3px 0}
+.theight{font-size:20px;font-weight:700;color:#fff}
+.ttype{font-size:11px;color:#8899aa}
+.tch{display:flex;align-items:flex-end;height:80px;gap:2px;margin:10px 0;padding:4px 0}
 .tch div{flex:1;border-radius:2px 2px 0 0;min-height:2px;position:relative}
 .tch .thnw{background:linear-gradient(to top,#3dc1d3,transparent)}
 .tch .thfu{background:linear-gradient(to top,#f39c12,transparent)}
-.tst{display:flex;justify-content:space-between;font-size:9px;color:#8899aa;margin:0 0 4px}
-.tcur{background:rgba(61,193,211,0.1);border-radius:8px;padding:8px;text-align:center;font-size:13px;margin:8px 0}
+.tst{display:flex;justify-content:space-between;font-size:10px;color:#8899aa;margin:0 0 4px}
+.tcur{background:rgba(61,193,211,0.1);border-radius:10px;padding:10px;text-align:center;font-size:14px;margin:8px 0}
 .tcur b{color:#3dc1d3}
 </style>
 </head>
@@ -239,15 +241,15 @@ function renderTideExtremes(exList, stationCode, spotName) {
   });
   h += '</div>';
   
-  // Show spots in active region
+  // Show spots in active region as dropdown
   if (activeRegion && SPOT_REGIONS[activeRegion]) {
-    h += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 10px">';
+    h += '<select class="tdrop" onchange="if(this.value)loadTideSpot(this.value)">';
+    h += '<option value="">— 揀釣點 —</option>';
     SPOT_REGIONS[activeRegion].forEach(function(s) {
-      var stn = FISHING_SPOTS[s];
-      var isActive = (s == spotName);
-      h += '<button style="padding:3px 8px;border:1px solid ' + (isActive ? '#3dc1d3' : '#1a3a5a') + ';border-radius:10px;background:' + (isActive ? 'rgba(61,193,211,0.15)' : '#0f2a45') + ';color:' + (isActive ? '#3dc1d3' : '#e0e8f0') + ';font-size:11px;cursor:pointer" onclick="loadTideSpot(\''+s+'\')">'+s+'</button>';
+      var sel = (s == spotName) ? ' selected' : '';
+      h += '<option value="'+s+'"'+sel+'>🎯 '+s+'</option>';
     });
-    h += '</div>';
+    h += '</select>';
   }
   
   // Station name indicator
