@@ -125,16 +125,26 @@ const MARINE_SPOTS = {
 };
 var MARINE_CACHE = {};
 
-// Weather icons/descriptions by WMO code
-const WMO = {
-  0:["☀️","晴天"],1:["🌤️","大致天晴"],2:["⛅","多雲"],3:["☁️","密雲"],
-  45:["🌫️","霧"],48:["🌫️","霧"],
-  51:["🌦️","微雨"],53:["🌦️","小雨"],55:["🌧️","中雨"],
-  61:["🌦️","微雨"],63:["🌧️","中雨"],65:["🌧️","大雨"],
-  71:["🌨️","小雪"],73:["🌨️","中雪"],75:["❄️","大雪"],
-  80:["🌦️","陣雨"],81:["🌧️","中陣雨"],82:["🌧️","大陣雨"],
-  95:["⛈️","雷暴"],96:["⛈️","雷暴+雹"],99:["⛈️","雷暴+雹"]
+// HKO weather icon mapping
+const HKO_ICONS = {
+  50:["☀️","晴天"],51:["🌤️","大致天晴"],52:["⛅","短暫陽光"],53:["☁️","多雲"],54:["☁️","密雲"],
+  55:["💨","大風"],56:["🌫️","薄霧"],57:["🌫️","霧"],
+  60:["🌦️","微雨"],61:["🌧️","雨"],62:["🌧️","大雨"],63:["⛈️","雷暴"],64:["⛈️","大雷暴"],
+  65:["☀️","酷熱"],66:["❄️","寒冷"],
+  70:["🌦️","微雨"],71:["🌦️","雨+陽光"],72:["🌦️","微雨"],73:["🌧️","雨"],74:["🌧️","大雨"],75:["🌧️","大雨"],
+  76:["☀️","酷熱"],77:["☀️","天晴"],
+  80:["💨","大風"],81:["💨","強風"],82:["💨","烈風"],83:["💨","狂風"],84:["💨","颶風"],
+  85:["🌧️","雨+風"],86:["🌧️","雨+強風"],87:["🌧️","雨+烈風"],88:["🌧️","雨+狂風"],89:["🌧️","雨+颶風"],
+  90:["🌧️","雷雨"],91:["🌧️","雷雨+強風"],92:["🌧️","雷雨+烈風"],93:["🌧️","雷雨+狂風"],94:["🌧️","雷雨+颶風"]
 };
+var HKO_CACHE = null;
+
+async function fetchHKO() {
+  try {
+    var r = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
+    HKO_CACHE = await r.json();
+  } catch(e) { HKO_CACHE = null; }
+}
 const FISH = [
   ["石斑","Grouper","30-100cm","全年","中級"],["黃腳鱲","Yellowfin Bream","20-50cm","秋冬","初級"],
   ["黑鱲","Black Bream","20-45cm","冬季","初級"],["紅鮋","Red Gurnard","15-35cm","夏秋","初級"],
@@ -158,33 +168,63 @@ function renderWeather(data, marineData) {
   var ws=data.hourly.wind_speed_10m[idx];
   var wd=data.hourly.wind_direction_10m[idx];
   var gu=data.hourly.wind_gusts_10m[idx];
-  var wc=data.hourly.weather_code[idx];
-  var hu=data.hourly.relative_humidity_2m[idx];
   var pp=data.hourly.precipitation_probability[idx];
   var uv=data.hourly.uv_index[idx];
   
+  // Use HKO data for temperature, humidity, and weather condition
+  var hkoTemp = null, hkoHumidity = null, hkoIcon = null, hkoWarnings = [];
+  if (HKO_CACHE) {
+    if (HKO_CACHE.temperature && HKO_CACHE.temperature.data) {
+      for (var k=0; k<HKO_CACHE.temperature.data.length; k++) {
+        if (HKO_CACHE.temperature.data[k].place == "香港天文台") {
+          hkoTemp = HKO_CACHE.temperature.data[k].value;
+          break;
+        }
+      }
+    }
+    if (HKO_CACHE.humidity && HKO_CACHE.humidity.data && HKO_CACHE.humidity.data[0]) {
+      hkoHumidity = HKO_CACHE.humidity.data[0].value;
+    }
+    if (HKO_CACHE.icon && HKO_CACHE.icon[0] !== undefined) {
+      hkoIcon = HKO_CACHE.icon[0];
+    }
+    if (HKO_CACHE.warningMessage) {
+      HKO_CACHE.warningMessage.forEach(function(w) {
+        if (w.indexOf('警告') >= 0) hkoWarnings.push(w);
+      });
+    }
+  }
+  
+  var displayTemp = hkoTemp !== null ? hkoTemp : t;
+  var displayHumidity = hkoHumidity !== null ? hkoHumidity : null;
+  var hkoW = HKO_ICONS[hkoIcon] || ["🌡️", displayTemp.toFixed(1)+"°C"];
+  
   var bf=Math.min(12,Math.round(ws/10));
   var dir=WIND_DIR[Math.round(wd/22.5)%16];
-  var wmo=WMO[wc]||["❓","未知"];
   
-  // Wind description - 吹咩風
+  // Wind description
   var windDesc = "吹" + dir + "風 " + bf + "級";
   if (bf >= 8) windDesc += "⚠️";
   
-  // Weather description with emoji
-  var dayIcons = ["🌙","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌞","🌙"];
-  var timeIcon = dayIcons[h];
+  // Warning badges
+  if (hkoWarnings.length > 0) {
+    var warnHtml = '<div style="text-align:center;padding:6px;margin:4px 0;background:rgba(255,100,50,0.15);border:1px solid rgba(255,100,50,0.3);border-radius:8px;font-size:13px">';
+    hkoWarnings.forEach(function(w) {
+      warnHtml += '⚠️ ' + w + '<br>';
+    });
+    warnHtml += '</div>';
+  } else { warnHtml = ''; }
   
   var mainW = '<div style="text-align:center;padding:4px 0">' +
-    '<span style="font-size:36px">' + wmo[0] + '</span>' +
-    '<div class="wdesc">' + wmo[1] + ' · ' + t.toFixed(1) + '°C</div>' +
-    '</div>';
+    '<span style="font-size:36px">' + hkoW[0] + '</span>' +
+    '<div class="wdesc">' + hkoW[1] + ' · ' + displayTemp.toFixed(1) + '°C</div>' +
+    '</div>' + warnHtml;
   
-  // Wind + wave grid
+  // Wind + weather grid
   var mainG = '<div class="g">' +
     '<div class="it"><div class="ic">💨</div><div class="lb">風力</div><div class="vl">' + bf + '級</div><div class="sb">' + windDesc + '</div></div>' +
     '<div class="it"><div class="ic">💥</div><div class="lb">陣風</div><div class="vl">' + gu.toFixed(0) + '</div><div class="sb">km/h</div></div>' +
-    '<div class="it"><div class="ic">💧</div><div class="lb">濕度</div><div class="vl">' + (hu !== undefined ? hu + '%' : '--') + '</div><div class="sb">降雨 ' + (pp !== undefined ? pp + '%' : '--') + '</div></div>' +
+    '<div class="it"><div class="ic">💧</div><div class="lb">濕度</div><div class="vl">' + (displayHumidity !== null ? displayHumidity + '%' : '--') + '</div><div class="sb">降雨 ' + (pp !== undefined ? pp + '%' : '--') + '</div></div>' +
     '<div class="it"><div class="ic">☀️</div><div class="lb">紫外線</div><div class="vl">' + (uv !== undefined ? uv.toFixed(1) : '--') + '</div><div class="sb">' + (uv < 3 ? '溫和' : uv < 6 ? '中等' : uv < 8 ? '強烈' : '極高⚠️') + '</div></div>' +
     '</div>';
   
@@ -253,10 +293,9 @@ function renderWeather(data, marineData) {
   var fr='';for(var i=0;i<Math.min(3,data.daily.time.length);i++){
     var d=new Date(data.daily.time[i]+'T12:00:00'),mx=data.daily.temperature_2m_max[i],mn=data.daily.temperature_2m_min[i];
     var wf=Math.min(12,Math.round((data.daily.wind_speed_10m_max[i]||0)/10));
-    var wc2=data.daily.weather_code ? (data.daily.weather_code[i]||0) : 0;
-    var wmo2=WMO[wc2]||["❓",""];
     var pp2=data.daily.precipitation_probability_max ? (data.daily.precipitation_probability_max[i]||0) : 0;
-    fr+='<div class="fr"><span style="font-size:14px">'+wmo2[0]+'</span><b>'+(d.getMonth()+1)+'/'+d.getDate()+'('+days[d.getDay()]+')</b><span>'+mn.toFixed(0)+'-'+mx.toFixed(0)+'°C</span><span>💨'+wf+'級</span><span>🌧️'+pp2+'%</span></div>';
+    var icon2 = pp2 > 60 ? '🌧️' : pp2 > 20 ? '🌦️' : '☀️';
+    fr+='<div class="fr"><span style="font-size:14px">'+icon2+'</span><b>'+(d.getMonth()+1)+'/'+d.getDate()+'('+days[d.getDay()]+')</b><span>'+mn.toFixed(0)+'-'+mx.toFixed(0)+'°C</span><span>💨'+wf+'級</span><span>🌧️'+pp2+'%</span></div>';
   }
   document.getElementById('forecastRows').innerHTML=fr;
   
@@ -264,8 +303,11 @@ function renderWeather(data, marineData) {
 }
 
 async function refreshWeather(){
+  // Fetch HKO official weather data first
+  await fetchHKO();
+  
   try{
-    var w=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+HK_LAT+'&longitude='+HK_LON+'&hourly=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max,weather_code,precipitation_probability_max,sunrise,sunset&timezone=Asia/Hong_Kong&forecast_days=3').then(function(r){return r.json();});
+    var w=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+HK_LAT+'&longitude='+HK_LON+'&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max,precipitation_probability_max,sunrise,sunset&timezone=Asia/Hong_Kong&forecast_days=3').then(function(r){return r.json();});
     
     // Fetch marine data for multiple HK regions
     var marineKeys = Object.keys(MARINE_SPOTS);
