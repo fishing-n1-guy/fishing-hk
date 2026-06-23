@@ -17,9 +17,10 @@ h1{text-align:center;font-size:20px;padding:16px;background:linear-gradient(135d
 .br{display:flex;gap:4px;margin:12px 0} .br div{flex:1;height:6px;border-radius:3px;background:#1a3a5a} .br .ok{background:#3dc1d3}
 .sc{font-size:13px;color:#8899aa;text-align:center;line-height:1.6}
 .fr{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
-.fg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.fi{background:rgba(10,61,98,0.3);border-radius:10px;padding:10px;text-align:center;border:1px solid #1a3a5a}
-.fn{font-size:15px;font-weight:600;margin:3px 0} .ft{font-size:10px;color:#8899aa;line-height:1.4}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fi{background:rgba(10,61,98,0.3);border-radius:12px;padding:10px;text-align:center;border:1px solid #1a3a5a;transition:all 0.2s}
+.fi:active{transform:scale(0.96)}
+.fn{font-size:14px;font-weight:600;margin:4px 0} .ft{font-size:10px;color:#8899aa;line-height:1.4}
 .nav{display:flex;gap:6px;margin:14px 0}
 .nav a{flex:1;padding:8px;background:#0f2a45;border-radius:20px;color:#3dc1d3;text-decoration:none;font-size:13px;text-align:center;border:1px solid #1a3a5a}
 .page{display:none}
@@ -264,18 +265,77 @@ async function fetchHKO() {
   } catch(e) { HKO_CACHE = null; }
 }
 const FISH = [
-  ["石斑","Grouper","30-100cm","全年","中級"],["黃腳鱲","Yellowfin Bream","20-50cm","秋冬","初級"],
-  ["黑鱲","Black Bream","20-45cm","冬季","初級"],["紅鮋","Red Gurnard","15-35cm","夏秋","初級"],
-  ["泥鯭","Rabbitfish","15-30cm","夏季","初級"],["牙帶","Ribbonfish","50-120cm","秋冬","進階"],
-  ["黃花魚","Yellow Croaker","20-50cm","春季","進階"],["沙鑽","Sand Whiting","15-30cm","全年","初級"],
-  ["立魚","Sea Bream","20-60cm","秋冬季","初級"],["火點","Spotty Grouper","20-40cm","夏季","中級"],
-  ["左口","Flatfish","20-50cm","全年","中級"],["星鱸","Spotted Sea Bass","30-80cm","秋冬","中級"],
-  ["魷魚","Squid","15-40cm","夏秋","初級"],["真鯛","Red Sea Bream","25-60cm","冬季","進階"],
-  ["鯆魚","Ray","50-150cm","夏秋","進階"],["黃鰭鮪","Yellowfin Tuna","50-200cm","夏季","專家"]
+  ["石斑","Grouper","30-100cm","全年","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Epinephelus_marginatus.jpg/200px-Epinephelus_marginatus.jpg"],
+  ["芝麻斑","Brown-marbled Grouper","30-80cm","夏秋","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Epinephelus_fuscoguttatus.jpg/200px-Epinephelus_fuscoguttatus.jpg"],
+  ["青斑","Orange-spotted Grouper","25-60cm","夏季","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Epinephelus_coioides.jpg/200px-Epinephelus_coioides.jpg"],
+  ["東星斑","Coral Trout","20-60cm","夏季","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Plectropomus_leopardus.jpg/200px-Plectropomus_leopardus.jpg"],
+  ["紅斑","Red Grouper","20-50cm","秋冬","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Epinephelus_marginatus_2.jpg/200px-Epinephelus_marginatus_2.jpg"],
+  ["火點","Spotty Grouper","20-40cm","夏季","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Epinephelus_merra.jpg/200px-Epinephelus_merra.jpg"],
+  ["黃腳鱲","Yellowfin Bream","20-50cm","秋冬","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Acanthopagrus_latus.jpg/200px-Acanthopagrus_latus.jpg"],
+  ["黑鱲","Black Bream","20-45cm","冬季","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Acanthopagrus_schlegelii.jpg/200px-Acanthopagrus_schlegelii.jpg"],
+  ["立魚","Sea Bream","20-60cm","秋冬季","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Pagrus_pagrus.jpg/200px-Pagrus_pagrus.jpg"],
+  ["真鯛","Red Sea Bream","25-60cm","冬季","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Pagrus_major.jpg/200px-Pagrus_major.jpg"],
+  ["白鱲","White Snapper","25-50cm","秋冬","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Gymnocranius_griseus.jpg/200px-Gymnocranius_griseus.jpg"],
+  ["星鱸","Spotted Sea Bass","30-80cm","秋冬","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Lateolabrax_japonicus.jpg/200px-Lateolabrax_japonicus.jpg"],
+  ["盲曹","Barramundi","30-100cm","夏季","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Barramundi_%2836945357715%29.jpg/200px-Barramundi_%2836945357715%29.jpg"],
+  ["紅鮋","Red Gurnard","15-35cm","夏秋","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Chelidonichthys_lucerna.jpg/200px-Chelidonichthys_lucerna.jpg"],
+  ["泥鯭","Rabbitfish","15-30cm","夏季","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Siganus_canaliculatus.jpg/200px-Siganus_canaliculatus.jpg"],
+  ["牙帶","Ribbonfish","50-120cm","秋冬","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Lepidopus_caudatus.jpg/200px-Lepidopus_caudatus.jpg"],
+  ["黃花魚","Yellow Croaker","20-50cm","春季","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Larimichthys_crocea.jpg/200px-Larimichthys_crocea.jpg"],
+  ["沙鑽","Sand Whiting","15-30cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Sillago_sihama.jpg/200px-Sillago_sihama.jpg"],
+  ["魷魚","Squid","15-40cm","夏秋","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Loligo_vulgaris.jpg/200px-Loligo_vulgaris.jpg"],
+  ["鯆魚","Ray","50-150cm","夏秋","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Dasyatis_pastinaca.jpg/200px-Dasyatis_pastinaca.jpg"],
+  ["左口","Flatfish","20-50cm","全年","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Paralichthys_olivaceus.jpg/200px-Paralichthys_olivaceus.jpg"],
+  ["雞魚","Javelin Grunter","20-40cm","夏秋","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Pomadasys_kaakan.jpg/200px-Pomadasys_kaakan.jpg"],
+  ["細鱗","Red Morwong","20-50cm","冬季","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Cheilodactylus_zonatus.jpg/200px-Cheilodactylus_zonatus.jpg"],
+  ["青衣","Green Wrasse","20-50cm","夏季","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Halichoeres_hortulanus.jpg/200px-Halichoeres_hortulanus.jpg"],
+  ["紅杉","Red Bigeye","15-30cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Priacanthus_macracanthus.jpg/200px-Priacanthus_macracanthus.jpg"],
+  ["大眼雞","Bigeye","15-30cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Heteropriacanthus_cruentatus.jpg/200px-Heteropriacanthus_cruentatus.jpg"],
+  ["馬友","Fourfinger Threadfin","30-80cm","夏季","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Eleutheronema_tetradactylum.jpg/200px-Eleutheronema_tetradactylum.jpg"],
+  ["烏頭","Grey Mullet","20-60cm","秋冬","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Mugil_cephalus.jpg/200px-Mugil_cephalus.jpg"],
+  ["金古","Golden Trevally","20-60cm","夏季","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Gnathanodon_speciosus.jpg/200px-Gnathanodon_speciosus.jpg"],
+  ["池魚","Horse Mackerel","15-30cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Trachurus_trachurus.jpg/200px-Trachurus_trachurus.jpg"],
+  ["梳羅","Barracuda","40-120cm","夏季","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Barracuda_%28Sphyraena_barracuda%29.jpg/200px-Barracuda_%28Sphyraena_barracuda%29.jpg"],
+  ["三鬚","Three-lined Grunt","15-30cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Plectorhinchus_cinctus.jpg/200px-Plectorhinchus_cinctus.jpg"],
+  ["赤筆","Red Mullet","15-30cm","春季","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Mullus_barbatus.jpg/200px-Mullus_barbatus.jpg"],
+  ["剝皮魚","Filefish","15-40cm","冬季","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Stephanolepis_hispidus.jpg/200px-Stephanolepis_hispidus.jpg"],
+  ["雞泡魚","Pufferfish","10-40cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Takifugu_rubripes.jpg/200px-Takifugu_rubripes.jpg"],
+  ["鱸魚","Japanese Sea Bass","20-70cm","秋冬","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Lateolabrax_japonicus_01.jpg/200px-Lateolabrax_japonicus_01.jpg"],
+  ["牛鰍","Conger Eel","40-150cm","全年","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Conger_conger.jpg/200px-Conger_conger.jpg"],
+  ["門鱔","Pike Eel","50-200cm","全年","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Muraenesox_cinereus.jpg/200px-Muraenesox_cinereus.jpg"],
+  ["石狗公","Scorpionfish","10-25cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Scorpaena_notata.jpg/200px-Scorpaena_notata.jpg"],
+  ["黃鰭鮪","Yellowfin Tuna","50-200cm","夏季","專家","https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Thunnus_albacares.jpg/200px-Thunnus_albacares.jpg"],
+  ["杉斑","Areolate Grouper","25-50cm","夏秋","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Epinephelus_areolatus.jpg/200px-Epinephelus_areolatus.jpg"],
+  ["花頭梅","Half-banded Seaperch","15-30cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Hypodytes_rubicundus.jpg/200px-Hypodytes_rubicundus.jpg"],
+  ["坑鰜","Wrasse","20-50cm","夏季","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Cheilinus_trilobatus.jpg/200px-Cheilinus_trilobatus.jpg"],
+  ["黃衣","Yellowtail","30-80cm","秋冬","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Seriola_lalandi.jpg/200px-Seriola_lalandi.jpg"],
+  ["白花","White Croaker","15-35cm","冬季","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Pennahia_argentata.jpg/200px-Pennahia_argentata.jpg"],
+  ["紅衫","Golden Thread","20-40cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Nemipterus_virgatus.jpg/200px-Nemipterus_virgatus.jpg"],
+  ["黑鮋","Black Scorpionfish","10-25cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Sebastiscus_marmoratus.jpg/200px-Sebastiscus_marmoratus.jpg"],
+  ["冚畢","Snubnose Pompano","20-50cm","夏季","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Trachinotus_blochii.jpg/200px-Trachinotus_blochii.jpg"],
+  ["斑𩶘","Blackspot Tuskfish","20-45cm","夏季","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Choerodon_schoenleinii.jpg/200px-Choerodon_schoenleinii.jpg"],
+  ["海鱺","Cobia","50-150cm","夏季","進階","https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Rachycentron_canadum.jpg/200px-Rachycentron_canadum.jpg"],
+  ["水針","Needlefish","30-80cm","夏季","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Tylosurus_acus.jpg/200px-Tylosurus_acus.jpg"],
+  ["沙鯭","Lizardfish","15-30cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Synodus_saurus.jpg/200px-Synodus_saurus.jpg"],
+  ["花利","Flathead","25-60cm","全年","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Platycephalus_indicus.jpg/200px-Platycephalus_indicus.jpg"],
+  ["金山鯽","Tilapia","15-40cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Oreochromis_mossambicus.jpg/200px-Oreochromis_mossambicus.jpg"],
+  ["塘虱","Walking Catfish","20-50cm","夏季","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Clarias_batrachus.jpg/200px-Clarias_batrachus.jpg"],
+  ["墨魚","Cuttlefish","15-40cm","夏秋","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Sepia_officinalis.jpg/200px-Sepia_officinalis.jpg"],
+  ["八爪魚","Octopus","20-100cm","夏秋","中級","https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Octopus_vulgaris.jpg/200px-Octopus_vulgaris.jpg"],
+  ["瀨尿蝦","Mantis Shrimp","10-30cm","全年","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Oratosquilla_oratoria.jpg/200px-Oratosquilla_oratoria.jpg"],
+  ["花蟹","Flower Crab","15-30cm","夏秋","初級","https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Portunus_pelagicus.jpg/200px-Portunus_pelagicus.jpg"],
 ];
 
-// Render fish
-(function(){var g=document.getElementById('fishGrid');g.innerHTML=FISH.map(f=>'<div class="fi"><div>🐟</div><div class="fn">'+f[0]+'</div><div class="ft">'+f[1]+'<br>'+f[2]+' · '+f[3]+' · '+f[4]+'</div></div>').join('');})();
+// Render fish with images
+(function(){
+  var g=document.getElementById('fishGrid');
+  g.innerHTML=FISH.map(function(f){
+    var img = f[5] ? '<img src="'+f[5]+'" style="width:100%;height:80px;object-fit:contain;border-radius:6px;background:rgba(10,61,98,0.3);margin-bottom:4px" onerror="this.style.display=\'none\'" alt="">' : '<div style="font-size:28px;padding:8px">🐟</div>';
+    var season = f[3]; var lvl = f[4];
+    var lvlColor = lvl=='初級'?'#2ecc71':lvl=='中級'?'#f39c12':lvl=='進階'?'#e67e22':'#e74c3c';
+    return '<div class="fi">'+img+'<div class="fn">'+f[0]+'</div><div class="ft">'+f[1]+'<br>'+f[2]+' · '+season+' · <span style="color:'+lvlColor+'">'+lvl+'</span></div></div>';
+  }).join('');
+})();
 
 function renderWeather(data, marineData) {
   var now=new Date(),h=now.getHours(),today=now.toISOString().slice(0,10);
@@ -419,8 +479,12 @@ function renderWeather(data, marineData) {
   }
   fr+='</div>';
   document.getElementById('forecastRows').innerHTML=fr;
-  
-  var n=new Date();document.getElementById('updateTime').textContent=n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate()+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+}
+
+// Update footer
+function updateFooter() {
+  var n = new Date();
+  document.getElementById('updateTime').textContent = n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate()+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
 }
 
 // Page switching
