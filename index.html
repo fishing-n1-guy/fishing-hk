@@ -348,11 +348,18 @@ const FISH = [
 // Render fish with images
 (function(){
   var g=document.getElementById('fishGrid');
+  var lvlColors = {"初級":"#2ecc71","中級":"#f39c12","進階":"#e67e22","專家":"#e74c3c"};
+  var lvlIcons = {"初級":"🟢","中級":"🟡","進階":"🟠","專家":"🔴"};
   g.innerHTML=FISH.map(function(f){
-    var img = f[5] ? '<img src="'+f[5]+'" style="width:100%;height:80px;object-fit:contain;border-radius:6px;background:rgba(10,61,98,0.3);margin-bottom:4px" onerror="this.style.display=\'none\'" alt="">' : '<div style="font-size:28px;padding:8px">🐟</div>';
-    var season = f[3]; var lvl = f[4];
-    var lvlColor = lvl=='初級'?'#2ecc71':lvl=='中級'?'#f39c12':lvl=='進階'?'#e67e22':'#e74c3c';
-    return '<div class="fi">'+img+'<div class="fn">'+f[0]+'</div><div class="ft">'+f[1]+'<br>'+f[2]+' · '+season+' · <span style="color:'+lvlColor+'">'+lvl+'</span></div></div>';
+    var img = f[5] ? '<img src="'+f[5]+'" style="width:100%;height:80px;object-fit:contain;border-radius:6px;background:rgba(10,61,98,0.3);margin-bottom:4px" onerror="this.style.display=\'none\'" alt="">' : '';
+    var lvl = f[4];
+    var lc = lvlColors[lvl] || '#8899aa';
+    var li = lvlIcons[lvl] || '⚪';
+    var emoji = f[0].includes('蟹')?'🦀':f[0].includes('蝦')?'🦐':f[0].includes('魷')||f[0].includes('墨')||f[0].includes('八爪')?'🦑':f[0].includes('魚')||f[0].includes('泡')?'🐡':f[0].includes('䱽')||f[0].includes('𩶘')||f[0].includes('鱲')?'🐟':'🐟';
+    if (!img) {
+      img = '<div style="width:100%;height:80px;display:flex;align-items:center;justify-content:center;font-size:40px;background:rgba(10,61,98,0.2);border-radius:6px;margin-bottom:4px">'+emoji+'</div>';
+    }
+    return '<div class="fi">'+img+'<div class="fn">'+f[0]+'</div><div class="ft">'+f[1]+'<br>'+f[2]+' · '+f[3]+' · <span style="color:'+lc+'">'+li+' '+lvl+'</span></div></div>';
   }).join('');
 })();
 
