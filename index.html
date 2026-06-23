@@ -179,16 +179,86 @@ var TIDE_STATIONS = {
 };
 var TIDE_ORDER = ["CCH","KLW","TMW","SPW","LOP","TAO","CLK","MWC","TPK","TBT","CMW","WAG","KCT","QUB"];
 
+// Fishing spots → nearest tide station
+var FISHING_SPOTS = {
+  // 東水
+  "果洲群島":"TMW","東龍洲":"TMW","蒲台群島":"WAG","橫瀾島":"WAG","宋崗":"WAG","擔桿列島":"WAG",
+  "白腊":"TMW","浪茄":"WAG","大浪灣":"TMW","龍蝦灣":"TMW","清水灣":"TMW","布袋澳":"TMW",
+  // 西水
+  "蚊洲":"SPW","青龍頭":"MWC","大小磨刀":"CLK","龍鼓灘":"CLK","小欖":"LOP","青山灣":"LOP",
+  "黃金海岸":"LOP","大欖涌":"LOP","沙洲":"CLK","龍珠島":"CLK","屯門":"LOP","欣澳":"LOP","陰澳":"LOP",
+  // 東北
+  "塔門":"KLW","黃石碼頭":"KLW","大灘":"KLW","海下":"KLW","赤洲":"KLW",
+  "鴨洲":"TPK","吉澳":"KLW","東平洲":"KLW","往灣洲":"KLW","娥眉洲":"KLW","榕樹凹":"TPK","荔枝窩":"TPK","三椏涌":"TPK",
+  // 西貢
+  "西貢碼頭":"TPK","糧船灣":"TMW","滘西洲":"TMW","吊鐘洲":"KLW","甕缸群島":"TMW",
+  // 北部
+  "三門仔":"TPK","馬料水":"TPK","大尾篤":"TPK","黃竹角咀":"KLW",
+  // 南部
+  "南丫島":"CCH","索罟群島":"SPW","大鴉洲":"SPW","香港仔":"QUB","赤柱":"QUB","石澳":"TMW","昂船洲":"KCT","青衣":"KCT","油塘":"QUB","筲箕灣":"QUB",
+  // 大嶼山
+  "東涌":"CLK","梅窩":"CMW","貝澳":"CMW","長沙":"CMW","塘福":"SPW","分流":"SPW"
+};
+
+// Group spots by region for UI
+var SPOT_REGIONS = {
+  "東水":["果洲群島","東龍洲","蒲台群島","橫瀾島","宋崗","擔桿列島","白腊","浪茄","大浪灣","龍蝦灣","清水灣","布袋澳"],
+  "西水":["蚊洲","青龍頭","大小磨刀","龍鼓灘","小欖","青山灣","黃金海岸","大欖涌","沙洲","龍珠島","屯門","欣澳","陰澳"],
+  "東北":["塔門","黃石碼頭","大灘","海下","赤洲","鴨洲","吉澳","東平洲","往灣洲","娥眉洲","榕樹凹","荔枝窩","三椏涌"],
+  "西貢":["西貢碼頭","糧船灣","滘西洲","吊鐘洲","甕缸群島"],
+  "北部":["三門仔","馬料水","大尾篤","黃竹角咀"],
+  "南部":["南丫島","索罟群島","大鴉洲","香港仔","赤柱","石澳","昂船洲","青衣","油塘","筲箕灣"],
+  "大嶼山":["東涌","梅窩","貝澳","長沙","塘福","分流"]
+};
+
 function tideDateStr(month, day) {
   var now = new Date();
   return (now.getMonth()+1)==month&&now.getDate()==day?"今日":(now.getMonth()+1)==month&&now.getDate()+1==day?"明日":
     (now.getMonth()+1)==month&&now.getDate()+2==day?"後日":month+"/"+day;
 }
 
-function renderTideExtremes(exList, stationCode) {
-  var h = '<div class="tsel">';
+function renderTideExtremes(exList, stationCode, spotName) {
+  // Spot selector
+  var h = '<div style="margin-bottom:6px;font-size:11px;color:#8899aa">📍 選擇釣魚位置（自動對應最近潮汐站）</div>';
+  
+  // Region buttons
+  var regionKeys = Object.keys(SPOT_REGIONS);
+  var activeRegion = null;
+  
+  // Check if current spot is in a region
+  if (spotName) {
+    for (var r in SPOT_REGIONS) {
+      if (SPOT_REGIONS[r].indexOf(spotName) >= 0) { activeRegion = r; break; }
+    }
+  }
+  
+  // Show region tabs
+  h += '<div class="tsel" style="margin:4px 0">';
+  regionKeys.forEach(function(r) {
+    h += '<button' + (r == activeRegion ? ' class="act"' : '') + ' onclick="toggleRegion(\''+r+'\')">'+r+'</button>';
+  });
+  h += '</div>';
+  
+  // Show spots in active region
+  if (activeRegion) {
+    h += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 10px">';
+    SPOT_REGIONS[activeRegion].forEach(function(s) {
+      var stn = FISHING_SPOTS[s];
+      var isActive = (s == spotName);
+      h += '<button style="padding:3px 8px;border:1px solid ' + (isActive ? '#3dc1d3' : '#1a3a5a') + ';border-radius:10px;background:' + (isActive ? 'rgba(61,193,211,0.15)' : '#0f2a45') + ';color:' + (isActive ? '#3dc1d3' : '#e0e8f0') + ';font-size:11px;cursor:pointer" onclick="loadTideSpot(\''+s+'\')">'+s+'</button>';
+    });
+    h += '</div>';
+  }
+  
+  // Station name indicator
+  if (spotName) {
+    h += '<div style="text-align:center;font-size:10px;color:#8899aa;margin:4px 0 8px">📍 ' + spotName + ' → 參考 ' + TIDE_STATIONS[stationCode] + ' 潮汐站</div>';
+  }
+  
+  // Station selector (advanced)
+  h += '<div style="font-size:11px;color:#667788;margin:8px 0 4px">⚙️ 直接揀潮汐站：</div><div class="tsel">';
   TIDE_ORDER.forEach(function(c) {
-    h += '<button' + (c == stationCode ? ' class="act"' : '') + ' onclick="loadTide(\''+c+'\')">'+TIDE_STATIONS[c]+'</button>';
+    h += '<button' + (c == stationCode && !spotName ? ' class="act"' : '') + ' onclick="loadTide(\''+c+'\')">'+TIDE_STATIONS[c]+'</button>';
   });
   h += '</div>';
   
@@ -213,6 +283,23 @@ function renderTideExtremes(exList, stationCode) {
   
   document.getElementById('tideExtremes').innerHTML = h;
 }
+
+// Region toggle state
+var ACTIVE_REGION = null;
+
+function toggleRegion(r) {
+  ACTIVE_REGION = (ACTIVE_REGION == r) ? null : r;
+  loadTide();
+}
+
+function loadTideSpot(spotName) {
+  var stn = FISHING_SPOTS[spotName];
+  if (!stn) return;
+  ACTIVE_SPOT = spotName;
+  loadTide(stn, spotName);
+}
+
+var ACTIVE_SPOT = null;
 
 function renderTideChart(hourlyList) {
   var h = '';
@@ -288,8 +375,11 @@ function renderTideCurrent(exList) {
   document.getElementById('tideCurrent').innerHTML = h;
 }
 
-async function loadTide(station) {
-  station = station || 'CCH'; // Default to Cheung Chau (popular fishing spot)
+async function loadTide(station, spotName) {
+  station = station || (ACTIVE_SPOT ? FISHING_SPOTS[ACTIVE_SPOT] : 'CCH');
+  spotName = spotName || ACTIVE_SPOT;
+  if (!station) { station = 'CCH'; ACTIVE_SPOT = null; }
+  
   document.getElementById('tideExtremes').innerHTML = '<div class="loading">⏳ 載入潮汐資料中...</div>';
   document.getElementById('tideChart').innerHTML = '';
   document.getElementById('tideCurrent').innerHTML = '';
@@ -300,8 +390,8 @@ async function loadTide(station) {
     var s = data.stations[station];
     if (!s) throw 'No data for station';
     
-    document.getElementById('tideStationLabel').textContent = '— ' + TIDE_STATIONS[station];
-    renderTideExtremes(s.extremes, station);
+    document.getElementById('tideStationLabel').textContent = spotName ? '— ' + TIDE_STATIONS[station] + '（' + spotName + '）' : '— ' + TIDE_STATIONS[station];
+    renderTideExtremes(s.extremes, station, spotName);
     renderTideChart(s.hourly);
     renderTideCurrent(s.extremes);
   } catch(e) {
