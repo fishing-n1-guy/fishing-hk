@@ -352,44 +352,55 @@ const FISH = [
 // Wikipedia fish image cache
 var FISH_IMG_CACHE = {};
 
-// Search Wikipedia for fish images (Chinese Wikipedia first)
+// Search Chinese Wikipedia for fish images by Chinese name
 async function loadFishImages() {
   var g = document.getElementById('fishGrid');
   if (!g) return;
   var cards = g.querySelectorAll('.fi');
   for (var i = 0; i < FISH.length && i < cards.length; i++) {
-    var sciName = FISH[i][5];
-    if (!sciName) continue;
+    var chName = FISH[i][0]; // Chinese name
+    if (!chName) continue;
     try {
-      // Try Chinese Wikipedia first (more accurate for HK fish)
-      var r = await fetch('https://zh.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(sciName)+'&prop=pageimages&format=json&origin=*&pithumbsize=300');
+      // Search Chinese Wikipedia by Chinese name
+      var r = await fetch('https://zh.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(chName+' 魚')+'&format=json&origin=*&srlimit=3');
       var data = await r.json();
-      var pages = data.query && data.query.pages;
+      var searchResults = data.query && data.query.search;
       var imgUrl = null;
-      if (pages) {
-        for (var pid in pages) {
-          if (pages[pid].thumbnail) { imgUrl = pages[pid].thumbnail.source; break; }
-        }
-      }
-      // Fallback: try English Wikipedia
-      if (!imgUrl) {
-        var r2 = await fetch('https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(sciName)+'&prop=pageimages&format=json&origin=*&pithumbsize=300');
-        var data2 = await r2.json();
-        var pages2 = data2.query && data2.query.pages;
-        if (pages2) {
-          for (var pid2 in pages2) {
-            if (pages2[pid2].thumbnail) { imgUrl = pages2[pid2].thumbnail.source; break; }
+      if (searchResults && searchResults.length > 0) {
+        for (var j = 0; j < searchResults.length && !imgUrl; j++) {
+          var title = searchResults[j].title;
+          var r2 = await fetch('https://zh.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(title)+'&prop=pageimages&format=json&origin=*&pithumbsize=300');
+          var data2 = await r2.json();
+          var pages2 = data2.query && data2.query.pages;
+          if (pages2) {
+            for (var pid in pages2) {
+              if (pages2[pid].thumbnail) { imgUrl = pages2[pid].thumbnail.source; break; }
+            }
           }
         }
       }
-      if (imgUrl) {
-        var img = '<img src="'+imgUrl+'" style="width:100%;height:100%;object-fit:contain" alt="'+FISH[i][0]+'">';
-        var existing = cards[i].querySelector('.fi-img-wrap');
-        if (existing) existing.innerHTML = img;
-      } else {
-        // No image found - clean empty state
-        var existing = cards[i].querySelector('.fi-img-wrap');
-        if (existing) existing.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:28px;color:#334">🐟</div>';
+      // Fallback: try English Wikipedia with English name
+      if (!imgUrl && FISH[i][1]) {
+        var r3 = await fetch('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(FISH[i][1]+' fish')+'&format=json&origin=*&srlimit=2');
+        var data3 = await r3.json();
+        var results3 = data3.query && data3.query.search;
+        if (results3 && results3.length > 0) {
+          var title3 = results3[0].title;
+          var r4 = await fetch('https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(title3)+'&prop=pageimages&format=json&origin=*&pithumbsize=300');
+          var data4 = await r4.json();
+          var pages4 = data4.query && data4.query.pages;
+          if (pages4) {
+            for (var pid4 in pages4) {
+              if (pages4[pid4].thumbnail) { imgUrl = pages4[pid4].thumbnail.source; break; }
+            }
+          }
+        }
+      }
+      var existing = cards[i].querySelector('.fi-img-wrap');
+      if (imgUrl && existing) {
+        existing.innerHTML = '<img src="'+imgUrl+'" style="width:100%;height:100%;object-fit:contain" alt="'+chName+'">';
+      } else if (existing) {
+        existing.innerHTML = '';
       }
     } catch(e) {
       var existing = cards[i].querySelector('.fi-img-wrap');
