@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🐟 香港釣魚資訊站 - by 小婷</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a1628;color:#e0e8f0;padding:16px;max-width:800px;margin:0 auto}
+h1{text-align:center;font-size:20px;padding:16px;background:linear-gradient(135deg,#0a3d62,#0d5a7a);border-radius:14px;margin-bottom:14px}
+.card{background:#0f2a45;border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid #1a3a5a}
+.ct{font-size:15px;font-weight:600;margin-bottom:10px;color:#3dc1d3}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.it{background:rgba(10,61,98,0.4);border-radius:10px;padding:12px;text-align:center}
+.ic{font-size:24px} .lb{font-size:11px;color:#8899aa;margin:3px 0} .vl{font-size:22px;font-weight:700;color:#fff} .sb{font-size:11px;color:#8899aa}
+.scr{text-align:center;font-size:42px;font-weight:700;margin:10px 0}
+.br{display:flex;gap:4px;margin:12px 0} .br div{flex:1;height:6px;border-radius:3px;background:#1a3a5a} .br .ok{background:#3dc1d3}
+.sc{font-size:13px;color:#8899aa;text-align:center;line-height:1.6}
+.fr{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fi{background:rgba(10,61,98,0.3);border-radius:10px;padding:10px;text-align:center;border:1px solid #1a3a5a}
+.fn{font-size:15px;font-weight:600;margin:3px 0} .ft{font-size:10px;color:#8899aa;line-height:1.4}
+.nav{display:flex;gap:6px;margin:14px 0}
+.nav a{flex:1;padding:8px;background:#0f2a45;border-radius:20px;color:#3dc1d3;text-decoration:none;font-size:13px;text-align:center;border:1px solid #1a3a5a}
+.ftr{text-align:center;font-size:11px;color:#8899aa;padding:16px;line-height:1.5}
+.refresh{text-align:center;font-size:12px;color:#3dc1d3;padding:8px;cursor:pointer}
+.refresh:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<h1>🐟 香港釣魚資訊站<br><span style="font-size:13px;color:#8899aa">by 小婷 · <span id="updateTime">載入中</span></span></h1>
+
+<div class="nav">
+  <a href="#w">🌤️ 天氣</a>
+  <a href="#f">🐟 魚種</a>
+  <a href="#c">📝 記錄</a>
+</div>
+
+<div class="card" id="w">
+  <div class="ct">🌤️ 即時天氣</div>
+  <div id="weatherGrid" class="g">
+    <div class="it"><div class="ic">🌡️</div><div class="lb">氣溫</div><div class="vl" id="wTemp">--</div></div>
+    <div class="it"><div class="ic">💨</div><div class="lb">風力</div><div class="vl" id="wWind">--</div><div class="sb" id="wWindName">--</div></div>
+    <div class="it"><div class="ic">🧭</div><div class="lb">風向</div><div class="vl" id="wWindDir">--</div><div class="sb" id="wWindSpeed">--</div></div>
+    <div class="it"><div class="ic">💥</div><div class="lb">陣風</div><div class="vl" id="wGust">--</div><div class="sb">km/h</div></div>
+    <div class="it"><div class="ic">🌊</div><div class="lb">浪高</div><div class="vl" id="wWave">--</div><div class="sb" id="wWaveState">--</div></div>
+    <div class="it"><div class="ic">〰️</div><div class="lb">湧浪</div><div class="vl" id="wSwell">--</div><div class="sb" id="wWindWave">--</div></div>
+  </div>
+  <div class="refresh" onclick="refreshWeather()">🔄 點擊更新天氣</div>
+</div>
+
+<div class="card" id="scoreCard">
+  <div class="ct">🎯 釣魚指數</div>
+  <div class="scr" id="scoreVal">--</div>
+  <div class="br" id="scoreBars"></div>
+  <div class="sc" id="scoreMsg"></div>
+</div>
+
+<div class="card" id="forecastCard">
+  <div class="ct">📅 未來三天</div>
+  <div id="forecastRows"></div>
+</div>
+
+<div class="card" id="f">
+  <div class="ct">🐟 香港魚種圖鑑</div>
+  <div class="fg" id="fishGrid"></div>
+</div>
+
+<div class="card" id="c">
+  <div class="ct">📝 釣獲記錄</div>
+  <div style="font-size:14px;text-align:center;padding:20px;color:#8899aa">
+    記錄功能需要 browser 嘅 localStorage<br>
+    記錄你嘅釣獲 🎣
+  </div>
+</div>
+
+<div class="ftr">
+  資料來源：Open-Meteo<br>
+  由小婷為 Jay 製作 🎣<br>
+  <span style="font-size:10px">天氣資料每次開頁自動更新</span>
+</div>
+
+<script>
+// Pre-embedded data (fallback if fetch fails)
+const PRE_WEATHER = {"latitude": 22.319859, "longitude": 114.198555, "generationtime_ms": 0.07474422454833984, "utc_offset_seconds": 28800, "timezone": "Asia/Hong_Kong", "timezone_abbreviation": "GMT+8", "elevation": 21.0, "hourly_units": {"time": "iso8601", "temperature_2m": "°C", "wind_speed_10m": "km/h", "wind_direction_10m": "°", "wind_gusts_10m": "km/h"}, "hourly": {"time": ["2026-06-23T00:00", "2026-06-23T01:00", "2026-06-23T02:00", "2026-06-23T03:00", "2026-06-23T04:00", "2026-06-23T05:00", "2026-06-23T06:00", "2026-06-23T07:00", "2026-06-23T08:00", "2026-06-23T09:00", "2026-06-23T10:00", "2026-06-23T11:00", "2026-06-23T12:00", "2026-06-23T13:00", "2026-06-23T14:00", "2026-06-23T15:00", "2026-06-23T16:00", "2026-06-23T17:00", "2026-06-23T18:00", "2026-06-23T19:00", "2026-06-23T20:00", "2026-06-23T21:00", "2026-06-23T22:00", "2026-06-23T23:00", "2026-06-24T00:00", "2026-06-24T01:00", "2026-06-24T02:00", "2026-06-24T03:00", "2026-06-24T04:00", "2026-06-24T05:00", "2026-06-24T06:00", "2026-06-24T07:00", "2026-06-24T08:00", "2026-06-24T09:00", "2026-06-24T10:00", "2026-06-24T11:00", "2026-06-24T12:00", "2026-06-24T13:00", "2026-06-24T14:00", "2026-06-24T15:00", "2026-06-24T16:00", "2026-06-24T17:00", "2026-06-24T18:00", "2026-06-24T19:00", "2026-06-24T20:00", "2026-06-24T21:00", "2026-06-24T22:00", "2026-06-24T23:00", "2026-06-25T00:00", "2026-06-25T01:00", "2026-06-25T02:00", "2026-06-25T03:00", "2026-06-25T04:00", "2026-06-25T05:00", "2026-06-25T06:00", "2026-06-25T07:00", "2026-06-25T08:00", "2026-06-25T09:00", "2026-06-25T10:00", "2026-06-25T11:00", "2026-06-25T12:00", "2026-06-25T13:00", "2026-06-25T14:00", "2026-06-25T15:00", "2026-06-25T16:00", "2026-06-25T17:00", "2026-06-25T18:00", "2026-06-25T19:00", "2026-06-25T20:00", "2026-06-25T21:00", "2026-06-25T22:00", "2026-06-25T23:00"], "temperature_2m": [27.9, 27.9, 27.8, 27.6, 27.5, 27.4, 27.5, 28.2, 29.0, 29.7, 30.2, 30.4, 30.5, 30.5, 30.5, 30.5, 30.3, 29.8, 29.3, 28.5, 28.2, 28.2, 28.1, 28.0, 27.9, 27.8, 27.7, 27.5, 27.3, 27.3, 27.5, 28.4, 29.2, 29.6, 30.1, 30.4, 30.9, 31.3, 31.1, 30.9, 30.4, 29.9, 29.4, 28.6, 28.3, 28.3, 28.3, 28.2, 28.3, 28.2, 28.0, 27.9, 27.8, 27.9, 27.7, 28.3, 28.9, 29.1, 30.3, 30.7, 29.9, 30.7, 31.4, 31.5, 31.0, 30.2, 29.6, 28.8, 28.1, 28.1, 28.2, 28.2], "wind_speed_10m": [12.3, 13.5, 13.9, 13.6, 13.3, 13.0, 11.4, 11.2, 12.0, 14.8, 15.9, 16.6, 17.5, 18.8, 18.8, 18.4, 18.4, 17.4, 15.7, 14.7, 13.3, 13.6, 14.2, 14.4, 14.2, 14.7, 14.3, 14.3, 14.9, 14.8, 14.6, 14.0, 13.6, 14.1, 16.9, 17.5, 15.9, 14.8, 14.5, 14.8, 14.4, 15.1, 14.8, 14.6, 13.6, 12.5, 12.6, 13.9, 14.7, 15.2, 14.6, 13.4, 14.3, 12.3, 11.7, 11.8, 13.2, 14.7, 15.9, 16.2, 17.4, 15.2, 14.6, 13.1, 13.4, 13.0, 11.9, 8.4, 10.1, 11.4, 12.3, 12.0], "wind_direction_10m": [211, 214, 216, 220, 229, 235, 233, 232, 225, 222, 223, 219, 216, 217, 218, 219, 217, 218, 216, 220, 213, 212, 213, 213, 216, 221, 223, 223, 221, 224, 224, 225, 229, 228, 227, 231, 231, 224, 219, 216, 210, 208, 210, 210, 211, 217, 216, 216, 217, 221, 225, 227, 228, 226, 223, 223, 220, 223, 227, 233, 235, 234, 235, 234, 229, 218, 222, 208, 197, 199, 202, 210], "wind_gusts_10m": [26.3, 29.2, 30.6, 30.6, 29.9, 28.8, 28.1, 28.4, 30.2, 37.1, 40.7, 42.8, 44.3, 47.5, 48.2, 47.5, 46.1, 45.4, 42.1, 37.8, 32.0, 29.5, 30.6, 31.3, 31.3, 32.0, 31.7, 31.0, 32.0, 31.7, 32.0, 32.8, 35.3, 35.6, 41.4, 42.8, 43.6, 40.3, 39.2, 39.6, 38.5, 37.8, 38.2, 36.0, 32.0, 29.5, 27.0, 29.5, 31.7, 32.4, 33.5, 32.0, 31.3, 31.0, 26.6, 29.5, 32.4, 36.4, 40.3, 41.0, 47.5, 42.5, 39.6, 38.2, 34.9, 34.9, 33.8, 28.8, 20.9, 24.1, 26.6, 26.3]}, "daily_units": {"time": "iso8601", "temperature_2m_max": "°C", "temperature_2m_min": "°C", "wind_speed_10m_max": "km/h"}, "daily": {"time": ["2026-06-23", "2026-06-24", "2026-06-25"], "temperature_2m_max": [30.5, 31.3, 31.5], "temperature_2m_min": [27.4, 27.3, 27.7], "wind_speed_10m_max": [18.8, 17.5, 17.4]}};
+const PRE_MARINE = {"latitude": 22.291664, "longitude": 114.20836, "generationtime_ms": 0.16295909881591797, "utc_offset_seconds": 28800, "timezone": "Asia/Hong_Kong", "timezone_abbreviation": "GMT+8", "elevation": 21.0, "hourly_units": {"time": "iso8601", "wave_height": "m", "wave_direction": "°", "wind_wave_height": "m", "swell_wave_height": "m"}, "hourly": {"time": ["2026-06-23T00:00", "2026-06-23T01:00", "2026-06-23T02:00", "2026-06-23T03:00", "2026-06-23T04:00", "2026-06-23T05:00", "2026-06-23T06:00", "2026-06-23T07:00", "2026-06-23T08:00", "2026-06-23T09:00", "2026-06-23T10:00", "2026-06-23T11:00", "2026-06-23T12:00", "2026-06-23T13:00", "2026-06-23T14:00", "2026-06-23T15:00", "2026-06-23T16:00", "2026-06-23T17:00", "2026-06-23T18:00", "2026-06-23T19:00", "2026-06-23T20:00", "2026-06-23T21:00", "2026-06-23T22:00", "2026-06-23T23:00", "2026-06-24T00:00", "2026-06-24T01:00", "2026-06-24T02:00", "2026-06-24T03:00", "2026-06-24T04:00", "2026-06-24T05:00", "2026-06-24T06:00", "2026-06-24T07:00", "2026-06-24T08:00", "2026-06-24T09:00", "2026-06-24T10:00", "2026-06-24T11:00", "2026-06-24T12:00", "2026-06-24T13:00", "2026-06-24T14:00", "2026-06-24T15:00", "2026-06-24T16:00", "2026-06-24T17:00", "2026-06-24T18:00", "2026-06-24T19:00", "2026-06-24T20:00", "2026-06-24T21:00", "2026-06-24T22:00", "2026-06-24T23:00", "2026-06-25T00:00", "2026-06-25T01:00", "2026-06-25T02:00", "2026-06-25T03:00", "2026-06-25T04:00", "2026-06-25T05:00", "2026-06-25T06:00", "2026-06-25T07:00", "2026-06-25T08:00", "2026-06-25T09:00", "2026-06-25T10:00", "2026-06-25T11:00", "2026-06-25T12:00", "2026-06-25T13:00", "2026-06-25T14:00", "2026-06-25T15:00", "2026-06-25T16:00", "2026-06-25T17:00", "2026-06-25T18:00", "2026-06-25T19:00", "2026-06-25T20:00", "2026-06-25T21:00", "2026-06-25T22:00", "2026-06-25T23:00", "2026-06-26T00:00", "2026-06-26T01:00", "2026-06-26T02:00", "2026-06-26T03:00", "2026-06-26T04:00", "2026-06-26T05:00", "2026-06-26T06:00", "2026-06-26T07:00", "2026-06-26T08:00", "2026-06-26T09:00", "2026-06-26T10:00", "2026-06-26T11:00", "2026-06-26T12:00", "2026-06-26T13:00", "2026-06-26T14:00", "2026-06-26T15:00", "2026-06-26T16:00", "2026-06-26T17:00", "2026-06-26T18:00", "2026-06-26T19:00", "2026-06-26T20:00", "2026-06-26T21:00", "2026-06-26T22:00", "2026-06-26T23:00", "2026-06-27T00:00", "2026-06-27T01:00", "2026-06-27T02:00", "2026-06-27T03:00", "2026-06-27T04:00", "2026-06-27T05:00", "2026-06-27T06:00", "2026-06-27T07:00", "2026-06-27T08:00", "2026-06-27T09:00", "2026-06-27T10:00", "2026-06-27T11:00", "2026-06-27T12:00", "2026-06-27T13:00", "2026-06-27T14:00", "2026-06-27T15:00", "2026-06-27T16:00", "2026-06-27T17:00", "2026-06-27T18:00", "2026-06-27T19:00", "2026-06-27T20:00", "2026-06-27T21:00", "2026-06-27T22:00", "2026-06-27T23:00", "2026-06-28T00:00", "2026-06-28T01:00", "2026-06-28T02:00", "2026-06-28T03:00", "2026-06-28T04:00", "2026-06-28T05:00", "2026-06-28T06:00", "2026-06-28T07:00", "2026-06-28T08:00", "2026-06-28T09:00", "2026-06-28T10:00", "2026-06-28T11:00", "2026-06-28T12:00", "2026-06-28T13:00", "2026-06-28T14:00", "2026-06-28T15:00", "2026-06-28T16:00", "2026-06-28T17:00", "2026-06-28T18:00", "2026-06-28T19:00", "2026-06-28T20:00", "2026-06-28T21:00", "2026-06-28T22:00", "2026-06-28T23:00", "2026-06-29T00:00", "2026-06-29T01:00", "2026-06-29T02:00", "2026-06-29T03:00", "2026-06-29T04:00", "2026-06-29T05:00", "2026-06-29T06:00", "2026-06-29T07:00", "2026-06-29T08:00", "2026-06-29T09:00", "2026-06-29T10:00", "2026-06-29T11:00", "2026-06-29T12:00", "2026-06-29T13:00", "2026-06-29T14:00", "2026-06-29T15:00", "2026-06-29T16:00", "2026-06-29T17:00", "2026-06-29T18:00", "2026-06-29T19:00", "2026-06-29T20:00", "2026-06-29T21:00", "2026-06-29T22:00", "2026-06-29T23:00"], "wave_height": [0.36, 0.38, 0.42, 0.44, 0.46, 0.48, 0.48, 0.46, 0.46, 0.46, 0.48, 0.48, 0.5, 0.54, 0.56, 0.56, 0.58, 0.58, 0.56, 0.56, 0.54, 0.54, 0.54, 0.54, 0.56, 0.56, 0.58, 0.58, 0.6, 0.6, 0.6, 0.58, 0.58, 0.58, 0.6, 0.6, 0.58, 0.58, 0.56, 0.56, 0.56, 0.56, 0.56, 0.58, 0.58, 0.58, 0.58, 0.58, 0.58, 0.58, 0.58, 0.58, 0.58, 0.58, 0.58, 0.58, 0.58, 0.58, 0.6, 0.6, 0.6, 0.58, 0.58, 0.58, 0.56, 0.56, 0.56, 0.54, 0.54, 0.54, 0.54, 0.54, 0.56, 0.58, 0.6, 0.6, 0.58, 0.58, 0.58, 0.56, 0.56, 0.56, 0.54, 0.54, 0.54, 0.52, 0.52, 0.52, 0.52, 0.52, 0.5, 0.5, 0.48, 0.48, 0.48, 0.48, 0.48, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.48, 0.48, 0.48, 0.48, 0.48, 0.48, 0.46, 0.46, 0.46, 0.44, 0.44, 0.44, 0.46, 0.46, 0.46, 0.48, 0.48, 0.48, 0.46, 0.46, 0.46, 0.44, 0.44, 0.42, 0.42, 0.4, 0.4, 0.4, 0.4, 0.4, 0.42, 0.42, 0.44, 0.44, 0.46, 0.46, 0.48, 0.48, 0.5, 0.5, 0.52, 0.52, 0.52, 0.52, 0.5, 0.5, 0.48, 0.48, 0.48, 0.48, 0.48, 0.5, 0.5, 0.5, 0.52, 0.52, 0.54, 0.54, 0.56, 0.56, 0.58, 0.58], "wave_direction": [185, 187, 188, 189, 190, 191, 191, 191, 191, 190, 189, 188, 189, 191, 192, 191, 191, 190, 187, 184, 181, 178, 176, 173, 172, 172, 171, 171, 172, 172, 171, 170, 169, 170, 170, 171, 171, 170, 170, 169, 169, 168, 168, 168, 168, 168, 167, 167, 168, 169, 170, 171, 171, 172, 171, 169, 168, 168, 169, 169, 169, 170, 170, 169, 167, 166, 166, 166, 166, 166, 165, 165, 167, 170, 172, 173, 174, 175, 174, 173, 172, 172, 173, 173, 174, 176, 177, 177, 176, 176, 175, 175, 174, 174, 175, 175, 177, 178, 180, 181, 181, 182, 183, 183, 184, 184, 185, 185, 184, 183, 182, 181, 180, 179, 178, 178, 177, 178, 178, 179, 179, 178, 178, 178, 178, 178, 178, 178, 178, 177, 176, 175, 175, 174, 174, 174, 173, 173, 172, 172, 171, 170, 170, 169, 170, 170, 171, 172, 172, 173, 173, 173, 173, 173, 172, 172, 172, 171, 171, 171, 170, 170, 170, 169, 169, 169, 168, 168], "wind_wave_height": [0.18, 0.24, 0.28, 0.28, 0.28, 0.28, 0.26, 0.22, 0.2, 0.24, 0.3, 0.34, 0.38, 0.42, 0.46, 0.44, 0.44, 0.42, 0.38, 0.34, 0.3, 0.3, 0.3, 0.3, 0.3, 0.32, 0.32, 0.32, 0.34, 0.34, 0.32, 0.28, 0.26, 0.3, 0.32, 0.36, 0.34, 0.32, 0.3, 0.3, 0.32, 0.32, 0.32, 0.3, 0.3, 0.3, 0.28, 0.28, 0.3, 0.3, 0.32, 0.3, 0.28, 0.26, 0.26, 0.26, 0.26, 0.28, 0.3, 0.32, 0.3, 0.28, 0.26, 0.24, 0.24, 0.22, 0.18, 0.12, 0.08, 0.12, 0.16, 0.2, 0.24, 0.26, 0.3, 0.26, 0.2, 0.16, 0.16, 0.18, 0.18, 0.2, 0.2, 0.22, 0.24, 0.26, 0.28, 0.24, 0.18, 0.14, 0.1, 0.08, 0.04, 0.08, 0.14, 0.18, 0.18, 0.2, 0.2, 0.2, 0.22, 0.22, 0.22, 0.2, 0.2, 0.2, 0.22, 0.22, 0.2, 0.16, 0.14, 0.14, 0.16, 0.16, 0.14, 0.14, 0.12, 0.16, 0.18, 0.22, 0.22, 0.2, 0.2, 0.18, 0.16, 0.14, 0.12, 0.1, 0.08, 0.08, 0.08, 0.08, 0.1, 0.12, 0.14, 0.16, 0.2, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.2, 0.16, 0.14, 0.12, 0.08, 0.06, 0.08, 0.12, 0.14, 0.18, 0.22, 0.26, 0.26, 0.26, 0.26, 0.26, 0.26, 0.26, 0.26, 0.26, 0.26], "swell_wave_height": [0.22, 0.22, 0.22, 0.26, 0.32, 0.36, 0.36, 0.36, 0.36, 0.32, 0.3, 0.26, 0.24, 0.22, 0.2, 0.24, 0.28, 0.32, 0.32, 0.34, 0.34, 0.34, 0.32, 0.32, 0.32, 0.32, 0.32, 0.32, 0.34, 0.34, 0.36, 0.38, 0.4, 0.4, 0.38, 0.38, 0.36, 0.36, 0.34, 0.34, 0.32, 0.32, 0.32, 0.3, 0.3, 0.3, 0.3, 0.3, 0.28, 0.28, 0.26, 0.28, 0.32, 0.34, 0.34, 0.36, 0.36, 0.38, 0.4, 0.42, 0.42, 0.4, 0.4, 0.4, 0.42, 0.42, 0.42, 0.42, 0.42, 0.42, 0.42, 0.42, 0.4, 0.4, 0.38, 0.4, 0.4, 0.42, 0.44, 0.44, 0.46, 0.46, 0.44, 0.44, 0.42, 0.42, 0.4, 0.4, 0.38, 0.38, 0.4, 0.42, 0.44, 0.42, 0.42, 0.4, 0.38, 0.36, 0.34, 0.34, 0.34, 0.34, 0.34, 0.36, 0.36, 0.36, 0.38, 0.38, 0.4, 0.4, 0.42, 0.4, 0.4, 0.38, 0.38, 0.36, 0.36, 0.34, 0.34, 0.32, 0.32, 0.34, 0.34, 0.34, 0.34, 0.34, 0.34, 0.34, 0.34, 0.36, 0.36, 0.38, 0.38, 0.36, 0.36, 0.34, 0.32, 0.3, 0.3, 0.28, 0.28, 0.3, 0.32, 0.34, 0.34, 0.36, 0.36, 0.36, 0.38, 0.38, 0.38, 0.4, 0.4, 0.4, 0.4, 0.4, 0.38, 0.38, 0.36, 0.36, 0.36, 0.36, 0.36, 0.38, 0.38, 0.38, 0.4, 0.4]}, "daily_units": {"time": "iso8601", "wave_height_max": "m", "wave_direction_dominant": "°"}, "daily": {"time": ["2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-27", "2026-06-28", "2026-06-29"], "wave_height_max": [0.58, 0.6, 0.6, 0.6, 0.5, 0.48, 0.58], "wave_direction_dominant": [188, 170, 169, 173, 181, 176, 171]}};
+const FISH_DATA = [
+  ["石斑","Grouper","30-100cm","全年","中級"],["黃腳鱲","Yellowfin Bream","20-50cm","秋冬","初級"],
+  ["黑鱲","Black Bream","20-45cm","冬季","初級"],["紅鮋","Red Gurnard","15-35cm","夏秋","初級"],
+  ["泥鯭","Rabbitfish","15-30cm","夏季","初級"],["牙帶","Ribbonfish","50-120cm","秋冬","進階"],
+  ["黃花魚","Yellow Croaker","20-50cm","春季","進階"],["沙鑽","Sand Whiting","15-30cm","全年","初級"],
+  ["立魚","Sea Bream","20-60cm","秋冬季","初級"],["火點","Spotty Grouper","20-40cm","夏季","中級"],
+  ["左口","Flatfish","20-50cm","全年","中級"],["星鱸","Spotted Sea Bass","30-80cm","秋冬","中級"],
+  ["魷魚","Squid","15-40cm","夏秋","初級"],["真鯛","Red Sea Bream","25-60cm","冬季","進階"],
+  ["鯆魚","Ray","50-150cm","夏秋","進階"],["黃鰭鮪","Yellowfin Tuna","50-200cm","夏季","專家"]
+];
+
+const WIND_DIR = ["北","東北偏北","東北","東北偏東","東","東南偏東","東南","東南偏南","南","西南偏南","西南","西南偏西","西","西北偏西","西北","西北偏北"];
+const BF_NAMES = ["無風","軟風","輕風","微風","和風","清風","強風","疾風","大風","烈風","暴風","狂風","颶風"];
+
+// Render fish
+(function() {
+  const g = document.getElementById('fishGrid');
+  g.innerHTML = FISH_DATA.map(f => 
+    '<div class="fi"><div>🐟</div><div class="fn">'+f[0]+'</div><div class="ft">'+f[1]+'<br>'+f[2]+' · '+f[3]+' · '+f[4]+'</div></div>'
+  ).join('');
+})();
+
+function renderWeather(data, marine) {
+  const times = data.hourly.time;
+  const hkNow = new Date();
+  hkNow.setHours(hkNow.getHours() + 8); // UTC to HKT
+  const h = hkNow.getUTCHours();
+  const today = hkNow.toISOString().slice(0,10);
+  
+  let idx = 0;
+  for(let i=0;i<times.length;i++) {
+    if(times[i].startsWith(today) && parseInt(times[i].slice(11,13)) >= h) { idx = i; break; }
+  }
+  
+  const temp = data.hourly.temperature_2m[idx];
+  const windS = data.hourly.wind_speed_10m[idx];
+  const windD = data.hourly.wind_direction_10m[idx];
+  const gust = data.hourly.wind_gusts_10m[idx];
+  const waveH = marine.hourly.wave_height[idx];
+  const swell = marine.hourly.swell_wave_height[idx];
+  const windWave = marine.hourly.wind_wave_height[idx];
+  
+  const bf = Math.min(12, Math.round(windS / 10));
+  const dir = WIND_DIR[Math.round(windD/22.5)%16];
+  
+  let ss = "平靜";
+  if(waveH>=0.1) ss="小浪"; if(waveH>=0.5) ss="中浪"; if(waveH>=1.25) ss="大浪"; if(waveH>=2.5) ss="非常大浪"; if(waveH>=4) ss="巨浪";
+  
+  document.getElementById('wTemp').textContent = temp.toFixed(1)+'°C';
+  document.getElementById('wWind').textContent = bf+'級';
+  document.getElementById('wWindName').textContent = BF_NAMES[bf];
+  document.getElementById('wWindDir').textContent = dir;
+  document.getElementById('wWindSpeed').textContent = windS.toFixed(0)+'km/h';
+  document.getElementById('wGust').textContent = gust.toFixed(0);
+  document.getElementById('wWave').textContent = waveH.toFixed(2)+'m';
+  document.getElementById('wWaveState').textContent = ss;
+  document.getElementById('wSwell').textContent = swell.toFixed(2)+'m';
+  document.getElementById('wWindWave').textContent = '風浪'+windWave.toFixed(2)+'m';
+  
+  // Score
+  let score = 50;
+  if(bf<=3) score+=25; else if(bf<=5) score+=10; else if(bf<=7) score-=10; else score-=30;
+  if(waveH<0.3) score+=10; else if(waveH<1) score+=5; else if(waveH>2) score-=20;
+  if(temp>=22&&temp<=30) score+=15; else if(temp<15||temp>35) score-=10;
+  score = Math.max(0, Math.min(100, score));
+  
+  const el = document.getElementById('scoreVal');
+  el.textContent = score+'/100';
+  el.style.color = score>=65?'#2ecc71':score>=45?'#f39c12':'#e74c3c';
+  
+  document.getElementById('scoreBars').innerHTML = Array(10).fill(0).map((_,i)=>'<div'+(i*10<score?' class="ok"':'')+'></div>').join('');
+  
+  const msgs = ["😢 唔係好適合釣魚","😐 麻麻地，考慮清楚","👌 一般，可以一試","👍 唔錯，可以出發","🏆 極佳！今日好適合釣魚！"];
+  document.getElementById('scoreMsg').textContent = msgs[Math.min(4, Math.floor(score/25))] + '  🌬️'+bf+'級 🌊'+waveH.toFixed(2)+'m 🌡️'+temp.toFixed(1)+'°C';
+  
+  // Daily forecast
+  const days = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
+  const fRows = document.getElementById('forecastRows');
+  fRows.innerHTML = '';
+  for(let i=0;i<Math.min(3,data.daily.time.length);i++) {
+    const d = new Date(data.daily.time[i]+'T12:00:00');
+    const tmax = data.daily.temperature_2m_max[i];
+    const tmin = data.daily.temperature_2m_min[i];
+    const wmax = Math.min(12, Math.round(data.daily.wind_speed_10m_max[i]/10));
+    const wavemax = marine.daily.wave_height_max[i]||0;
+    fRows.innerHTML += '<div class="fr"><b>'+(d.getMonth()+1)+'/'+d.getDate()+'('+days[d.getDay()]+')</b><span>'+tmin.toFixed(0)+'-'+tmax.toFixed(0)+'°C</span><span>💨'+wmax+'級</span><span>🌊'+wavemax.toFixed(2)+'m</span></div>';
+  }
+  
+  const now = new Date();
+  document.getElementById('updateTime').textContent = 
+    now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate()+' '+
+    String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+}
+
+async function refreshWeather() {
+  try {
+    const [w, m] = await Promise.all([
+      fetch('https://api.open-meteo.com/v1/forecast?latitude=22.3193&longitude=114.1694&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max&timezone=Asia/Hong_Kong&forecast_days=3').then(r=>r.json()),
+      fetch('https://marine-api.open-meteo.com/v1/marine?latitude=22.3193&longitude=114.1694&hourly=wave_height,wave_direction,wind_wave_height,swell_wave_height&daily=wave_height_max,wave_direction_dominant&timezone=Asia/Hong_Kong').then(r=>r.json())
+    ]);
+    renderWeather(w, m);
+  } catch(e) {
+    // Fallback to pre-embedded data
+    renderWeather(PRE_WEATHER, PRE_MARINE);
+  }
+}
+
+// Initial render with pre-embedded data
+renderWeather(PRE_WEATHER, PRE_MARINE);
+// Then try to fetch fresh data
+refreshWeather();
+</script>
+</body>
+</html>

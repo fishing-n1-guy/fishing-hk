@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🐟 香港釣魚資訊站 — by 小婷</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --primary: #0a3d62;
+    --secondary: #1e6f9f;
+    --accent: #3dc1d3;
+    --bg: #0a1628;
+    --card: #0f2a45;
+    --text: #e0e8f0;
+    --text2: #8899aa;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --font: 'Segoe UI', system-ui, sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0a3d62, #0d5a7a);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid var(--accent);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header h1 { font-size: 22px; color: #fff; }
+  .header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+
+  /* Navigation */
+  .nav {
+    display: flex;
+    background: var(--card);
+    border-bottom: 1px solid #1a3a5a;
+    position: sticky; top: 72px; z-index: 99;
+  }
+  .nav button {
+    flex: 1; padding: 12px 8px; border: none;
+    background: transparent; color: var(--text2); font-size: 13px;
+    cursor: pointer; transition: all 0.3s; font-family: var(--font);
+    border-bottom: 3px solid transparent;
+  }
+  .nav button.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(61,209,194,0.1); }
+  .nav button:hover { color: var(--text); }
+
+  /* Content */
+  .content { padding: 16px; max-width: 800px; margin: 0 auto; }
+
+  /* Page sections */
+  .page { display: none; animation: fadeIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    border: 1px solid #1a3a5a;
+    transition: all 0.3s;
+  }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: var(--accent); }
+
+  /* Weather Grid */
+  .weather-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .weather-item {
+    background: rgba(10,61,98,0.4);
+    border-radius: 12px; padding: 14px;
+    text-align: center;
+  }
+  .weather-item .icon { font-size: 28px; }
+  .weather-item .label { font-size: 12px; color: var(--text2); margin: 4px 0; }
+  .weather-item .value { font-size: 20px; font-weight: 700; color: #fff; }
+  .weather-item .sub { font-size: 11px; color: var(--text2); }
+
+  /* Tide chart */
+  .tide-chart { width: 100%; height: 140px; position: relative; margin: 10px 0; }
+  .tide-chart canvas { width: 100%; height: 100%; border-radius: 8px; }
+
+  /* Loading */
+  .loading { text-align: center; padding: 30px; color: var(--text2); }
+  .loading .spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid var(--card); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error { color: var(--danger); text-align: center; padding: 20px; font-size: 14px; }
+
+  /* Fish cards */
+  .search-box {
+    width: 100%; padding: 12px 16px; border: 1px solid #1a3a5a;
+    background: var(--card); color: var(--text); border-radius: 10px;
+    font-size: 14px; margin-bottom: 14px; outline: none; font-family: var(--font);
+    transition: border-color 0.3s;
+  }
+  .search-box:focus { border-color: var(--accent); }
+  .fish-card {
+    display: flex; gap: 14px; padding: 14px; cursor: pointer;
+  }
+  .fish-card .fish-icon { font-size: 36px; line-height: 1; }
+  .fish-card .info { flex: 1; }
+  .fish-card .info h3 { font-size: 16px; color: #fff; margin-bottom: 2px; }
+  .fish-card .info .eng { font-size: 12px; color: var(--text2); }
+  .fish-card .info .tags { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .fish-card .info .tag {
+    font-size: 11px; padding: 3px 8px; border-radius: 20px;
+    background: rgba(61,209,194,0.15); color: var(--accent);
+  }
+  .fish-detail { display: none; padding: 16px; border-top: 1px solid #1a3a5a; }
+  .fish-detail.open { display: block; }
+  .fish-detail .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .fish-detail .row .l { color: var(--text2); }
+  .fish-detail .row .r { color: #fff; text-align: right; }
+  .fish-detail .desc { font-size: 14px; line-height: 1.6; color: var(--text); margin: 10px 0; }
+
+  /* Catch form */
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid #1a3a5a;
+    background: rgba(10,61,98,0.3); color: var(--text); border-radius: 8px;
+    font-size: 14px; outline: none; font-family: var(--font);
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--bg); }
+  .btn {
+    width: 100%; padding: 12px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, var(--secondary), var(--accent));
+    color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
+    font-family: var(--font); transition: transform 0.2s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-danger { background: linear-gradient(135deg, #c0392b, var(--danger)); }
+
+  /* Catch list */
+  .catch-item {
+    display: flex; gap: 12px; padding: 14px; align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .catch-item:last-child { border-bottom: none; }
+  .catch-item .c-icon { font-size: 28px; }
+  .catch-item .c-info { flex: 1; }
+  .catch-item .c-info .c-name { font-size: 15px; color: #fff; font-weight: 600; }
+  .catch-item .c-info .c-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .catch-item .c-del { background: none; border: none; color: var(--danger); font-size: 20px; cursor: pointer; padding: 4px 8px; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .stat-item { text-align: center; padding: 14px; background: rgba(10,61,98,0.4); border-radius: 12px; }
+  .stat-item .num { font-size: 24px; font-weight: 700; color: var(--accent); }
+  .stat-item .lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+  /* Empty state */
+  .empty { text-align: center; padding: 40px 20px; color: var(--text2); }
+  .empty .icon { font-size: 48px; margin-bottom: 10px; }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--card); border-radius: 16px; padding: 24px; max-width: 400px; width: 100%; max-height: 80vh; overflow-y: auto; border: 1px solid #1a3a5a; }
+  .modal h2 { font-size: 18px; margin-bottom: 14px; color: var(--accent); }
+
+  /* Wind direction arrow */
+  .wind-arrow { display: inline-block; font-size: 16px; transition: transform 0.3s; }
+
+  /* Notice */
+  .notice { font-size: 12px; color: var(--text2); text-align: center; padding: 20px; line-height: 1.6; }
+  .notice a { color: var(--accent); }
+
+  /* Time selector */
+  .time-select { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; }
+  .time-select button {
+    padding: 6px 14px; border: 1px solid #1a3a5a; border-radius: 20px;
+    background: transparent; color: var(--text2); font-size: 12px; cursor: pointer;
+    white-space: nowrap; font-family: var(--font); transition: all 0.2s;
+  }
+  .time-select button.active { background: var(--secondary); color: #fff; border-color: var(--accent); }
+
+  /* Level indicators */
+  .level-bar { display: flex; gap: 4px; margin-top: 4px; }
+  .level-bar .bar { flex: 1; height: 4px; border-radius: 2px; background: #1a3a5a; }
+  .level-bar .bar.filled { background: var(--accent); }
+  .level-text { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+  /* Responsive */
+  @media (min-width: 600px) {
+    .weather-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .header h1 { font-size: 26px; }
+    .nav button { font-size: 15px; padding: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1>🐟 香港釣魚資訊站</h1>
+  <p>by 小婷 🌊 天氣·魚種·釣獲記錄</p>
+</div>
+
+<!-- Navigation -->
+<nav class="nav">
+  <button class="active" onclick="switchPage('weather')">🌤️ 天氣</button>
+  <button onclick="switchPage('fish')">🐟 魚種</button>
+  <button onclick="switchPage('catches')">📝 記錄</button>
+</nav>
+
+<div class="content">
+
+<!-- ===== PAGE 1: WEATHER ===== -->
+<div id="page-weather" class="page active">
+  <div id="weather-loading" class="loading">
+    <div class="spinner"></div>
+    <div>正在載入天氣資料...</div>
+  </div>
+  <div id="weather-content" style="display:none">
+    <!-- Time selector -->
+    <div class="time-select" id="time-select"></div>
+    <!-- Weather grid -->
+    <div class="weather-grid" id="weather-grid"></div>
+    <!-- Tide chart -->
+    <div class="card">
+      <div class="card-title">🌊 潮汐預報</div>
+      <div class="tide-chart"><canvas id="tideCanvas"></canvas></div>
+      <div style="font-size:12px;color:var(--text2);text-align:center" id="tide-info"></div>
+    </div>
+    <!-- Fishing forecast -->
+    <div class="card" id="forecast-card">
+      <div class="card-title">🎯 今日釣魚指數</div>
+      <div id="forecast-content"></div>
+    </div>
+  </div>
+  <div id="weather-error" class="error" style="display:none"></div>
+  <div class="notice">資料來源：Open-Meteo、NOAA Tides</div>
+</div>
+
+<!-- ===== PAGE 2: FISH ===== -->
+<div id="page-fish" class="page">
+  <input class="search-box" type="text" id="fishSearch" placeholder="🔍 搜尋魚種名稱..." oninput="searchFish()">
+  <div id="fish-list"></div>
+</div>
+
+<!-- ===== PAGE 3: CATCHES ===== -->
+<div id="page-catches" class="page">
+  <div id="catch-stats" class="stats-grid"></div>
+  <div class="card">
+    <div class="card-title">🎣 記錄新釣獲</div>
+    <form id="catchForm" onsubmit="saveCatch(event)">
+      <div class="form-group">
+        <label>魚種</label>
+        <select id="catchFish" required></select>
+      </div>
+      <div class="form-group">
+        <label>日期</label>
+        <input type="date" id="catchDate" required>
+      </div>
+      <div class="form-group">
+        <label>魚獲長度 (cm)</label>
+        <input type="number" id="catchSize" min="1" step="0.5" placeholder="約幾長？">
+      </div>
+      <div class="form-group">
+        <label>釣點</label>
+        <input type="text" id="catchLocation" placeholder="例如：青山灣、東涌..." style="text-transform:uppercase">
+      </div>
+      <div class="form-group">
+        <label>備註</label>
+        <textarea id="catchNotes" rows="2" placeholder="天氣、水流、用咩餌..."></textarea>
+      </div>
+      <button class="btn" type="submit">📥 記錄釣獲</button>
+    </form>
+  </div>
+  <div id="catch-list"></div>
+</div>
+
+</div><!-- /content -->
+
+<!-- Fish detail modal -->
+<div class="modal-overlay" id="fishModal">
+  <div class="modal" id="fishModalContent"></div>
+</div>
+
+<script>
+// ============================================================
+// FISH DATABASE
+// ============================================================
+const FISH_DB = [
+  {id:"sekbaan",name:"石斑",eng:"Grouper",sci:"Epinephelinae",desc:"香港最受歡迎嘅食用魚之一，肉質鮮甜。常見品種包括青斑、芝麻斑、老鼠斑等。棲息於岩石底層，用生蝦或魷魚作餌最有效。",season:"全年",size:"30-100cm",bait:"生蝦、魷魚、魚肉",location:"石灘、礁石區、沉船",difficulty:"中級",image:"🐟",tips:"石斑好鍾意匿埋喺石罅，釣組要貼底，用粗絲腳"},
+  {id:"wonggeuklaap",name:"黃腳鱲",eng:"Yellowfin Bream",sci:"Acanthopagrus latus",desc:"香港磯釣熱門目標魚，背鰭黃色係特徵。雜食性，力量大，釣上手好有滿足感。",season:"秋冬",size:"20-50cm",bait:"南極蝦、青蟲、麵包",location:"礁石岸邊、碼頭、內灣",difficulty:"初級",image:"🐟",tips:"黃腳鱲食餌好咀刁，要用幼絲同細鉤，南極蝦係最好嘅餌"},
+  {id:"haklaap",name:"黑鱲",eng:"Black Bream",sci:"Acanthopagrus schlegelii",desc:"同黃腳鱲相似但全身偏黑，同樣係磯釣熱門魚種。冬天最活躍，釣獲量大。",season:"冬季",size:"20-45cm",bait:"南極蝦、青蟲、蝦仁",location:"石岸、防波堤、碼頭",difficulty:"初級",image:"🐟",tips:"黑鱲群體活動，搵到魚群可以連續中魚"},
+  {id:"hunglau",name:"紅鮋",eng:"Red Gurnard",sci:"Lepidotrigla microptera",desc:"紅色魚身，胸鰭大而華麗。棲息沙泥底，肉質嫩滑。釣到時會發出咕咕聲。",season:"夏秋",size:"15-35cm",bait:"蝦仁、魚肉、青蟲",location:"沙泥海底、內灣",difficulty:"初級",image:"🐟",tips:"紅鮋鍾意沙泥底，用沉底釣法效果最好"},
+  {id:"nailing",name:"泥鯭",eng:"Rabbitfish",sci:"Siganus oramin",desc:"香港常見魚種，背鰭有毒刺要小心。雜食性，容易釣獲，但肉質一般。",season:"夏季",size:"15-30cm",bait:"麵包、南極蝦、青蟲",location:"碼頭、內灣、石岸",difficulty:"初級",image:"🐟",tips:"泥鯭背鰭有毒，要小心處理。佢哋成日成群出沒"},
+  {id:"ngadaai",name:"牙帶",eng:"Ribbonfish",sci:"Trichiurus lepturus",desc:"身體扁長似帶，銀白色。牙齒鋒利，要用鋼絲腳。肉質細嫩，清蒸一流。",season:"秋冬",size:"50-120cm",bait:"魚肉、魷魚鬚、生蝦",location:"外海、深水區、夜釣",difficulty:"進階",image:"🐟",tips:"牙帶牙齒好利，一定要用鋼絲腳。夜晚釣獲率更高"},
+  {id:"wongfayue",name:"黃花魚",eng:"Yellow Croaker",sci:"Larimichthys crocea",desc:"名貴食用魚，金黃色魚身。肉質鮮嫩，價格高昂。近年野生數量減少。",season:"春季",size:"20-50cm",bait:"蝦仁、蟹肉、青蟲",location:"泥泥沙底、河口",difficulty:"進階",image:"🐟",tips:"黃花魚對水質要求高，水清時先有機會釣到"},
+  {id:"sajun",name:"沙鑽",eng:"Sand Whiting",sci:"Sillago sihama",desc:"沙白色魚身，尖嘴。喺沙灘同沙泥地好常見，釣獲量多，適合一家人玩。",season:"全年",size:"15-30cm",bait:"青蟲、蝦仁、沙蠶",location:"沙灘、沙泥灘、河口",difficulty:"初級",image:"🐟",tips:"沙鑽食餌好脆口，一啄就要抽竿。沙灘釣最好用長投竿"},
+  {id:"lapyu",name:"立魚",eng:"Sea Bream (general)",sci:"Sparidae",desc:"立魚係統稱，包括黃腳鱲、黑鱲等多種。香港磯釣最主要目標魚群之一。",season:"秋冬季",size:"20-60cm",bait:"南極蝦、青蟲、蟹仔",location:"礁石區、防波堤、碼頭",difficulty:"初級至中級",image:"🐟",tips:"立魚係群體魚類，打誘餌好重要，誘餌粉開得靚先引到魚群"},
+  {id:"fodim",name:"火點",eng:"Spotty Grouper",sci:"Epinephelus akaara",desc:"身上有紅色斑點，屬於石斑科。肉質極佳，係高級食用魚。棲息於岩礁區。",season:"夏季",size:"20-40cm",bait:"生蝦、蟹仔、魷魚",location:"岩礁區、石排、沉船",difficulty:"中級",image:"🐟",tips:"火點同石斑習性相似，匿喺石罅等獵物經過"},
+  {id:"chohong",name:"左口",eng:"Flatfish",sci:"Bothidae",desc:"身體扁平成橢圓形，兩隻眼都喺同一邊。棲息沙泥底，肉質鮮嫩。",season:"全年",size:"20-50cm",bait:"蝦仁、青蟲、小魚",location:"沙泥海底、內灣",difficulty:"中級",image:"🐟",tips:"左口鍾意伏喺沙泥底等獵物，沉底釣係最佳方法"},
+  {id:"singsyu",name:"星鱸",eng:"Spotted Sea Bass",sci:"Lateolabrax maculatus",desc:"身上有黑色斑點，係香港常見嘅食用魚。河口同內灣都有機會釣到。",season:"秋冬",size:"30-80cm",bait:"生蝦、魚肉、假餌",location:"河口、內灣、碼頭",difficulty:"中級",image:"🐟",tips:"星鱸鍾意流水急嘅位置，漲退潮交替時段最好釣"},
+  {id:"mangkei",name:"魷魚",eng:"Squid",sci:"Teuthida",desc:"軟體動物，用魷魚餌木釣法最常見。香港夜釣熱門目標，釣獲時會噴墨汁。",season:"夏秋",size:"15-40cm",bait:"餌木、蝦肉",location:"碼頭、燈光下、內灣",difficulty:"初級",image:"🦑",tips:"魷魚趨光，夜晚有燈光嘅碼頭最好釣。餌木要慢慢跳底"},
+  {id:"siuwan",name:"小環",eng:"Scad",sci:"Decapterus maruadsi",desc:"銀藍色魚身，小型魚，成群出沒。魚排同碼頭常見魚獲。",season:"全年",size:"15-25cm",bait:"南極蝦、麵包、青蟲",location:"魚排、碼頭、內灣",difficulty:"初級",image:"🐟",tips:"小環成群活動，釣到一條即係附近有一大群"},
+  {id:"taai",name:"真鯛",eng:"Red Sea Bream",sci:"Pagrus major",desc:"日本料理常見魚種，香港離島水域都有。粉紅色魚身，肉質極佳。",season:"冬季",size:"25-60cm",bait:"南極蝦、蟹肉、青蟲",location:"離島、礁石區、深場",difficulty:"進階",image:"🐟",tips:"真鯛喺深水區活動，要用重磯釣組先釣到"},
+  {id:"bin",name:"鯆魚",eng:"Ray",sci:"Rajiformes",desc:"身體扁平似魔鬼魚，尾部有毒刺。拉力巨大，釣上手好刺激。底棲魚類。",season:"夏秋",size:"50-150cm",bait:"魚肉、蟹仔、魷魚",location:"沙泥海底、內灣",difficulty:"進階",image:"🐟",tips:"鯆魚拉力好大，但尾部有毒刺要小心。釣到後剪絲放生較好"},
+  {id:"waanpok",name:"黃鰭鮪",eng:"Yellowfin Tuna",sci:"Thunnus albacares",desc:"遠洋魚種，離島外海有機會釣到。肉質極佳，係刺身極品。",season:"夏季",size:"50-200cm",bait:"小魚、魷魚、假餌",location:"外海、離島遠洋",difficulty:"專家",image:"🐟",tips:"黃鰭鮪要用船釣拖釣。拉力極強，要有體力頂得住"},
+];
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  document.querySelector(`.nav button:nth-child(${{weather:1,fish:2,catches:3}[page]})`).classList.add('active');
+}
+
+// ============================================================
+// WEATHER
+// ============================================================
+const HK_LAT = 22.3193, HK_LON = 114.1694;
+
+// Wind direction to text
+const WIND_DIR = ["北","東北偏北","東北","東北偏東","東","東南偏東","東南","東南偏南","南","西南偏南","西南","西南偏西","西","西北偏西","西北","西北偏北"];
+function windDegToText(d) { return WIND_DIR[Math.round(d/22.5)%16]; }
+
+// Beaufort scale
+function beaufort(speedKmh) {
+  const b = [1,5,11,19,28,38,49,61,74,88,102,117,999];
+  for(let i=0;i<b.length-1;i++) if(speedKmh<b[i+1]*3.6) return i;
+  return 12;
+}
+function beaufortText(b) { return ["無風","軟風","輕風","微風","和風","清風","強風","疾風","大風","烈風","暴風","狂風","颶風"][b]||"未知"; }
+
+function seaState(waveH) {
+  if(waveH<0.1) return "平靜"; if(waveH<0.5) return "小浪"; if(waveH<1.25) return "中浪";
+  if(waveH<2.5) return "大浪"; if(waveH<4) return "非常大浪"; return "巨浪";
+}
+
+function fishScore(windB, waveH, temp) {
+  let score = 50;
+  if(windB<=3) score += 25;
+  else if(windB<=5) score += 10;
+  else if(windB<=7) score -= 10;
+  else score -= 30;
+  if(waveH<0.3) score += 10;
+  else if(waveH<1) score += 5;
+  else if(waveH>2) score -= 20;
+  if(temp>=22 && temp<=30) score += 15;
+  else if(temp<15 || temp>35) score -= 10;
+  return Math.max(0, Math.min(100, score));
+}
+
+function scoreText(s) {
+  if(s>=80) return "🏆 極佳！今日好適合釣魚！";
+  if(s>=65) return "👍 唔錯，可以出發";
+  if(s>=45) return "👌 一般，可以一試";
+  if(s>=25) return "😐 麻麻地，考慮清楚先";
+  return "😢 唔係好適合釣魚";
+}
+
+function initWeather() {
+  const el = document.getElementById('weather-loading');
+  const ec = document.getElementById('weather-content');
+  const ee = document.getElementById('weather-error');
+  
+  Promise.all([fetchWeather(), fetchMarine(), fetchTide()])
+    .then(([weather, marine, tide]) => {
+      el.style.display = 'none';
+      ec.style.display = 'block';
+      renderWeather(weather, marine, tide);
+    })
+    .catch(err => {
+      el.style.display = 'none';
+      ee.style.display = 'block';
+      ee.textContent = '❌ 載入天氣資料失敗：' + err.message;
+    });
+}
+
+async function fetchWeather() {
+  const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${HK_LAT}&longitude=${HK_LON}&hourly=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max&timezone=Asia/Hong_Kong&forecast_days=3`);
+  return r.json();
+}
+
+async function fetchMarine() {
+  const r = await fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${HK_LAT}&longitude=${HK_LON}&hourly=wave_height,wave_direction,wind_wave_height,swell_wave_height&daily=wave_height_max,wave_direction_dominant&timezone=Asia/Hong_Kong`);
+  return r.json();
+}
+
+async function fetchTide() {
+  // NOAA station near HK
+  const today = new Date();
+  const ds = today.toISOString().slice(0,10).replace(/-/g,'');
+  const r = await fetch(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?station=1617760&begin_date=${ds}&end_date=${ds}&product=predictions&datum=MLLW&units=metric&time_zone=gmt&format=json`);
+  return r.json();
+}
+
+function renderWeather(weather, marine, tide) {
+  const now = new Date();
+  const hour = now.getHours();
+  const todayStr = now.toISOString().slice(0,10);
+  
+  // Find current hour index
+  const times = weather.hourly.time;
+  let idx = times.findIndex(t => t.startsWith(todayStr) && parseInt(t.slice(11,13))>=hour);
+  if(idx<0) idx = 0;
+  
+  // Time selector
+  const ts = document.getElementById('time-select');
+  ts.innerHTML = '';
+  for(let i=0;i<Math.min(12,times.length);i++) {
+    const t = times[i];
+    if(!t.startsWith(todayStr)) continue;
+    const h = parseInt(t.slice(11,13));
+    const b = document.createElement('button');
+    b.textContent = `${h}:00`;
+    b.dataset.idx = i;
+    b.onclick = () => selectTime(i, weather, marine);
+    if(i===idx) b.classList.add('active');
+    ts.appendChild(b);
+  }
+  
+  // Store data for time selection
+  window._weatherData = weather;
+  window._marineData = marine;
+  window._tideData = tide;
+  
+  // Render for current time
+  selectTime(idx, weather, marine);
+  
+  // Render tide
+  renderTide(tide);
+  
+  // Render forecast
+  renderForecast(weather, marine);
+}
+
+function selectTime(idx, weather, marine) {
+  document.querySelectorAll('.time-select button').forEach(b => b.classList.remove('active'));
+  const btns = document.querySelectorAll('.time-select button');
+  if(btns[idx]) btns[idx].classList.add('active');
+  
+  const w = weather.hourly;
+  const m = marine.hourly;
+  
+  const temp = w.temperature_2m[idx];
+  const windS = w.wind_speed_10m[idx] / 3.6; // kmh to m/s
+  const windD = w.wind_direction_10m[idx];
+  const gust = w.wind_gusts_10m[idx];
+  const waveH = m.wave_height[idx];
+  const waveDir = m.wave_direction[idx];
+  const windWave = m.wind_wave_height[idx];
+  const swell = m.swell_wave_height[idx];
+  
+  const bf = beaufort(windS*3.6);
+  
+  const grid = document.getElementById('weather-grid');
+  grid.innerHTML = `
+    <div class="weather-item">
+      <div class="icon">🌡️</div>
+      <div class="label">氣溫</div>
+      <div class="value">${temp.toFixed(1)}°C</div>
+    </div>
+    <div class="weather-item">
+      <div class="icon">💨</div>
+      <div class="label">風力</div>
+      <div class="value">${bf}級</div>
+      <div class="sub">${beaufortText(bf)}</div>
+    </div>
+    <div class="weather-item">
+      <div class="icon">🧭</div>
+      <div class="label">風向</div>
+      <div class="value">${windDegToText(windD)}</div>
+      <div class="sub" style="font-size:18px">${windS.toFixed(1)} m/s</div>
+    </div>
+    <div class="weather-item">
+      <div class="icon">💥</div>
+      <div class="label">陣風</div>
+      <div class="value">${gust.toFixed(0)} km/h</div>
+    </div>
+    <div class="weather-item">
+      <div class="icon">🌊</div>
+      <div class="label">浪高</div>
+      <div class="value">${waveH.toFixed(2)}m</div>
+      <div class="sub">${seaState(waveH)}</div>
+    </div>
+    <div class="weather-item">
+      <div class="icon">〰️</div>
+      <div class="label">湧浪</div>
+      <div class="value">${swell.toFixed(2)}m</div>
+      <div class="sub">風浪: ${windWave.toFixed(2)}m</div>
+    </div>
+  `;
+  
+  // Level visualization
+  const levels = document.getElementById('forecast-content');
+  const score = fishScore(bf, waveH, temp);
+  const bars = Math.round(score/10);
+  levels.innerHTML = `
+    <div style="text-align:center;font-size:36px;font-weight:700;color:${score>=65?'var(--success)':score>=45?'var(--warning)':'var(--danger)'}">${score}/100</div>
+    <div class="level-bar">${Array(10).fill(0).map((_,i)=>`<div class="bar${i<bars?' filled':''}"></div>`).join('')}</div>
+    <div class="level-text">${scoreText(score)}</div>
+    <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.8">
+      風力 ${bf}級 · 浪高 ${waveH.toFixed(2)}m · 氣溫 ${temp.toFixed(1)}°C<br>
+      風向 ${windDegToText(windD)}
+    </div>
+  `;
+}
+
+function renderTide(tide) {
+  if(!tide.predictions || !tide.predictions.length) {
+    document.getElementById('tide-info').textContent = '潮汐資料暫時未能載入';
+    return;
+  }
+  const canvas = document.getElementById('tideCanvas');
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * 2 || 600;
+  canvas.height = 140 * 2 || 280;
+  
+  const W = canvas.width, H = canvas.height;
+  const data = tide.predictions.slice(0, 288); // 24h
+  const values = data.map(d => parseFloat(d.v));
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 0.1;
+  
+  ctx.clearRect(0,0,W,H);
+  
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 1;
+  for(let i=0;i<5;i++) {
+    const y = H * i / 4;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+  
+  // Fill
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0, 'rgba(61,209,194,0.3)');
+  grad.addColorStop(1, 'rgba(30,111,159,0.05)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(0,H);
+  data.forEach((d,i) => {
+    const x = i / data.length * W;
+    const y = H - ((parseFloat(d.v)-min)/range * H * 0.85 + H*0.05);
+    i===0 ? ctx.lineTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.lineTo(W,H);
+  ctx.closePath();
+  ctx.fill();
+  
+  // Line
+  ctx.strokeStyle = '#3dc1d3';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  data.forEach((d,i) => {
+    const x = i / data.length * W;
+    const y = H - ((parseFloat(d.v)-min)/range * H * 0.85 + H*0.05);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  
+  // High/low markers
+  let maxIdx = 0, minIdx = 0;
+  for(let i=1;i<values.length;i++) {
+    if(values[i]>values[maxIdx]) maxIdx=i;
+    if(values[i]<values[minIdx]) minIdx=i;
+  }
+  const now = new Date();
+  const currentH = data[Math.floor(values.length/24*now.getHours()+now.getMinutes()/60*values.length/24)];
+  
+  ctx.fillStyle = '#e74c3c';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  const maxX = maxIdx/data.length*W, maxY = H-((values[maxIdx]-min)/range*H*0.85+H*0.05);
+  ctx.fillText(`▲ 最高 ${values[maxIdx].toFixed(2)}m`, maxX, maxY-8);
+  
+  ctx.fillStyle = '#3498db';
+  const minX = minIdx/data.length*W, minY = H-((values[minIdx]-min)/range*H*0.85+H*0.05);
+  ctx.fillText(`▼ 最低 ${values[minIdx].toFixed(2)}m`, minX, minY+18);
+  
+  const curVal = currentH ? currentH.v : values[Math.floor(now.getHours()/24*values.length)];
+  document.getElementById('tide-info').innerHTML = `
+    最高潮 ${values[maxIdx].toFixed(2)}m · 最低潮 ${values[minIdx].toFixed(2)}m · 目前水位 ${curVal?parseFloat(curVal).toFixed(2):'---'}m
+  `;
+}
+
+function renderForecast(weather, marine) {
+  const daily = weather.daily;
+  const dailyM = marine.daily;
+  let html = '';
+  for(let i=0;i<Math.min(3,daily.time.length);i++) {
+    const date = new Date(daily.time[i]+'T12:00:00');
+    const dayName = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][date.getDay()];
+    const tMax = daily.temperature_2m_max[i];
+    const tMin = daily.temperature_2m_min[i];
+    const windMax = daily.wind_speed_10m_max[i] / 3.6;
+    const bf = beaufort(windMax*3.6);
+    const waveMax = dailyM.wave_height_max[i];
+    const score = fishScore(bf, waveMax||0.5, (tMax+tMin)/2);
+    const dateStr = `${date.getMonth()+1}/${date.getDate()}(${dayName})`;
+    html += `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div style="flex:1"><b>${dateStr}</b></div>
+        <div style="text-align:center;flex:1">${tMin.toFixed(0)}-${tMax.toFixed(0)}°C</div>
+        <div style="text-align:center;flex:1">💨${bf}級</div>
+        <div style="text-align:center;flex:1">🌊${waveMax?waveMax.toFixed(2):'?'}m</div>
+        <div style="text-align:center;flex:0.7;color:${score>=65?'var(--success)':score>=45?'var(--warning)':'var(--danger)'};font-weight:700">${score}</div>
+      </div>
+    `;
+  }
+  document.getElementById('forecast-content').innerHTML += html.replace('<div id="forecast-content">','');
+}
+
+// ============================================================
+// FISH SPECIES
+// ============================================================
+function renderFish(filter='') {
+  const list = document.getElementById('fish-list');
+  const q = filter.toLowerCase();
+  const filtered = FISH_DB.filter(f => 
+    f.name.includes(q) || f.eng.toLowerCase().includes(q) || f.desc.includes(q)
+  );
+  
+  if(!filtered.length) {
+    list.innerHTML = '<div class="empty"><div class="icon">🔍</div>搵唔到相關魚種</div>';
+    return;
+  }
+  
+  list.innerHTML = filtered.map(f => `
+    <div class="card fish-card" onclick="toggleFishDetail('${f.id}')">
+      <div class="fish-icon">${f.image}</div>
+      <div class="info">
+        <h3>${f.name}</h3>
+        <div class="eng">${f.eng}</div>
+        <div class="tags">
+          <span class="tag">${f.season}</span>
+          <span class="tag">${f.difficulty}</span>
+          <span class="tag">${f.size}</span>
+        </div>
+      </div>
+    </div>
+    <div class="fish-detail" id="detail-${f.id}">
+      <div class="desc">${f.desc}</div>
+      <div class="row"><span class="l">📏 體型</span><span class="r">${f.size}</span></div>
+      <div class="row"><span class="l">🗓️ 季節</span><span class="r">${f.season}</span></div>
+      <div class="row"><span class="l">🎯 難度</span><span class="r">${f.difficulty}</span></div>
+      <div class="row"><span class="l">🪱 常用餌</span><span class="r">${f.bait}</span></div>
+      <div class="row"><span class="l">📍 釣點</span><span class="r">${f.location}</span></div>
+      <div style="margin-top:10px;padding:10px;background:rgba(61,209,194,0.1);border-radius:8px;font-size:13px;color:var(--accent)">💡 ${f.tips}</div>
+    </div>
+  `).join('');
+}
+
+function toggleFishDetail(id) {
+  const el = document.getElementById('detail-'+id);
+  el.classList.toggle('open');
+}
+
+function searchFish() {
+  renderFish(document.getElementById('fishSearch').value);
+}
+
+// ============================================================
+// CATCH RECORDS
+// ============================================================
+function getCatches() {
+  try { return JSON.parse(localStorage.getItem('fishing_catches')||'[]'); } catch { return []; }
+}
+
+function saveCatches(data) {
+  localStorage.setItem('fishing_catches', JSON.stringify(data));
+}
+
+function initCatches() {
+  const sel = document.getElementById('catchFish');
+  sel.innerHTML = FISH_DB.map(f => `<option value="${f.name}">${f.image} ${f.name}</option>`).join('');
+  document.getElementById('catchDate').value = new Date().toISOString().slice(0,10);
+  renderCatches();
+}
+
+function saveCatch(e) {
+  e.preventDefault();
+  const catches = getCatches();
+  catches.unshift({
+    id: Date.now(),
+    fish: document.getElementById('catchFish').value,
+    date: document.getElementById('catchDate').value,
+    size: document.getElementById('catchSize').value || '',
+    location: document.getElementById('catchLocation').value.toUpperCase() || '未記錄',
+    notes: document.getElementById('catchNotes').value || ''
+  });
+  saveCatches(catches);
+  renderCatches();
+  document.getElementById('catchForm').reset();
+  document.getElementById('catchDate').value = new Date().toISOString().slice(0,10);
+  alert('✅ 記錄成功！');
+}
+
+function deleteCatch(id) {
+  if(!confirm('確定要刪除呢個記錄？')) return;
+  const catches = getCatches().filter(c => c.id !== id);
+  saveCatches(catches);
+  renderCatches();
+}
+
+function renderCatches() {
+  const catches = getCatches();
+  
+  // Stats
+  const total = catches.length;
+  const species = new Set(catches.map(c => c.fish)).size;
+  const sizes = catches.filter(c => c.size).map(c => parseFloat(c.size)).filter(s => s>0);
+  const maxSize = sizes.length ? Math.max(...sizes) : 0;
+  
+  document.getElementById('catch-stats').innerHTML = `
+    <div class="stat-item"><div class="num">${total}</div><div class="lbl">總記錄</div></div>
+    <div class="stat-item"><div class="num">${species}</div><div class="lbl">魚種</div></div>
+    <div class="stat-item"><div class="num">${maxSize?maxSize+'cm':'-'}</div><div class="lbl">最長</div></div>
+  `;
+  
+  const list = document.getElementById('catch-list');
+  
+  if(!catches.length) {
+    list.innerHTML = '<div class="card"><div class="empty"><div class="icon">🎣</div>未有釣獲記錄<br><span style="font-size:13px">記錄你嘅第一次釣獲啦！</span></div></div>';
+    return;
+  }
+  
+  list.innerHTML = catches.map(c => {
+    const fish = FISH_DB.find(f => f.name === c.fish);
+    return `
+    <div class="card catch-item">
+      <div class="c-icon">${fish?fish.image:'🐟'}</div>
+      <div class="c-info">
+        <div class="c-name">${c.fish}</div>
+        <div class="c-meta">📅 ${c.date} · 📍 ${c.location}${c.size?' · 📏 '+c.size+'cm':''}</div>
+        ${c.notes ? `<div class="c-meta" style="color:var(--text)">📝 ${c.notes}</div>` : ''}
+      </div>
+      <button class="c-del" onclick="deleteCatch(${c.id})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+initWeather();
+renderFish();
+initCatches();
+
+// Resize tide canvas on window resize
+let tideTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(tideTimer);
+  tideTimer = setTimeout(() => {
+    if(window._tideData) renderTide(window._tideData);
+  }, 500);
+});
+</script>
+</body>
+</html>

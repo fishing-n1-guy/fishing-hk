@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🐟 香港釣魚資訊站 - by 小婷</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a1628;color:#e0e8f0;padding:16px;max-width:800px;margin:0 auto}
+h1{text-align:center;font-size:20px;padding:16px;background:linear-gradient(135deg,#0a3d62,#0d5a7a);border-radius:14px;margin-bottom:14px}
+.card{background:#0f2a45;border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid #1a3a5a}
+.ct{font-size:15px;font-weight:600;margin-bottom:10px;color:#3dc1d3}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.it{background:rgba(10,61,98,0.4);border-radius:10px;padding:12px;text-align:center}
+.ic{font-size:24px} .lb{font-size:11px;color:#8899aa;margin:3px 0} .vl{font-size:22px;font-weight:700;color:#fff} .sb{font-size:11px;color:#8899aa}
+.scr{text-align:center;font-size:42px;font-weight:700;margin:10px 0}
+.br{display:flex;gap:4px;margin:12px 0} .br div{flex:1;height:6px;border-radius:3px;background:#1a3a5a} .br .ok{background:#3dc1d3}
+.sc{font-size:13px;color:#8899aa;text-align:center;line-height:1.6}
+.fr{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fi{background:rgba(10,61,98,0.3);border-radius:10px;padding:10px;text-align:center;border:1px solid #1a3a5a}
+.fn{font-size:15px;font-weight:600;margin:3px 0} .ft{font-size:10px;color:#8899aa;line-height:1.4}
+.nav{display:flex;gap:6px;margin:14px 0}
+.nav a{flex:1;padding:8px;background:#0f2a45;border-radius:20px;color:#3dc1d3;text-decoration:none;font-size:13px;text-align:center;border:1px solid #1a3a5a}
+.ftr{text-align:center;font-size:11px;color:#8899aa;padding:16px;line-height:1.5}
+@media(min-width:600px){.g{grid-template-columns:1fr 1fr 1fr}.fg{grid-template-columns:1fr 1fr 1fr 1fr}}
+</style>
+</head>
+<body>
+
+<h1>🐟 香港釣魚資訊站<br><span style="font-size:13px;color:#8899aa">by 小婷 · 2026/06/23</span></h1>
+
+<div class="nav">
+  <a href="#w">🌤️ 天氣</a>
+  <a href="#f">🐟 魚種</a>
+  <a href="#c">📝 記錄</a>
+</div>
+
+<div class="card" id="w">
+  <div class="ct">🌤️ 即時天氣 (8:00 香港時間)</div>
+  <div class="g">
+    <div class="it"><div class="ic">🌡️</div><div class="lb">氣溫</div><div class="vl">29.0°C</div></div>
+    <div class="it"><div class="ic">💨</div><div class="lb">風力</div><div class="vl">1級</div><div class="sb">軟風</div></div>
+    <div class="it"><div class="ic">🧭</div><div class="lb">風向</div><div class="vl">西南</div><div class="sb">12km/h</div></div>
+    <div class="it"><div class="ic">💥</div><div class="lb">陣風</div><div class="vl">30</div><div class="sb">km/h</div></div>
+    <div class="it"><div class="ic">🌊</div><div class="lb">浪高</div><div class="vl">0.46m</div><div class="sb">小浪</div></div>
+    <div class="it"><div class="ic">〰️</div><div class="lb">湧浪</div><div class="vl">0.36m</div><div class="sb">風浪0.20m</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="ct">🎯 釣魚指數</div>
+  <div class="scr" style="color:#2ecc71">95/100</div>
+  <div class="br"><div class="ok"></div><div class="ok"></div><div class="ok"></div><div class="ok"></div><div class="ok"></div><div class="ok"></div><div class="ok"></div><div class="ok"></div><div class="ok"></div><div class="ok"></div></div>
+  <div class="sc" style="margin-bottom:6px">🏆 極佳！今日好適合釣魚！</div>
+  <div class="sc">風力 1級 · 浪高 0.46m · 氣溫 29.0°C</div>
+</div>
+
+<div class="card">
+  <div class="ct">🌊 潮汐預報</div>
+  <div style="font-size:14px;color:#8899aa;text-align:center;padding:6px">最高潮 0.59m · 最低潮 0.04m · 目前 0.40m</div>
+</div>
+
+<div class="card">
+  <div class="ct">📅 未來三天預測</div>
+  <div class='fr'><b>6/23(星期一)</b><span>27-30°C</span><span>💨2級</span><span>🌊0.58m</span></div><div class='fr'><b>6/24(星期二)</b><span>27-31°C</span><span>💨2級</span><span>🌊0.60m</span></div><div class='fr'><b>6/25(星期三)</b><span>28-32°C</span><span>💨2級</span><span>🌊0.60m</span></div>
+</div>
+
+<div class="card" id="f">
+  <div class="ct">🐟 香港魚種圖鑑</div>
+  <div class="fg"><div class='fi'><div>🐟</div><div class='fn'>石斑</div><div class='ft'>Grouper<br>30-100cm · 全年 · 中級</div></div><div class='fi'><div>🐟</div><div class='fn'>黃腳鱲</div><div class='ft'>Yellowfin Bream<br>20-50cm · 秋冬 · 初級</div></div><div class='fi'><div>🐟</div><div class='fn'>黑鱲</div><div class='ft'>Black Bream<br>20-45cm · 冬季 · 初級</div></div><div class='fi'><div>🐟</div><div class='fn'>紅鮋</div><div class='ft'>Red Gurnard<br>15-35cm · 夏秋 · 初級</div></div><div class='fi'><div>🐟</div><div class='fn'>泥鯭</div><div class='ft'>Rabbitfish<br>15-30cm · 夏季 · 初級</div></div><div class='fi'><div>🐟</div><div class='fn'>牙帶</div><div class='ft'>Ribbonfish<br>50-120cm · 秋冬 · 進階</div></div><div class='fi'><div>🐟</div><div class='fn'>黃花魚</div><div class='ft'>Yellow Croaker<br>20-50cm · 春季 · 進階</div></div><div class='fi'><div>🐟</div><div class='fn'>沙鑽</div><div class='ft'>Sand Whiting<br>15-30cm · 全年 · 初級</div></div><div class='fi'><div>🐟</div><div class='fn'>立魚</div><div class='ft'>Sea Bream<br>20-60cm · 秋冬季 · 初級</div></div><div class='fi'><div>🐟</div><div class='fn'>火點</div><div class='ft'>Spotty Grouper<br>20-40cm · 夏季 · 中級</div></div><div class='fi'><div>🐟</div><div class='fn'>左口</div><div class='ft'>Flatfish<br>20-50cm · 全年 · 中級</div></div><div class='fi'><div>🐟</div><div class='fn'>星鱸</div><div class='ft'>Spotted Sea Bass<br>30-80cm · 秋冬 · 中級</div></div><div class='fi'><div>🐟</div><div class='fn'>魷魚</div><div class='ft'>Squid<br>15-40cm · 夏秋 · 初級</div></div><div class='fi'><div>🐟</div><div class='fn'>真鯛</div><div class='ft'>Red Sea Bream<br>25-60cm · 冬季 · 進階</div></div><div class='fi'><div>🐟</div><div class='fn'>鯆魚</div><div class='ft'>Ray<br>50-150cm · 夏秋 · 進階</div></div><div class='fi'><div>🐟</div><div class='fn'>黃鰭鮪</div><div class='ft'>Yellowfin Tuna<br>50-200cm · 夏季 · 專家</div></div></div>
+</div>
+
+<div class="card" id="c">
+  <div class="ct">📝 釣獲記錄</div>
+  <div style="font-size:14px;text-align:center;padding:20px;color:#8899aa">
+    記錄功能需要 browser 嘅 localStorage<br>
+    請用互動版本記錄 🎣
+  </div>
+</div>
+
+<div class="ftr">
+  資料來源：Open-Meteo · NOAA Tides<br>
+  由小婷為 Jay 製作 🎣
+</div>
+
+</body>
+</html>
