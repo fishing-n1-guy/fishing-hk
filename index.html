@@ -59,7 +59,7 @@ h1{text-align:center;font-size:20px;padding:16px;background:linear-gradient(135d
 </head>
 <body>
 
-<h1>🐟 香港釣魚資訊站<br><span style="font-size:13px;color:#8899aa">by 小婷 · <span id="updateTime">載入中...</span></span></h1>
+<h1>🐟 香港釣魚資訊站<br><span style="font-size:13px;color:#8899aa">by 小婷 · <span id="updateTime">載入中...</span><span id="lunarInfo"></span></span></h1>
 
 <div class="nav" id="mainNav">
   <a href="#" onclick="switchPage('home');return false" class="act" data-page="home">🌤️ 首頁</a>
@@ -128,7 +128,112 @@ const HK_LAT=22.3193, HK_LON=114.1694;
 const WIND_DIR=["北","東北偏北","東北","東北偏東","東","東南偏東","東南","東南偏南","南","西南偏南","西南","西南偏西","西","西北偏西","西北","西北偏北"];
 const BF_NAMES=["無風","軟風","輕風","微風","和風","清風","強風","疾風","大風","烈風","暴風","狂風","颶風"];
 
-// HK regions for marine data (lat, lon, name)
+// Lunar calendar and tide flow
+const LUNAR_MONTH = ["正","二","三","四","五","六","七","八","九","十","十一","十二"];
+const LUNAR_DAY = ["初一","初二","初三","初四","初五","初六","初七","初八","初九","初十","十一","十二","十三","十四","十五","十六","十七","十八","十九","二十","廿一","廿二","廿三","廿四","廿五","廿六","廿七","廿八","廿九","三十"];
+
+// Lunar calendar lookup table (1900-2100)
+// Each entry encodes: leap month (bits 16-19), month lengths (bits 0-15, 1=30 days, 0=29 days)
+const LUNAR_INFO = [
+  0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
+  0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
+  0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
+  0x06566,0x0d4a0,0x0ea50,0x16a95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+  0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
+  0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052d0,0x0a9a8,0x0e950,0x06aa0,
+  0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
+  0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,
+  0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,
+  0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x05ac0,0x0ab60,0x096d5,0x092e0,
+  0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,
+  0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,
+  0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,
+  0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,
+  0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,
+  0x14b63,0x09370,0x049f8,0x04970,0x064b0,0x168a6,0x0ea50,0x06aa0,0x1a6c4,0x0aae0,
+  0x092e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,
+  0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,0x052b0,
+  0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,0x0d160];
+
+function solarToLunar(year, month, day) {
+  if (year < 1900 || year > 2100) return null;
+  var y = year - 1900;
+  var leapMonth = (LUNAR_INFO[y] >> 16) & 0xf; // which month is leap
+  var monthBits = LUNAR_INFO[y] & 0xffff; // month lengths
+  
+  // Days in each month for this lunar year
+  var monthDays = [];
+  for (var m = 0; m < 12; m++) {
+    monthDays.push((monthBits >> (11 - m)) & 1 ? 30 : 29);
+  }
+  if (leapMonth > 0) {
+    // Insert leap month after leapMonth-1
+    monthDays.splice(leapMonth, 0, (monthBits >> 12) & 1 ? 30 : 29);
+  }
+  
+  // Base date: Jan 31, 1900 = 农历正月初一 (lunar 1900/1/1)
+  var baseDate = new Date(1900, 0, 31); // Jan 31, 1900
+  var targetDate = new Date(year, month - 1, day);
+  var offset = Math.round((targetDate - baseDate) / 86400000);
+  
+  if (offset < 0) return null;
+  
+  // Walk through lunar months to find the date
+  var lYear = 1900 + y;
+  var lMonth = 1;
+  var lDay = 1;
+  var daysPassed = 0;
+  var totalMonths = monthDays.length;
+  
+  for (var m = 0; m < totalMonths; m++) {
+    var md = monthDays[m];
+    if (daysPassed + md > offset) {
+      lMonth = m + 1;
+      lDay = offset - daysPassed + 1;
+      break;
+    }
+    daysPassed += md;
+  }
+  
+  // Determine if leap month
+  var isLeap = false;
+  if (leapMonth > 0 && lMonth > leapMonth) {
+    lMonth--; // Adjust: months after leap are numbered normally
+    if (lMonth == leapMonth) isLeap = true;
+  }
+  
+  return { month: lMonth, day: lDay, isLeap: isLeap, leapMonth: leapMonth };
+}
+
+function getLunarDate(date) {
+  return solarToLunar(date.getFullYear(), date.getMonth() + 1, date.getDate());
+}
+
+function getTideFlow(lunarDay) {
+  // 生流 (spring tide): around new moon (1-3) and full moon (15-17)
+  // 死流 (neap tide): around 1st quarter (7-9) and last quarter (22-24)
+  if ((lunarDay >= 1 && lunarDay <= 3) || (lunarDay >= 15 && lunarDay <= 17))
+    return {type:"生流", icon:"🌊", desc:"大流，水流急，釣魚黃金期！"};
+  if ((lunarDay >= 7 && lunarDay <= 9) || (lunarDay >= 22 && lunarDay <= 24))
+    return {type:"死流", icon:"🌀", desc:"細流，水流慢，魚開口差啲"};
+  if (lunarDay >= 4 && lunarDay <= 6)
+    return {type:"生流尾", icon:"🌊", desc:"生流尾，仲有得玩"};
+  if (lunarDay >= 10 && lunarDay <= 14)
+    return {type:"死流尾→生流", icon:"🌊", desc:"就嚟生流，開始好轉"};
+  if (lunarDay >= 18 && lunarDay <= 21)
+    return {type:"生流尾", icon:"🌊", desc:"生流尾，仲有得玩"};
+  return {type:"死流尾", icon:"🌀", desc:"就嚟死流，水流轉慢"};
+}
+
+// Update header with lunar date
+function updateHeader() {
+  var now = new Date();
+  var lunar = getLunarDate(now);
+  var flow = lunar ? getTideFlow(lunar.day) : null;
+  var flowHtml = flow ? ' · ' + flow.icon + ' ' + flow.type : '';
+  var lunarHtml = lunar ? ' 農曆' + LUNAR_MONTH[lunar.month-1] + '月' + LUNAR_DAY[lunar.day-1] : '';
+  document.getElementById('lunarInfo').innerHTML = lunarHtml + flowHtml;
+}
 const MARINE_SPOTS = {
   main: [22.3193, 114.1694, "香港整體水域"],
   east: [22.2000, 114.3500, "東水"],
@@ -344,6 +449,7 @@ async function refreshWeather(){
 }
 
 refreshWeather();
+updateHeader();
 
 // === 🌊 潮汐功能 ===
 var TIDE_STATIONS = {
@@ -393,6 +499,17 @@ function tideDateStr(month, day) {
 function renderTideExtremes(exList, stationCode, spotName) {
   // Spot selector
   var h = '<div style="margin-bottom:6px;font-size:11px;color:#8899aa">📍 選擇釣魚位置（自動對應最近潮汐站）</div>';
+  
+  // 生流/死流 info
+  var lunar = getLunarDate(new Date());
+  var flow = lunar ? getTideFlow(lunar.day) : null;
+  if (flow) {
+    h += '<div style="text-align:center;padding:6px;margin:4px 0 8px;background:rgba(61,193,211,0.08);border:1px solid rgba(61,193,211,0.2);border-radius:8px">' +
+      '<span style="font-size:20px">' + flow.icon + '</span> ' +
+      '<span style="font-size:14px;font-weight:600;color:#3dc1d3">' + flow.type + '</span>' +
+      '<span style="font-size:12px;color:#8899aa;margin-left:6px">' + flow.desc + '</span>' +
+      '</div>';
+  }
   
   // Region buttons
   var regionKeys = Object.keys(SPOT_REGIONS);
