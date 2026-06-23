@@ -431,41 +431,19 @@ const FISH_IMG = {
 
 
 // Load fish images from Wikipedia (client-side)
+// Load fish images from curated FISH_IMG map
 async function loadFishImages() {
   var g = document.getElementById('fishGrid');
   if (!g) return;
   var cards = g.querySelectorAll('.fi');
   for (var i = 0; i < FISH.length && i < cards.length; i++) {
-    var enName = FISH[i][1]; // English name
     var chName = FISH[i][0];
     var existing = cards[i].querySelector('.fi-img-wrap');
     if (!existing) continue;
-    
-    try {
-      // Search English Wikipedia by English name
-      var r = await fetch('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(enName+' fish')+'&format=json&origin=*&srlimit=2');
-      var data = await r.json();
-      var results = data.query && data.query.search;
-      var imgUrl = null;
-      
-      if (results && results.length > 0) {
-        var title = results[0].title;
-        var r2 = await fetch('https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(title)+'&prop=pageimages&format=json&origin=*&pithumbsize=300');
-        var data2 = await r2.json();
-        var pages = data2.query && data2.query.pages;
-        if (pages) {
-          for (var pid in pages) {
-            if (pages[pid].thumbnail) { imgUrl = pages[pid].thumbnail.source; break; }
-          }
-        }
-      }
-      
-      if (imgUrl) {
-        existing.innerHTML = '<img src="'+imgUrl+'" style="width:100%;height:100%;object-fit:contain" alt="'+chName+'">';
-      } else {
-        existing.innerHTML = '';
-      }
-    } catch(e) {
+    var imgUrl = FISH_IMG[chName];
+    if (imgUrl) {
+      existing.innerHTML = '<img src="'+imgUrl+'" style="width:100%;height:100%;object-fit:contain" alt="'+chName+'">';
+    } else {
       existing.innerHTML = '';
     }
   }
