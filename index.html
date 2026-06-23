@@ -172,8 +172,12 @@ async function refreshWeather(){
 refreshWeather();
 
 // === 🌊 潮汐功能 ===
-var TIDE_STATIONS = {"QUB":"鰂魚涌","CCH":"長洲","KLW":"高流灣","TMW":"大廟灣","SPW":"石壁","LOP":"樂安排"};
-var TIDE_ORDER = ["CCH","KLW","TMW","QUB","SPW"];
+var TIDE_STATIONS = {
+  "CCH":"長洲","KLW":"高流灣","TMW":"大廟灣","SPW":"石壁","LOP":"樂安排",
+  "TAO":"大澳","CLK":"赤鱲角(東)","MWC":"馬灣","TPK":"大埔滘","TBT":"尖鼻咀",
+  "CMW":"芝麻灣","WAG":"橫瀾島","KCT":"葵涌","QUB":"鰂魚涌"
+};
+var TIDE_ORDER = ["CCH","KLW","TMW","SPW","LOP","TAO","CLK","MWC","TPK","TBT","CMW","WAG","KCT","QUB"];
 
 function tideDateStr(month, day) {
   var now = new Date();

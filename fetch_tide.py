@@ -14,14 +14,22 @@ import os
 import urllib.request
 from datetime import datetime, timedelta, timezone
 
-# HK tide stations relevant for fishing
+# All 14 HK tide stations sorted by fishing relevance
 STATIONS = {
-    "QUB": {"name": "鰂魚涌", "name_en": "Quarry Bay"},
     "CCH": {"name": "長洲", "name_en": "Cheung Chau"},
     "KLW": {"name": "高流灣", "name_en": "Ko Lau Wan"},
     "TMW": {"name": "大廟灣", "name_en": "Tai Miu Wan"},
     "SPW": {"name": "石壁", "name_en": "Shek Pik"},
     "LOP": {"name": "樂安排", "name_en": "Lok On Pai"},
+    "TAO": {"name": "大澳", "name_en": "Tai O"},
+    "CLK": {"name": "赤鱲角(東)", "name_en": "Chek Lap Kok (E)"},
+    "MWC": {"name": "馬灣", "name_en": "Ma Wan"},
+    "TPK": {"name": "大埔滘", "name_en": "Tai Po Kau"},
+    "TBT": {"name": "尖鼻咀", "name_en": "Tsim Bei Tsui"},
+    "CMW": {"name": "芝麻灣", "name_en": "Chi Ma Wan"},
+    "WAG": {"name": "橫瀾島", "name_en": "Waglan Island"},
+    "KCT": {"name": "葵涌", "name_en": "Kwai Chung"},
+    "QUB": {"name": "鰂魚涌", "name_en": "Quarry Bay"},
 }
 
 HKO_BASE = "https://www.hko.gov.hk/tide/marine/data"
