@@ -20,6 +20,8 @@ h1{text-align:center;font-size:20px;padding:16px;background:linear-gradient(135d
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .fi{background:rgba(10,61,98,0.3);border-radius:12px;padding:10px;text-align:center;border:1px solid #1a3a5a;transition:all 0.2s}
 .fi:active{transform:scale(0.96)}
+.fi-img{width:100%;height:80px;display:flex;align-items:center;justify-content:center;background:rgba(10,61,98,0.2);border-radius:6px;margin-bottom:4px;font-size:40px;overflow:hidden}
+.fi-img img{width:100%;height:100%;object-fit:contain}
 .fn{font-size:14px;font-weight:600;margin:4px 0} .ft{font-size:10px;color:#8899aa;line-height:1.4}
 .nav{display:flex;gap:6px;margin:14px 0}
 .nav a{flex:1;padding:8px;background:#0f2a45;border-radius:20px;color:#3dc1d3;text-decoration:none;font-size:13px;text-align:center;border:1px solid #1a3a5a}
@@ -356,10 +358,8 @@ const FISH = [
     var lc = lvlColors[lvl] || '#8899aa';
     var li = lvlIcons[lvl] || '⚪';
     var emoji = f[0].includes('蟹')?'🦀':f[0].includes('蝦')?'🦐':f[0].includes('魷')||f[0].includes('墨')||f[0].includes('八爪')?'🦑':f[0].includes('魚')||f[0].includes('泡')?'🐡':f[0].includes('䱽')||f[0].includes('𩶘')||f[0].includes('鱲')?'🐟':'🐟';
-    if (!img) {
-      img = '<div style="width:100%;height:80px;display:flex;align-items:center;justify-content:center;font-size:40px;background:rgba(10,61,98,0.2);border-radius:6px;margin-bottom:4px">'+emoji+'</div>';
-    }
-    return '<div class="fi">'+img+'<div class="fn">'+f[0]+'</div><div class="ft">'+f[1]+'<br>'+f[2]+' · '+f[3]+' · <span style="color:'+lc+'">'+li+' '+lvl+'</span></div></div>';
+    var imgHtml = f[5] ? '<div class="fi-img"><img src="'+f[5]+'" onerror="this.parentNode.innerHTML=\''+emoji+'\'" alt=""></div>' : '<div class="fi-img" style="display:flex;align-items:center;justify-content:center;font-size:40px">'+emoji+'</div>';
+    return '<div class="fi">'+imgHtml+'<div class="fn">'+f[0]+'</div><div class="ft">'+f[1]+'<br>'+f[2]+' · '+f[3]+' · <span style="color:'+lc+'">'+li+' '+lvl+'</span></div></div>';
   }).join('');
 })();
 
