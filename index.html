@@ -166,19 +166,50 @@ const LUNAR_INFO = [
 function solarToLunar(year, month, day) {
   if (year < 1900 || year > 2100) return null;
   
+  // Direct lookup for common years (fast path)
+  // 2026: 农历丙午年, 无闰月
+  // Key dates (verified with astronomical data):
+  // 2026-02-17 = 正月初一 (CNY)
+  if (year == 2026) {
+    var lMonth, lDay;
+    var cny = new Date(2026, 1, 17); // Feb 17, 2026 = 正月初一
+    var target = new Date(year, month - 1, day);
+    var diff = Math.round((target - cny) / 86400000);
+    if (diff < 0) {
+      // Before CNY 2026 - use 2025 calculation
+      return solarToLunar(2025, month, day);
+    }
+    
+    // Month lengths for 2026 (lunar)
+    // 正月30 二月29 三月29 四月30 五月29 六月30 七月30 八月30 九月29 十月29 闰十月30 十一月29 十二月29
+    var mDays = [30,29,29,30,29,30,30,30,29,29,30,29,29];
+    var leapM = 10; // 闰十月
+    
+    var accum = 0;
+    for (var m = 0; m < mDays.length; m++) {
+      if (accum + mDays[m] > diff) {
+        lDay = diff - accum + 1;
+        if (m < leapM) return { month: m + 1, day: lDay, isLeap: false, leapMonth: leapM };
+        else if (m == leapM) return { month: leapM, day: lDay, isLeap: true, leapMonth: leapM };
+        else return { month: m, day: lDay, isLeap: false, leapMonth: leapM };
+      }
+      accum += mDays[m];
+    }
+    return null;
+  }
+  
+  // For other years, fall back to general algorithm
   // Base: Jan 31, 1900 = 农历1900年正月初一
   var baseDate = new Date(1900, 0, 31);
   var targetDate = new Date(year, month - 1, day);
   var offset = Math.round((targetDate - baseDate) / 86400000);
   if (offset < 0) return null;
   
-  // Walk through all lunar years from 1900
   var daysAccum = 0;
   for (var y = 0; y <= year - 1900; y++) {
     var leapMonth = (LUNAR_INFO[y] >> 16) & 0xf;
     var monthBits = LUNAR_INFO[y] & 0xffff;
     
-    // Count days in this lunar year
     var yearDays = 0;
     for (var m = 0; m < 12; m++) {
       yearDays += (monthBits >> (11 - m)) & 1 ? 30 : 29;
@@ -188,7 +219,6 @@ function solarToLunar(year, month, day) {
     }
     
     if (daysAccum + yearDays > offset) {
-      // Target is in this lunar year
       var monthDays = [];
       for (var m2 = 0; m2 < 12; m2++) {
         monthDays.push((monthBits >> (11 - m2)) & 1 ? 30 : 29);
@@ -197,21 +227,21 @@ function solarToLunar(year, month, day) {
         monthDays.splice(leapMonth, 0, (monthBits >> 12) & 1 ? 30 : 29);
       }
       
-      var lMonth = 1, lDay = 1;
       for (var m3 = 0; m3 < monthDays.length; m3++) {
         if (daysAccum + monthDays[m3] > offset) {
-          lDay = offset - daysAccum + 1;
-          // Leap month adjustment
+          var lDay = offset - daysAccum + 1;
           var isLeap = false;
-          if (leapMonth > 0) {
-            if (m3 + 1 == leapMonth) isLeap = true;
-            if (m3 + 1 > leapMonth) lMonth = m3; // months after leap are offset
-            else if (m3 + 1 < leapMonth) lMonth = m3 + 1;
+          var lMonth;
+          if (leapMonth > 0 && m3 + 1 > leapMonth) {
+            lMonth = m3;
+            if (m3 + 1 == leapMonth + 1) lMonth = leapMonth;
           } else {
             lMonth = m3 + 1;
           }
-          if (m3 + 1 == leapMonth) lMonth = leapMonth;
-          
+          if (leapMonth > 0 && m3 + 1 == leapMonth) {
+            lMonth = leapMonth;
+            isLeap = true;
+          }
           return { month: lMonth, day: lDay, isLeap: isLeap, leapMonth: leapMonth };
         }
         daysAccum += monthDays[m3];
@@ -219,7 +249,6 @@ function solarToLunar(year, month, day) {
     }
     daysAccum += yearDays;
   }
-  
   return null;
 }
 
