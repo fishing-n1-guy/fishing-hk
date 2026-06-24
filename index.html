@@ -490,21 +490,21 @@ async function loadFishImages() {
 // Render fish cards with Wikipedia image loading
 (function(){
   var g=document.getElementById('fishGrid');
-  var lvlColors = {"初級":"#1a8a4a","中級":"#b8860b","進階":"#cc5500","專家":"#aa2222"};
-  var lvlBg = {"初級":"rgba(26,138,74,0.15)","中級":"rgba(184,134,11,0.15)","進階":"rgba(204,85,0,0.15)","專家":"rgba(170,34,34,0.15)"};
+  var lvlColors = {"初級":"#1a8a5a","中級":"#b8860b","進階":"#cc5500","專家":"#aa2222"};
+  var lvlBg = {"初級":"rgba(26,138,90,0.12)","中級":"rgba(184,134,11,0.12)","進階":"rgba(204,85,0,0.12)","專家":"rgba(170,34,34,0.12)"};
   g.innerHTML=FISH.map(function(f, idx){
     var lvl = f[4];
     var lc = lvlColors[lvl] || '#556';
     var lb = lvlBg[lvl] || 'rgba(85,85,102,0.15)';
     return '<div class="fi">' +
-      '<div class="fi-img-wrap" style="width:100%;height:80px;border-radius:6px;margin-bottom:4px;background:rgba(10,61,98,0.2);overflow:hidden">' +
+      '<div class="fi-img-wrap" style="width:100%;height:80px;border-radius:6px;margin-bottom:4px;background:#eef2f6;overflow:hidden">' +
         '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:11px;color:#556">載入中...</div>' +
       '</div>' +
       '<div style="font-size:16px;font-weight:700;color:#1a2a3a;margin:4px 0 1px">'+f[0]+'</div>' +
       '<div style="font-size:10px;color:#8899aa;margin-bottom:4px">'+f[1]+'</div>' +
       '<div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:4px 0">' +
-        '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,0.03);color:#6a7a8a">'+f[2]+'</span>' +
-        '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,0.03);color:#6a7a8a">'+f[3]+'</span>' +
+        '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:#e8edf2;color:#4a5a6a;font-weight:600">'+f[2]+'</span>' +
+        '<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:#e8edf2;color:#4a5a6a;font-weight:600">'+f[3]+'</span>' +
       '</div>' +
       '<div style="font-size:10px;padding:3px 10px;border-radius:12px;background:'+lb+';color:'+lc+';font-weight:600;display:inline-block">'+lvl+'</div>' +
       '<div style="font-size:9px;color:#3dc1d3;margin-top:4px">📍 '+f[6]+'</div>' +
