@@ -342,11 +342,6 @@ const FISH = [
   ["杉斑", "Areolate Grouper", "25-50cm", "夏秋", "中級", "Epinephelus areolatus", "東水,南水,西貢"],
   ["坑鰜", "Wrasse", "20-50cm", "夏季", "中級", "Cheilinus trilobatus", "東水,西貢"],
   ["黃衣", "Yellowtail", "30-80cm", "秋冬", "進階", "Seriola lalandi", "東水,南水"],
-  ["黑鮋", "Black Scorpionfish", "10-25cm", "全年", "初級", "Sebastiscus marmoratus", "東水,西貢"],
-  ["冚畢", "Snubnose Pompano", "20-50cm", "夏季", "中級", "Trachinotus blochii", "西水,南水"],
-  ["斑𩶘", "Blackspot Tuskfish", "20-45cm", "夏季", "中級", "Choerodon schoenleinii", "東水,西貢"],
-  ["海鱺", "Cobia", "50-150cm", "夏季", "進階", "Rachycentron canadum", "東水,南水"],
-  ["花利", "Flathead", "25-60cm", "全年", "中級", "Platycephalus indicus", "西水,南水"],
   ["金山鯽", "Tilapia", "15-40cm", "全年", "初級", "Oreochromis mossambicus", "北水,西水"],
   ["塘虱", "Walking Catfish", "20-50cm", "夏季", "初級", "Clarias batrachus", "北水"],
   ["墨魚", "Cuttlefish", "15-40cm", "夏秋", "初級", "Sepia officinalis", "東水,西貢"],
@@ -377,20 +372,18 @@ const FISH = [
   ["紅衫", "Golden Thread", "20-40cm", "全年", "初級", "Nemipterus virgatus", "東水,南水"],
   ["石崇魚", "Devil Firefish", "10-25cm", "全年", "中級", "Pterois volitans", "東水,西貢"],
 ];
-// Total: 76 species
+// Total: 71 species
 
 
 const FISH_IMG = {
   "三鬚": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/33_三鬚.jpg",
   "八爪魚": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_八爪魚.jpg",
-  "冚畢": "https://inaturalist-open-data.s3.amazonaws.com/photos/177414434/medium.jpg",
   "剝皮魚": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/xx_剝皮魚.jpg",
   "坑鰜": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/43_坑鰜.jpg",
   "塘虱": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_塘虱.jpg",
-  "墨魚": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_墨魚.jpg",
+  "墨魚": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/cap_墨魚.jpg",
   "大眼雞": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/27_大眼雞.jpg",
   "左口": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/22_左口.jpg",
-  "斑𩶘": "https://inaturalist-open-data.s3.amazonaws.com/photos/66293751/medium.jpg",
   "星鱸": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/13_星鱸.jpg",
   "杉斑": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/42_杉斑.jpg",
   "東星斑": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/04_東星斑.jpg",
@@ -398,7 +391,6 @@ const FISH_IMG = {
   "池魚": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/31_池魚.jpg",
   "沙鑽": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/19_沙鑽.jpg",
   "泥鯭": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/16_泥鯭.jpg",
-  "海鱺": "https://inaturalist-open-data.s3.amazonaws.com/photos/19249056/medium.jpg",
   "瀨尿蝦": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_瀨尿蝦.jpg",
   "火點": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/06_火點.jpg",
   "烏頭": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/29_烏頭.jpg",
@@ -426,7 +418,6 @@ const FISH_IMG = {
   "紅𩶘": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_紅𩶘.jpg",
   "細鱗": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/24a_細鱗.jpg",
   "芝麻斑": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/02_芝麻斑.jpg",
-  "花利": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_花利.jpg",
   "花蟹": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_花蟹.jpg",
   "花鱸": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_花鱸.jpg",
   "藍旗𩶘": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_藍旗𩶘.jpg",
@@ -453,7 +444,6 @@ const FISH_IMG = {
   "黃鰭鮪": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/41_黃鰭鮪.jpg",
   "黑毛": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_黑毛.jpg",
   "黑沙(黑鱲)": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_黑沙_黑鱲_.jpg",
-  "黑鮋": "https://inaturalist-open-data.s3.amazonaws.com/photos/147015519/medium.jpeg",
   "龍躉": "https://fishing-n1-guy.github.io/fishing-hk/images/fish_caps/web_龍躉.jpg",
 };
 
