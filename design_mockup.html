@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎣 設計概念</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;color:#fff;font-family:'Segoe UI',system-ui,sans-serif;padding:20px}
+h1{text-align:center;margin:20px 0 30px;font-size:24px}
+.grid{display:grid;grid-template-columns:1fr;gap:30px;max-width:400px;margin:0 auto}
+.phone{background:#1a1a2e;border-radius:30px;padding:16px;border:2px solid #333;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.phone-inner{border-radius:22px;overflow:hidden;min-height:600px}
+.top-bar{display:flex;justify-content:space-between;padding:8px 4px 12px;font-size:12px;color:#8899aa}
+.label{text-align:center;font-size:14px;color:#00a8cc;margin:8px 0;font-weight:600;letter-spacing:1px}
+
+/* THEME A - Dark Ocean */
+.theme-a{background:linear-gradient(160deg,#0a1628 0%,#0d2b45 40%,#0f3a5a 100%);padding:16px}
+.theme-a .hdr{text-align:center;padding:10px 0 16px}
+.theme-a .hdr h2{font-size:16px;color:#3dc1d3}
+.theme-a .hdr p{font-size:11px;color:#6a8a9a}
+.theme-a .hero{border-radius:16px;padding:20px;background:linear-gradient(135deg,rgba(61,193,211,0.15),rgba(102,126,234,0.1));border:1px solid rgba(61,193,211,0.2);text-align:center;margin-bottom:12px}
+.theme-a .hero .temp{font-size:48px;font-weight:800;background:linear-gradient(135deg,#3dc1d3,#667eea);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.theme-a .hero .desc{font-size:13px;color:#8899aa;margin-top:4px}
+.theme-a .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.theme-a .card{background:rgba(255,255,255,0.05);border-radius:14px;padding:14px;text-align:center;border:1px solid rgba(255,255,255,0.06)}
+.theme-a .card .ic{font-size:24px}
+.theme-a .card .lb{font-size:10px;color:#6a8a9a;margin:4px 0}
+.theme-a .card .vl{font-size:20px;font-weight:700;color:#e8f0f8}
+.theme-a .tide{background:rgba(255,255,255,0.05);border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,0.06)}
+.theme-a .tide .bar{display:flex;gap:2px;height:60px;align-items:flex-end;margin:8px 0}
+.theme-a .tide .bar div{flex:1;border-radius:2px 2px 0 0;background:linear-gradient(to top,#3dc1d3,transparent);min-height:4px}
+.theme-a .tide .flow{text-align:center;font-size:13px;color:#3dc1d3}
+
+/* THEME B - Light Clean */
+.theme-b{background:linear-gradient(160deg,#f0f4f8 0%,#e2ebf0 50%,#f0f4f8 100%);padding:16px;color:#1a2a3a}
+.theme-b .hdr{text-align:center;padding:10px 0 16px}
+.theme-b .hdr h2{font-size:16px;color:#00a8cc}
+.theme-b .hdr p{font-size:11px;color:#6a7a8a}
+.theme-b .hero{border-radius:16px;padding:20px;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,0.05);text-align:center;margin-bottom:12px;border:1px solid rgba(0,0,0,0.04)}
+.theme-b .hero .temp{font-size:48px;font-weight:800;background:linear-gradient(135deg,#00c6a0,#00a8cc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.theme-b .hero .desc{font-size:13px;color:#6a7a8a;margin-top:4px}
+.theme-b .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.theme-b .card{background:#fff;border-radius:14px;padding:14px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.04)}
+.theme-b .card .ic{font-size:24px}
+.theme-b .card .lb{font-size:10px;color:#6a7a8a;margin:4px 0}
+.theme-b .card .vl{font-size:20px;font-weight:700;color:#1a2a3a}
+.theme-b .tide{background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.04)}
+.theme-b .tide .bar{display:flex;gap:2px;height:60px;align-items:flex-end;margin:8px 0}
+.theme-b .tide .bar div{flex:1;border-radius:2px 2px 0 0;background:linear-gradient(to top,#00c6a0,transparent);min-height:4px}
+.theme-b .tide .flow{text-align:center;font-size:13px;color:#00a8cc}
+
+/* THEME C - Sunset Warm */
+.theme-c{background:linear-gradient(160deg,#1a0a0a 0%,#3a1a0a 30%,#2a1520 60%,#1a0a2a 100%);padding:16px}
+.theme-c .hdr{text-align:center;padding:10px 0 16px}
+.theme-c .hdr h2{font-size:16px;color:#f0a030}
+.theme-c .hdr p{font-size:11px;color:#a08060}
+.theme-c .hero{border-radius:16px;padding:20px;background:linear-gradient(135deg,rgba(240,160,48,0.12),rgba(200,80,60,0.08));border:1px solid rgba(240,160,48,0.2);text-align:center;margin-bottom:12px}
+.theme-c .hero .temp{font-size:48px;font-weight:800;background:linear-gradient(135deg,#f0a030,#e06040);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.theme-c .hero .desc{font-size:13px;color:#a08060;margin-top:4px}
+.theme-c .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.theme-c .card{background:rgba(255,255,255,0.05);border-radius:14px;padding:14px;text-align:center;border:1px solid rgba(240,160,48,0.1)}
+.theme-c .card .ic{font-size:24px}
+.theme-c .card .lb{font-size:10px;color:#a08060;margin:4px 0}
+.theme-c .card .vl{font-size:20px;font-weight:700;color:#f0d8b0}
+.theme-c .tide{background:rgba(255,255,255,0.05);border-radius:14px;padding:14px;border:1px solid rgba(240,160,48,0.1)}
+.theme-c .tide .bar{display:flex;gap:2px;height:60px;align-items:flex-end;margin:8px 0}
+.theme-c .tide .bar div{flex:1;border-radius:2px 2px 0 0;background:linear-gradient(to top,#f0a030,transparent);min-height:4px}
+.theme-c .tide .flow{text-align:center;font-size:13px;color:#f0a030}
+
+.nav{margin-top:12px;display:flex;gap:4px}
+.nav div{flex:1;padding:10px 4px;text-align:center;font-size:11px;border-radius:10px}
+.nav div.act{font-weight:700}
+.theme-a .nav div{color:#6a8a9a}
+.theme-a .nav div.act{color:#3dc1d3;background:rgba(61,193,211,0.1)}
+.theme-b .nav div{color:#6a7a8a}
+.theme-b .nav div.act{color:#00a8cc;background:rgba(0,168,204,0.08)}
+.theme-c .nav div{color:#a08060}
+.theme-c .nav div.act{color:#f0a030;background:rgba(240,160,48,0.1)}
+</style>
+</head>
+<body>
+<h1>🎣 香港釣魚資訊站 — 設計概念</h1>
+<div class="grid">
+
+<!-- THEME A: Dark Ocean -->
+<div>
+  <div class="label">🌊 A. 深海夜釣風（Dark Ocean）</div>
+  <div class="phone">
+    <div class="phone-inner theme-a">
+      <div class="top-bar"><span>12:00</span><span>📶 5G 82%</span></div>
+      <div class="hdr"><h2>🐟 香港釣魚資訊站</h2><p>by 小婷 · 農曆五月十二 · 🌊 大生流</p></div>
+      <div class="hero">
+        <div class="temp">29°C</div>
+        <div class="desc">☀️ 天晴 · 體感 31°C</div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="ic">💨</div><div class="lb">風力</div><div class="vl">3級</div></div>
+        <div class="card"><div class="ic">🧭</div><div class="lb">風向</div><div class="vl">東南</div></div>
+        <div class="card"><div class="ic">🌊</div><div class="lb">浪高</div><div class="vl">0.5m</div></div>
+        <div class="card"><div class="ic">💧</div><div class="lb">濕度</div><div class="vl">78%</div></div>
+      </div>
+      <div class="tide">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#6a8a9a"><span>0.5m</span><span>🌊 今日潮汐</span><span>2.1m</span></div>
+        <div class="bar">
+          <div style="height:20%"></div><div style="height:25%"></div><div style="height:40%"></div><div style="height:60%"></div><div style="height:80%"></div><div style="height:95%"></div><div style="height:100%"></div><div style="height:90%"></div><div style="height:70%"></div><div style="height:50%"></div><div style="height:35%"></div><div style="height:25%"></div>
+          <div style="height:20%"></div><div style="height:30%"></div><div style="height:50%"></div><div style="height:70%"></div><div style="height:85%"></div><div style="height:90%"></div><div style="height:85%"></div><div style="height:70%"></div><div style="height:50%"></div><div style="height:35%"></div><div style="height:25%"></div><div style="height:20%"></div>
+        </div>
+        <div class="flow">🔺 漲潮 08:42 (2.1m) · 🔻 退潮 15:18 (0.5m)</div>
+      </div>
+      <div class="nav">
+        <div class="act">🌤️ 首頁</div>
+        <div>🐟 魚種</div>
+        <div>📝 記錄</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THEME B: Light Clean (Current style upgrade) -->
+<div>
+  <div class="label">☀️ B. 清新海洋風（Light Clean）</div>
+  <div class="phone">
+    <div class="phone-inner theme-b">
+      <div class="top-bar" style="color:#6a7a8a"><span>12:00</span><span>📶 5G 82%</span></div>
+      <div class="hdr"><h2>🐟 香港釣魚資訊站</h2><p>by 小婷 · 農曆五月十二 · 🌊 大生流</p></div>
+      <div class="hero">
+        <div class="temp">29°C</div>
+        <div class="desc">☀️ 天晴 · 體感 31°C</div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="ic">💨</div><div class="lb">風力</div><div class="vl">3級</div></div>
+        <div class="card"><div class="ic">🧭</div><div class="lb">風向</div><div class="vl">東南</div></div>
+        <div class="card"><div class="ic">🌊</div><div class="lb">浪高</div><div class="vl">0.5m</div></div>
+        <div class="card"><div class="ic">💧</div><div class="lb">濕度</div><div class="vl">78%</div></div>
+      </div>
+      <div class="tide">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#6a7a8a"><span>0.5m</span><span>🌊 今日潮汐</span><span>2.1m</span></div>
+        <div class="bar">
+          <div style="height:20%"></div><div style="height:25%"></div><div style="height:40%"></div><div style="height:60%"></div><div style="height:80%"></div><div style="height:95%"></div><div style="height:100%"></div><div style="height:90%"></div><div style="height:70%"></div><div style="height:50%"></div><div style="height:35%"></div><div style="height:25%"></div>
+          <div style="height:20%"></div><div style="height:30%"></div><div style="height:50%"></div><div style="height:70%"></div><div style="height:85%"></div><div style="height:90%"></div><div style="height:85%"></div><div style="height:70%"></div><div style="height:50%"></div><div style="height:35%"></div><div style="height:25%"></div><div style="height:20%"></div>
+        </div>
+        <div class="flow">🔺 漲潮 08:42 (2.1m) · 🔻 退潮 15:18 (0.5m)</div>
+      </div>
+      <div class="nav">
+        <div class="act">🌤️ 首頁</div>
+        <div>🐟 魚種</div>
+        <div>📝 記錄</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THEME C: Sunset Warm -->
+<div>
+  <div class="label">🌅 C. 日落釣魚風（Sunset Warm）</div>
+  <div class="phone">
+    <div class="phone-inner theme-c">
+      <div class="top-bar"><span>18:30</span><span>📶 5G 82%</span></div>
+      <div class="hdr"><h2>🐟 香港釣魚資訊站</h2><p>by 小婷 · 農曆五月十二 · 🌊 大生流</p></div>
+      <div class="hero">
+        <div class="temp">27°C</div>
+        <div class="desc">🌅 日落 · 體感 29°C</div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="ic">💨</div><div class="lb">風力</div><div class="vl">2級</div></div>
+        <div class="card"><div class="ic">🧭</div><div class="lb">風向</div><div class="vl">西南</div></div>
+        <div class="card"><div class="ic">🌊</div><div class="lb">浪高</div><div class="vl">0.3m</div></div>
+        <div class="card"><div class="ic">💧</div><div class="lb">濕度</div><div class="vl">72%</div></div>
+      </div>
+      <div class="tide">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#a08060"><span>0.5m</span><span>🌊 今日潮汐</span><span>2.1m</span></div>
+        <div class="bar">
+          <div style="height:20%"></div><div style="height:25%"></div><div style="height:40%"></div><div style="height:60%"></div><div style="height:80%"></div><div style="height:95%"></div><div style="height:100%"></div><div style="height:90%"></div><div style="height:70%"></div><div style="height:50%"></div><div style="height:35%"></div><div style="height:25%"></div>
+          <div style="height:20%"></div><div style="height:30%"></div><div style="height:50%"></div><div style="height:70%"></div><div style="height:85%"></div><div style="height:90%"></div><div style="height:85%"></div><div style="height:70%"></div><div style="height:50%"></div><div style="height:35%"></div><div style="height:25%"></div><div style="height:20%"></div>
+        </div>
+        <div class="flow">🔺 漲潮 08:42 (2.1m) · 🔻 退潮 15:18 (0.5m)</div>
+      </div>
+      <div class="nav">
+        <div class="act">🌤️ 首頁</div>
+        <div>🐟 魚種</div>
+        <div>📝 記錄</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<p style="text-align:center;margin:30px 0;color:#8899aa;font-size:13px">👆 3 個設計概念，睇下大佬鍾意邊個 style？</p>
+</body>
+</html>
