@@ -163,11 +163,12 @@ h1::before{content:'🎣';position:absolute;left:16px;top:50%;transform:translat
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div>
         <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">🐟 魚種</label>
-        <select id="cfFish" style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a" required></select>
+        <select id="cfFish" style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a" onchange="toggleCustomFish()"></select>
+        <input type="text" id="cfFishCustom" placeholder="輸入魚名..." style="display:none;width:100%;margin-top:6px;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a">
       </div>
       <div>
         <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">📅 日期</label>
-        <input type="date" id="cfDate" style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a" required>
+        <input type="date" id="cfDate" onchange="autoFillWeather()" style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a" required>
       </div>
       <div>
         <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">📏 長度 (cm)</label>
@@ -177,12 +178,65 @@ h1::before{content:'🎣';position:absolute;left:16px;top:50%;transform:translat
         <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">📍 釣點</label>
         <input type="text" id="cfLocation" placeholder="例如：青山灣" style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a">
       </div>
+      <div>
+        <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">🌊 潮汐階段</label>
+        <select id="cfTide" style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a">
+          <option value="">— 唔記得 —</option>
+          <option value="上流">🔺 上流（漲緊）</option>
+          <option value="流頂">⏸️ 流頂（最高）</option>
+          <option value="落流">🔻 落流（退緊）</option>
+          <option value="退盡">⬇️ 退盡（最低）</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">🎣 釣具</label>
+        <input type="text" id="cfGear" placeholder="例如：1.5磯竿、3B波" style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a">
+      </div>
     </div>
+
+    <!-- Weather auto-fill (readonly, editable if needed) -->
+    <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">🌡️ 天氣</label>
+        <input type="text" id="cfWeather" placeholder="自動填入..." style="width:100%;padding:10px 12px;background:#f0f6fa;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a">
+      </div>
+      <div>
+        <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">💨 風浪</label>
+        <input type="text" id="cfWindWave" placeholder="自動填入..." style="width:100%;padding:10px 12px;background:#f0f6fa;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a">
+      </div>
+    </div>
+
     <div style="margin-top:10px">
       <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">📝 備註</label>
-      <textarea id="cfNotes" rows="2" placeholder="天氣、水流、用咩餌..." style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a;resize:vertical;font-family:inherit"></textarea>
+      <textarea id="cfNotes" rows="2" placeholder="用咩餌、水流方向..." style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a;resize:vertical;font-family:inherit"></textarea>
     </div>
-    <button type="submit" style="width:100%;margin-top:12px;padding:12px;border:none;border-radius:14px;background:linear-gradient(135deg,#00c6a0,#00a8cc);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">📥 記錄釣獲</button>
+
+    <!-- Photo upload -->
+    <div style="margin-top:10px">
+      <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">📸 魚穫相</label>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input type="file" id="cfPhoto" accept="image/*" capture="environment" style="flex:1;padding:8px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:13px">
+      </div>
+      <div id="cfPhotoPreview" style="display:none;margin-top:6px;position:relative">
+        <img id="cfPhotoImg" style="max-width:100%;max-height:200px;border-radius:10px;object-fit:contain">
+        <button type="button" onclick="clearPhoto()" style="position:absolute;top:4px;right:4px;width:28px;height:28px;border:none;background:rgba(0,0,0,0.6);color:#fff;border-radius:50%;font-size:14px;cursor:pointer">✕</button>
+      </div>
+    </div>
+
+    <!-- Video upload -->
+    <div style="margin-top:10px">
+      <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">🎬 釣獲短片</label>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input type="file" id="cfVideo" accept="video/*" capture="environment" style="flex:1;padding:8px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:13px">
+        <span style="font-size:11px;color:#8899aa" id="cfVideoSize"></span>
+      </div>
+      <div id="cfVideoPreview" style="display:none;margin-top:6px;position:relative">
+        <video id="cfVideoEl" controls style="max-width:100%;max-height:200px;border-radius:10px"></video>
+        <button type="button" onclick="clearVideo()" style="position:absolute;top:4px;right:4px;width:28px;height:28px;border:none;background:rgba(0,0,0,0.6);color:#fff;border-radius:50%;font-size:14px;cursor:pointer">✕</button>
+      </div>
+    </div>
+
+    <button type="submit" style="width:100%;margin-top:14px;padding:12px;border:none;border-radius:14px;background:linear-gradient(135deg,#00c6a0,#00a8cc);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s">📥 記錄釣獲</button>
   </form>
   <div id="catchConfirm" style="display:none;margin-top:8px;text-align:center;padding:8px;background:#e8faf0;border-radius:10px;color:#00a87a;font-size:13px">✅ 記錄成功！</div>
 </div>
@@ -975,53 +1029,256 @@ async function loadTide(station, spotName) {
 }
 
 // ============================================================
-// CATCH RECORDS (localStorage)
+// CATCH RECORDS (localStorage + IndexedDB for media)
 // ============================================================
+
+// --- IndexedDB setup ---
+var IDB_REQ = indexedDB.open('FishingCatchesDB', 1);
+IDB_REQ.onupgradeneeded = function(e) {
+  var db = e.target.result;
+  if (!db.objectStoreNames.contains('media')) {
+    db.createObjectStore('media', { keyPath: 'id' });
+  }
+};
+var IDB_INSTANCE = null;
+IDB_REQ.onsuccess = function(e) { IDB_INSTANCE = e.target.result; };
+IDB_REQ.onerror = function() { console.log('IndexedDB init failed (media will not be stored)'); };
+
+function idbSave(key, data) {
+  return new Promise(function(resolve) {
+    if (!IDB_INSTANCE) { resolve(false); return; }
+    try {
+      var tx = IDB_INSTANCE.transaction('media', 'readwrite');
+      tx.objectStore('media').put({ id: key, data: data });
+      tx.oncomplete = function() { resolve(true); };
+      tx.onerror = function() { resolve(false); };
+    } catch(e) { resolve(false); }
+  });
+}
+function idbGet(key) {
+  return new Promise(function(resolve) {
+    if (!IDB_INSTANCE) { resolve(null); return; }
+    try {
+      var tx = IDB_INSTANCE.transaction('media', 'readonly');
+      var r = tx.objectStore('media').get(key);
+      r.onsuccess = function() { resolve(r.result ? r.result.data : null); };
+      r.onerror = function() { resolve(null); };
+    } catch(e) { resolve(null); }
+  });
+}
+function idbDelete(key) {
+  return new Promise(function(resolve) {
+    if (!IDB_INSTANCE) { resolve(false); return; }
+    try {
+      var tx = IDB_INSTANCE.transaction('media', 'readwrite');
+      tx.objectStore('media').delete(key);
+      tx.oncomplete = function() { resolve(true); };
+      tx.onerror = function() { resolve(false); };
+    } catch(e) { resolve(false); }
+  });
+}
+
+// --- localStorage ---
 function getCatches() {
   try { return JSON.parse(localStorage.getItem('fishing_catches')||'[]'); } catch(e) { return []; }
 }
 function saveCatches(data) {
   localStorage.setItem('fishing_catches', JSON.stringify(data));
 }
+
+// --- Form helpers ---
+var PENDING_PHOTO = null;  // {data: base64, type: mime}
+var PENDING_VIDEO = null;
+
+function toggleCustomFish() {
+  var sel = document.getElementById('cfFish');
+  var custom = document.getElementById('cfFishCustom');
+  custom.style.display = sel.value === '__other__' ? 'block' : 'none';
+  if (sel.value !== '__other__') custom.value = '';
+}
+
+function autoFillWeather() {
+  // Auto-fill weather from current cached data
+  var weather = window._AUTO_WEATHER;
+  if (!weather) {
+    // Try to get from the weather grid
+    var wEl = document.getElementById('weatherGrid');
+    if (wEl) {
+      var text = wEl.textContent || '';
+      weather = text.replace(/⏳.*?中\.\.\./g, '').trim();
+    }
+  }
+  var wInput = document.getElementById('cfWeather');
+  var wwInput = document.getElementById('cfWindWave');
+  if (!wInput) return;
+
+  // Try to get current tide info too
+  var tideInfo = '';
+  var tideEl = document.getElementById('tideCurrent');
+  if (tideEl) tideInfo = tideEl.textContent || '';
+
+  // Get current weather text from main page
+  var tempText = '', windText = '', waveText = '';
+  var items = document.querySelectorAll('.it');
+  items.forEach(function(item) {
+    var label = (item.querySelector('.lb') || {}).textContent || '';
+    var val = (item.querySelector('.vl') || {}).textContent || '';
+    if (label === '氣溫') tempText = val;
+    if (label === '風力') windText = val;
+    if (label === '浪高') waveText = val;
+  });
+
+  if (tempText || windText) {
+    wInput.value = (tempText ? '🌡️'+tempText : '') + (windText ? ' 💨'+windText : '');
+  }
+  // Try to get from HKO if available
+  try {
+    if (window.HKO_CACHE && HKO_CACHE.temperature && HKO_CACHE.temperature.data && HKO_CACHE.temperature.data[0]) {
+      var hkoTemp = HKO_CACHE.temperature.data[0].value;
+      var hkoPlace = HKO_CACHE.temperature.data[0].place;
+      wInput.value = hkoPlace + ' ' + hkoTemp + '°C';
+    }
+  } catch(e) {}
+
+  if (waveText) {
+    wwInput.value = waveText + (tideInfo ? ' · ' + tideInfo.replace(/🌊/g,'').trim() : '');
+  } else {
+    wwInput.value = tideInfo ? tideInfo.replace(/🌊/g,'').trim() : '';
+  }
+}
+
+function readFileAsDataURL(file) {
+  return new Promise(function(resolve) {
+    var r = new FileReader();
+    r.onload = function(e) { resolve(e.target.result); };
+    r.onerror = function() { resolve(null); };
+    r.readAsDataURL(file);
+  });
+}
+
+// Photo handling
+document.addEventListener('change', function(e) {
+  if (e.target.id === 'cfPhoto') {
+    var file = e.target.files[0];
+    if (!file) { clearPhoto(); return; }
+    readFileAsDataURL(file).then(function(data) {
+      if (!data) return;
+      PENDING_PHOTO = { data: data, type: file.type, name: file.name };
+      var preview = document.getElementById('cfPhotoPreview');
+      var img = document.getElementById('cfPhotoImg');
+      preview.style.display = 'block';
+      img.src = data;
+    });
+  }
+  if (e.target.id === 'cfVideo') {
+    var file = e.target.files[0];
+    if (!file) { clearVideo(); return; }
+    var sizeInfo = document.getElementById('cfVideoSize');
+    sizeInfo.textContent = (file.size / 1024 / 1024).toFixed(1) + 'MB';
+    readFileAsDataURL(file).then(function(data) {
+      if (!data) return;
+      PENDING_VIDEO = { data: data, type: file.type, name: file.name };
+      var preview = document.getElementById('cfVideoPreview');
+      var video = document.getElementById('cfVideoEl');
+      preview.style.display = 'block';
+      video.src = data;
+    });
+  }
+});
+
+function clearPhoto() {
+  PENDING_PHOTO = null;
+  document.getElementById('cfPhotoPreview').style.display = 'none';
+  document.getElementById('cfPhoto').value = '';
+}
+function clearVideo() {
+  PENDING_VIDEO = null;
+  document.getElementById('cfVideoPreview').style.display = 'none';
+  document.getElementById('cfVideoEl').src = '';
+  document.getElementById('cfVideo').value = '';
+  document.getElementById('cfVideoSize').textContent = '';
+}
+
+// --- Init ---
 function initRecords() {
   var sel = document.getElementById('cfFish');
   if (!sel) return;
-  sel.innerHTML = '<option value="">揀魚種...</option>';
-  FISH.map(function(f){ return f[0]; }).forEach(function(n) {
-    sel.innerHTML += '<option value="'+n+'">'+n+'</option>';
-  });
+  // Build fish options
+  var names = FISH.map(function(f){ return f[0]; });
+  sel.innerHTML = '<option value="">揀魚種...</option>' +
+    names.map(function(n) { return '<option value="'+n+'">'+n+'</option>'; }).join('') +
+    '<option value="__other__">✏️ 其他（自訂）</option>';
+
   document.getElementById('cfDate').value = new Date().toISOString().slice(0,10);
   renderCatches();
+  // Auto-fill weather after a short delay
+  setTimeout(autoFillWeather, 1000);
 
   // Form submit
   document.getElementById('catchForm').addEventListener('submit', function(e) {
     e.preventDefault();
     var fish = document.getElementById('cfFish').value;
     if (!fish) return;
+    var fishName = fish;
+    if (fish === '__other__') {
+      var custom = document.getElementById('cfFishCustom').value.trim();
+      if (!custom) { alert('請輸入魚名'); return; }
+      fishName = custom;
+    }
+    var catchId = Date.now();
     var catches = getCatches();
     catches.unshift({
-      id: Date.now(),
-      fish: fish,
+      id: catchId,
+      fish: fishName,
+      isCustom: fish === '__other__',
       date: document.getElementById('cfDate').value,
       size: document.getElementById('cfSize').value || '',
       location: document.getElementById('cfLocation').value || '',
-      notes: document.getElementById('cfNotes').value || ''
+      tidePhase: document.getElementById('cfTide').value || '',
+      gear: document.getElementById('cfGear').value || '',
+      weather: document.getElementById('cfWeather').value || '',
+      windWave: document.getElementById('cfWindWave').value || '',
+      notes: document.getElementById('cfNotes').value || '',
+      hasPhoto: !!PENDING_PHOTO,
+      hasVideo: !!PENDING_VIDEO
     });
     saveCatches(catches);
-    renderCatches();
+
+    // Save media to IndexedDB
+    var mediaPromises = [];
+    if (PENDING_PHOTO) {
+      mediaPromises.push(idbSave(catchId + '_photo', PENDING_PHOTO));
+    }
+    if (PENDING_VIDEO) {
+      mediaPromises.push(idbSave(catchId + '_video', PENDING_VIDEO));
+    }
+    Promise.all(mediaPromises).then(function() {
+      renderCatches();
+    });
+
+    // Reset form
     document.getElementById('catchForm').reset();
     document.getElementById('cfDate').value = new Date().toISOString().slice(0,10);
+    clearPhoto();
+    clearVideo();
+    document.getElementById('cfFishCustom').style.display = 'none';
+
     var confirm = document.getElementById('catchConfirm');
     confirm.style.display = 'block';
     setTimeout(function(){ confirm.style.display = 'none'; }, 2500);
   });
 }
+
 function deleteCatch(id) {
   if (!confirm('❌ 確定刪除呢個記錄？')) return;
   var catches = getCatches().filter(function(c){ return c.id !== id; });
   saveCatches(catches);
+  // Also delete media
+  idbDelete(id + '_photo');
+  idbDelete(id + '_video');
   renderCatches();
 }
+
 function renderCatches() {
   var catches = getCatches();
   // Stats
@@ -1050,24 +1307,89 @@ function renderCatches() {
     listEl.innerHTML = '<div class="card" style="text-align:center;padding:40px 20px;color:#8899aa"><div style="font-size:48px;margin-bottom:10px">🎣</div><div style="font-size:15px">未有釣獲記錄</div><div style="font-size:13px;margin-top:4px">記錄你嘅第一次釣獲啦！</div></div>';
     return;
   }
+
   listEl.innerHTML = catches.map(function(c){
-    var imgUrl = FISH_IMG[c.fish];
-    var imgHtml = imgUrl ? '<img src="'+imgUrl+'" style="width:44px;height:44px;border-radius:10px;object-fit:cover;background:#f0f4f8" onerror="this.style.display=`none`">' : '🐟';
+    var fishImg = FISH_IMG[c.fish] ? '<img src="'+FISH_IMG[c.fish]+'" style="width:44px;height:44px;border-radius:10px;object-fit:cover;background:#f0f4f8" onerror="this.style.display=`none`">' : '🐟';
     var locationDisplay = c.location || '未記錄';
     var sizeDisplay = c.size ? ' · 📏 '+c.size+'cm' : '';
-    var notesDisplay = c.notes ? '<div style="font-size:12px;color:#4a5a6a;margin-top:2px">📝 '+c.notes+'</div>' : '';
     var dateParts = c.date.split('-');
     var dateDisplay = dateParts.length === 3 ? dateParts[1]+'/'+dateParts[2] : c.date;
-    return '<div class="card" style="padding:14px;display:flex;gap:12px;align-items:center;margin-bottom:10px">'+
-      '<div style="flex-shrink:0">'+imgHtml+'</div>'+
-      '<div style="flex:1;min-width:0">'+
-        '<div style="font-size:15px;font-weight:600;color:#1a2a3a">'+c.fish+'</div>'+
-        '<div style="font-size:12px;color:#6a7a8a">📅 '+dateDisplay+' · 📍 '+locationDisplay+sizeDisplay+'</div>'+
-        notesDisplay+
+    var tideDisplay = c.tidePhase ? ' · '+c.tidePhase : '';
+    var gearDisplay = c.gear ? ' · 🎣 '+c.gear : '';
+    var weatherDisplay = c.weather ? '<div style="font-size:11px;color:#6a7a8a;margin-top:2px">🌡️ '+c.weather+(c.windWave?' · 💨 '+c.windWave:'')+'</div>' : '';
+    var notesDisplay = c.notes ? '<div style="font-size:12px;color:#4a5a6a;margin-top:2px">📝 '+c.notes+'</div>' : '';
+
+    // Media section
+    var mediaHtml = '';
+    if (c.hasPhoto || c.hasVideo) {
+      mediaHtml = '<div style="margin-top:6px;display:flex;gap:6px">';
+      if (c.hasPhoto) {
+        mediaHtml += '<div class="catch-media-thumb" data-id="'+c.id+'" data-type="photo" style="width:60px;height:60px;border-radius:8px;background:#eef2f6;overflow:hidden;cursor:pointer" onclick="openCatchMedia('+c.id+',\'photo\')"><div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:24px">📸</div></div>';
+      }
+      if (c.hasVideo) {
+        mediaHtml += '<div class="catch-media-thumb" data-id="'+c.id+'" data-type="video" style="width:60px;height:60px;border-radius:8px;background:#eef2f6;overflow:hidden;cursor:pointer" onclick="openCatchMedia('+c.id+',\'video\')"><div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:24px">🎬</div></div>';
+      }
+      mediaHtml += '</div>';
+    }
+
+    return '<div class="card" style="padding:14px;margin-bottom:10px">'+
+      '<div style="display:flex;gap:12px;align-items:flex-start">'+
+        '<div style="flex-shrink:0">'+fishImg+'</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:15px;font-weight:600;color:#1a2a3a">'+c.fish+'</div>'+
+          '<div style="font-size:12px;color:#6a7a8a">📅 '+dateDisplay+' · 📍 '+locationDisplay+sizeDisplay+tideDisplay+gearDisplay+'</div>'+
+          weatherDisplay+
+          notesDisplay+
+          mediaHtml+
+        '</div>'+
+        '<button onclick="deleteCatch('+c.id+')" style="flex-shrink:0;width:32px;height:32px;border:none;background:#fee;color:#e74c3c;border-radius:50%;font-size:16px;cursor:pointer;transition:all 0.2s">✕</button>'+
       '</div>'+
-      '<button onclick="deleteCatch('+c.id+')" style="flex-shrink:0;width:32px;height:32px;border:none;background:#fee;color:#e74c3c;border-radius:50%;font-size:16px;cursor:pointer;transition:all 0.2s">✕</button>'+
     '</div>';
   }).join('');
+
+  // Load media thumbnails async
+  catches.forEach(function(c) {
+    if (c.hasPhoto) {
+      idbGet(c.id + '_photo').then(function(media) {
+        if (!media) return;
+        var thumb = listEl.querySelector('.catch-media-thumb[data-id="'+c.id+'"][data-type="photo"]');
+        if (thumb) {
+          thumb.innerHTML = '<img src="'+media.data+'" style="width:100%;height:100%;object-fit:cover">';
+        }
+      });
+    }
+    if (c.hasVideo) {
+      idbGet(c.id + '_video').then(function(media) {
+        if (!media) return;
+        var thumb = listEl.querySelector('.catch-media-thumb[data-id="'+c.id+'"][data-type="video"]');
+        if (thumb) {
+          thumb.innerHTML = '<div style="position:relative;width:100%;height:100%"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px">▶️</div></div>';
+        }
+      });
+    }
+  });
+}
+
+// Media lightbox
+function openCatchMedia(id, type) {
+  idbGet(id + '_' + type).then(function(media) {
+    if (!media) return;
+    var lightbox = document.getElementById('catchMediaLightbox');
+    if (!lightbox) {
+      // Create lightbox
+      lightbox = document.createElement('div');
+      lightbox.id = 'catchMediaLightbox';
+      lightbox.style.cssText = 'display:none;position:fixed;z-index:9999;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);justify-content:center;align-items:center;cursor:pointer';
+      lightbox.onclick = function() { this.style.display = 'none'; };
+      document.body.appendChild(lightbox);
+    }
+    if (type === 'photo') {
+      lightbox.innerHTML = '<img src="'+media.data+'" style="max-width:95%;max-height:95%;object-fit:contain;border-radius:8px">';
+    } else {
+      lightbox.innerHTML = '<video src="'+media.data+'" controls style="max-width:95%;max-height:95%;border-radius:8px"></video>';
+    }
+    lightbox.style.display = 'flex';
+  });
 }
 
 // Init records on page load
