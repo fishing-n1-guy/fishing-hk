@@ -1,1 +1,1 @@
-{"catches": [{"id": 999, "fish": "test石斑", "date": "2026-06-27"}, {"id": 777, "fish": "tunnel test", "date": "2026-06-27"}], "version": 1}
+{"catches": [{"id": 1782575706974, "fish": "Test test", "isCustom": true, "date": "2026-06-27", "size": "", "location": "", "tidePhase": "", "gear": "", "weather": "🌡️京士柏 28°C", "windWave": "🧭 ? · 💨 1級 · 💥陣風19 · 🌊浪 0.42m(小浪)", "notes": "", "hasPhoto": false, "hasVideo": false}, {"id": 999, "fish": "test石斑", "date": "2026-06-27"}, {"id": 777, "fish": "tunnel test", "date": "2026-06-27"}], "version": 1}
