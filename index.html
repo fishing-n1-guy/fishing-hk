@@ -939,8 +939,8 @@ function renderTideExtremes(exList, stationCode, spotName) {
     h += '<div class="te">';
     dayData.extremes.forEach(function(e) {
       var icon = e.type == 'high' ? '🔺' : '🔻';
-      var lbl = e.type == 'high' ? '漲潮' : '退潮';
-      if (e.height_m < 0.5) lbl += '(乾潮)';
+      var lbl = e.type == 'high' ? '滿潮' : '乾潮';
+      if (e.height_m < 0.3) lbl += '(極低潮)';
       h += '<div class="tei"><div class="ticon">'+icon+'</div><div class="ttime" style="font-size:14px;font-weight:600;color:var(--text)">'+e.time+'</div><div class="theight">'+e.height_m.toFixed(2)+'m</div><div class="ttype">'+lbl+'</div></div>';
     });
     h += '</div>';
