@@ -1136,7 +1136,8 @@ function autoFillWeather() {
     var sb=(item.querySelector('.sub')||{}).textContent||'';
     if(lb==='風力'){
       var bfNum = parseInt(vl) || 0;
-      windStr = '🧭 ' + (sb.replace(/吹/,'').replace(/風.*/,'').trim() || '?') + ' · 💨 ' + bfNum + '級';
+      var dir = sb.replace('吹','').replace(/風.*/,'').trim();
+      windStr = '🧭 ' + (dir || '?') + ' · 💨 ' + bfNum + '級';
     }
     if(lb==='陣風' && vl) windStr += ' · 💥陣風' + vl;
     if(lb==='浪高' && !waveStr) waveStr = '🌊浪 '+vl+(sb?'('+sb+')':'');
