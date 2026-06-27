@@ -1298,6 +1298,8 @@ function initRecords() {
     }
     Promise.all(mediaPromises).then(function() {
       renderCatches();
+      // Auto push to cloud
+      setTimeout(function(){ cloudPush(catches); }, 500);
     });
 
     // Reset form
@@ -1468,9 +1470,9 @@ function openCatchMedia(id, type) {
   });
 }
 
-// Cloud sync (direct GitHub API write + public read)
-// Note: For personal use. Public release will use Cloudflare Workers.
-var SYNC_URL = 'https://raw.githubusercontent.com/fishing-n1-guy/fishing-hk/main/data/records/sync_master.json';
+// Cloud sync (tunnel-based - auto push to GitHub)
+var SYNC_READ_URL = 'https://raw.githubusercontent.com/fishing-n1-guy/fishing-hk/main/data/records/sync_master.json';
+var SYNC_TUNNEL = 'https://editor-sig-parks-activity.trycloudflare.com';
 
 function cloudFetch() {
   var card = document.getElementById('syncCard');
@@ -1479,36 +1481,50 @@ function cloudFetch() {
   card.style.display = 'block';
   status.innerHTML = '🔄 正在同步...';
   
-  fetch(SYNC_URL + '?_t=' + Date.now())
+  fetch(SYNC_READ_URL + '?_t=' + Date.now())
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (data && data.catches && data.catches.length > 0) {
         var local = getCatches();
         var localIds = {};
         local.forEach(function(c){ localIds[c.id] = true; });
-        var merged = false;
+        var newCount = 0;
         data.catches.forEach(function(c) {
           if (!localIds[c.id]) {
             local.push(c);
             localIds[c.id] = true;
-            merged = true;
+            newCount++;
           }
         });
-        if (merged) {
+        if (newCount > 0) {
           local.sort(function(a,b){ return b.id - a.id; });
           saveCatches(local);
           renderCatches();
-          status.innerHTML = '☁️ 同步完成 · 匯入 ' + (data.catches.length - Object.keys(localIds).length + merged) + ' 條紀錄';
-        } else {
-          status.innerHTML = '☁️ 已是最新 (' + local.length + ' 條紀錄)';
         }
+        status.innerHTML = '☁️ 已同步 (' + local.length + ' 條紀錄)';
       } else {
         status.innerHTML = '☁️ 未有雲端紀錄';
       }
     })
-    .catch(function(err) {
-      status.innerHTML = '☁️ 讀取失敗 (離線?)';
+    .catch(function() {
+      status.innerHTML = '☁️ —';
     });
+}
+
+function cloudPush(newCatches) {
+  // Sync new records to cloud via tunnel
+  if (!newCatches || newCatches.length === 0) return;
+  var all = getCatches();
+  fetch(SYNC_TUNNEL + '/sync', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({catches: all})
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if (d.ok) {
+      var st = document.getElementById('syncStatus');
+      if (st) st.innerHTML = '☁️ 已上傳 (' + d.synced + ' 條)';
+    }
+  }).catch(function(){});
 }
 
 // Try cloud sync on page load
