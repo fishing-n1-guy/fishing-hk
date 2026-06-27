@@ -1098,53 +1098,43 @@ function toggleCustomFish() {
 }
 
 function autoFillWeather() {
-  // Auto-fill weather from current cached data
-  var weather = window._AUTO_WEATHER;
-  if (!weather) {
-    // Try to get from the weather grid
-    var wEl = document.getElementById('weatherGrid');
-    if (wEl) {
-      var text = wEl.textContent || '';
-      weather = text.replace(/⏳.*?中\.\.\./g, '').trim();
-    }
-  }
   var wInput = document.getElementById('cfWeather');
   var wwInput = document.getElementById('cfWindWave');
   if (!wInput) return;
 
-  // Try to get current tide info too
-  var tideInfo = '';
-  var tideEl = document.getElementById('tideCurrent');
-  if (tideEl) tideInfo = tideEl.textContent || '';
-
-  // Get current weather text from main page
-  var tempText = '', windText = '', waveText = '';
+  var tempText = '', windLabel = '', windVal = '', gustVal = '', waveVal = '', waveLabel = '', dirText = '';
   var items = document.querySelectorAll('.it');
   items.forEach(function(item) {
     var label = (item.querySelector('.lb') || {}).textContent || '';
     var val = (item.querySelector('.vl') || {}).textContent || '';
+    var sub = (item.querySelector('.sub') || {}).textContent || '';
     if (label === '氣溫') tempText = val;
-    if (label === '風力') windText = val;
-    if (label === '浪高') waveText = val;
+    if (label === '風力') { windLabel = val; windVal = sub; }
+    if (label === '風向') { dirText = val; if (sub) windVal = sub; }
+    if (label === '陣風') gustVal = val;
+    if (label === '浪高') { waveVal = val; waveLabel = sub; }
+    if (label === '湧浪') { if (!waveVal) { waveVal = val; waveLabel = sub; } }
   });
 
-  if (tempText || windText) {
-    wInput.value = (tempText ? '🌡️'+tempText : '') + (windText ? ' 💨'+windText : '');
-  }
-  // Try to get from HKO if available
+  // Build weather string
+  var weatherStr = '';
+  if (tempText) weatherStr += '🌡️' + tempText;
+  // Try HKO for place name
   try {
     if (window.HKO_CACHE && HKO_CACHE.temperature && HKO_CACHE.temperature.data && HKO_CACHE.temperature.data[0]) {
-      var hkoTemp = HKO_CACHE.temperature.data[0].value;
       var hkoPlace = HKO_CACHE.temperature.data[0].place;
-      wInput.value = hkoPlace + ' ' + hkoTemp + '°C';
+      if (tempText) weatherStr = '🌡️' + hkoPlace + ' ' + tempText.replace('°C','') + '°C';
     }
   } catch(e) {}
+  wInput.value = weatherStr;
 
-  if (waveText) {
-    wwInput.value = waveText + (tideInfo ? ' · ' + tideInfo.replace(/🌊/g,'').trim() : '');
-  } else {
-    wwInput.value = tideInfo ? tideInfo.replace(/🌊/g,'').trim() : '';
-  }
+  // Build wind/wave string
+  var waveStr = '';
+  if (dirText) waveStr += '🧭 ' + dirText;
+  if (windLabel) waveStr += (waveStr ? ' · ' : '') + '💨 ' + windLabel + '級' + (windVal ? '(' + windVal + ')' : '');
+  if (gustVal) waveStr += (waveStr ? ' · ' : '') + '💥陣風' + gustVal;
+  if (waveVal) waveStr += (waveStr ? ' · ' : '') + '🌊浪' + waveVal + (waveLabel ? '(' + waveLabel + ')' : '');
+  wwInput.value = waveStr;
 }
 
 function readFileAsDataURL(file) {
