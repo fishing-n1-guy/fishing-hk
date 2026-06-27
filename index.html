@@ -354,19 +354,22 @@ function getLunarDate(date) {
 }
 
 function getTideFlow(lunarDay) {
-  // 生流 (spring tide): around new moon (1-3) and full moon (15-17)
-  // 死流 (neap tide): around 1st quarter (7-9) and last quarter (22-24)
-  if ((lunarDay >= 1 && lunarDay <= 3) || (lunarDay >= 15 && lunarDay <= 17))
-    return {type:"生流", icon:"🌊", desc:"大流，水流急，釣魚黃金期！"};
-  if ((lunarDay >= 7 && lunarDay <= 9) || (lunarDay >= 22 && lunarDay <= 24))
-    return {type:"死流", icon:"🌀", desc:"細流，水流慢，魚開口差啲"};
+  // 月相水流週期表 (based on lunar phase)
+  if (lunarDay >= 1 && lunarDay <= 3)
+    return {type:"起流 → 生流", icon:"🌊", desc:"水流開始變急，初三達到最急（大潮）"};
   if (lunarDay >= 4 && lunarDay <= 6)
-    return {type:"生流尾", icon:"🌊", desc:"生流尾，仲有得玩"};
-  if (lunarDay >= 10 && lunarDay <= 14)
-    return {type:"死流尾→生流", icon:"🌊", desc:"就嚟生流，開始好轉"};
-  if (lunarDay >= 18 && lunarDay <= 21)
-    return {type:"生流尾", icon:"🌊", desc:"生流尾，仲有得玩"};
-  return {type:"死流尾", icon:"🌀", desc:"就嚟死流，水流轉慢"};
+    return {type:"轉流 → 緩流", icon:"🌊", desc:"水流由最急逐漸減緩"};
+  if (lunarDay >= 7 && lunarDay <= 9)
+    return {type:"死流", icon:"🌀", desc:"水流最慢，漲退落差最小（小潮）"};
+  if (lunarDay >= 10 && lunarDay <= 13)
+    return {type:"起流 → 漸急", icon:"🌊", desc:"水流再次開始增強"};
+  if (lunarDay >= 14 && lunarDay <= 18)
+    return {type:"大生流", icon:"🌊", desc:"配合滿月，水流再次變得很急"};
+  if (lunarDay >= 19 && lunarDay <= 21)
+    return {type:"流 → 緩流", icon:"🌊", desc:"水流逐漸減慢"};
+  if (lunarDay >= 22 && lunarDay <= 24)
+    return {type:"死流", icon:"🌀", desc:"下半月死流期，水流最慢"};
+  return {type:"起流", icon:"🌊", desc:"水流重新發動，準備下個循環"};
 }
 
 // Update header with lunar date
