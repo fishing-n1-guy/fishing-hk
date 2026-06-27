@@ -852,38 +852,36 @@ function tideDateStr(month, day) {
 
 function renderTideExtremes(exList, stationCode, spotName) {
   // Spot selector
-  var h = '<div style="margin-bottom:6px;font-size:11px;color:#8899aa">📍 選擇釣魚位置（自動對應最近潮汐站）</div>';
+  var h = '<div style="margin-bottom:6px;font-size:11px;color:#c0a888">📍 選擇釣魚位置（自動對應最近潮汐站）</div>';
+  
+  // Show only today & tomorrow
+  var days = exList ? exList.slice(0, 2) : [];
   
   // 生流/死流 info
   var lunar = getLunarDate(new Date());
   var flow = lunar ? getTideFlow(lunar.day) : null;
   if (flow) {
-    h += '<div style="text-align:center;padding:6px;margin:4px 0 8px;background:rgba(61,193,211,0.08);border:1px solid rgba(61,193,211,0.2);border-radius:8px">' +
-      '<span style="font-size:20px">' + flow.icon + '</span> ' +
-      '<span style="font-size:14px;font-weight:600;color:#3dc1d3">' + flow.type + '</span>' +
-      '<span style="font-size:12px;color:#8899aa;margin-left:6px">' + flow.desc + '</span>' +
+    h += '<div style="text-align:center;padding:8px;margin:4px 0 8px;background:rgba(240,160,48,0.1);border:1px solid rgba(240,160,48,0.2);border-radius:10px">' +
+      '<span style="font-size:22px">' + flow.icon + '</span> ' +
+      '<span style="font-size:15px;font-weight:700;color:var(--accent)">' + flow.type + '</span>' +
+      '<span style="font-size:12px;color:var(--text3);margin-left:6px">' + flow.desc + '</span>' +
       '</div>';
   }
   
   // Region buttons
   var regionKeys = Object.keys(SPOT_REGIONS);
   var activeRegion = ACTIVE_REGION;
-  
-  // If a spot is selected and no region set, find its region
   if (spotName && !activeRegion) {
     for (var r in SPOT_REGIONS) {
       if (SPOT_REGIONS[r].indexOf(spotName) >= 0) { activeRegion = r; break; }
     }
   }
-  
-  // Show region tabs
   h += '<div class="tsel" style="margin:4px 0">';
   regionKeys.forEach(function(r) {
     h += '<button' + (r == activeRegion ? ' class="act"' : '') + ' onclick="toggleRegion(\''+r+'\')">'+r+'</button>';
   });
   h += '</div>';
   
-  // Show spots in active region as dropdown
   if (activeRegion && SPOT_REGIONS[activeRegion]) {
     h += '<select class="tdrop" onchange="if(this.value)loadTideSpot(this.value)">';
     h += '<option value="">— 揀釣點 —</option>';
@@ -894,43 +892,56 @@ function renderTideExtremes(exList, stationCode, spotName) {
     h += '</select>';
   }
   
-  // Station name indicator
   if (spotName) {
-    h += '<div style="text-align:center;font-size:10px;color:#8899aa;margin:4px 0 8px">📍 ' + spotName + ' → 參考 ' + TIDE_STATIONS[stationCode] + ' 潮汐站</div>';
+    h += '<div style="text-align:center;font-size:10px;color:var(--text3);margin:4px 0 8px">📍 ' + spotName + ' → 參考 ' + TIDE_STATIONS[stationCode] + ' 潮汐站</div>';
   }
   
   // Real-time water level
-  var rtHtml = '';
   if (RTIDE_CACHE && RTIDE_CACHE[stationCode] !== undefined) {
     var rt = RTIDE_CACHE[stationCode];
-    rtHtml = '<div style="display:flex;justify-content:center;gap:10px;padding:6px 10px;margin:6px 0;background:rgba(61,193,211,0.08);border-radius:8px;font-size:13px">' +
-      '<span>📡 即時水位：<b style="color:#3dc1d3;font-size:18px">' + rt.level.toFixed(2) + 'm</b></span>' +
-      '<span style="color:#8899aa">(' + rt.time.slice(-5) + ')</span>' +
+    h += '<div style="display:flex;justify-content:center;gap:10px;padding:8px 10px;margin:6px 0;background:rgba(240,160,48,0.08);border-radius:10px;font-size:13px">' +
+      '<span>📡 即時水位：<b style="color:var(--accent);font-size:20px">' + rt.level.toFixed(2) + 'm</b></span>' +
+      '<span style="color:var(--text3)">(' + rt.time.slice(-5) + ')</span>' +
       '</div>';
   }
   
-  // Station selector (advanced)
-  h += '<div style="font-size:11px;color:#667788;margin:8px 0 4px">⚙️ 直接揀潮汐站：</div><div class="tsel">';
+  // Station selector
+  h += '<div style="font-size:11px;color:var(--text3);margin:8px 0 4px">⚙️ 直接揀潮汐站：</div><div class="tsel">';
   TIDE_ORDER.forEach(function(c) {
     h += '<button' + (c == stationCode && !spotName ? ' class="act"' : '') + ' onclick="loadTide(\''+c+'\')">'+TIDE_STATIONS[c]+'</button>';
   });
   h += '</div>';
   
-  if (!exList || exList.length == 0) {
-    h += '<div style="text-align:center;padding:12px;color:#8899aa;font-size:13px">暫無潮汐資料</div>';
+  if (!days || days.length == 0) {
+    h += '<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px">暫無潮汐資料</div>';
     document.getElementById('tideExtremes').innerHTML = h;
     return;
   }
   
-  exList.forEach(function(dayData) {
+  // Show today & tomorrow
+  days.forEach(function(dayData) {
     var label = tideDateStr(dayData.month, dayData.day);
-    h += '<div style="font-size:11px;color:#8899aa;margin:8px 0 4px">— ' + label + ' —</div>';
+    var lunarDay = getLunarDate(new Date(new Date().getFullYear(), dayData.month-1, dayData.day));
+    var dayFlow = lunarDay ? getTideFlow(lunarDay.day) : null;
+    
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 4px">' +
+      '<span style="font-size:13px;font-weight:700;color:var(--text)">' + label + '</span>' +
+      (dayFlow ? '<span style="font-size:11px;color:var(--accent)">' + dayFlow.icon + ' ' + dayFlow.type + '</span>' : '') +
+      '</div>';
+    
+    // Tidal range
+    if (dayData.extremes && dayData.extremes.length >= 2) {
+      var hMax = Math.max.apply(null, dayData.extremes.map(function(e){return e.height_m;}));
+      var hMin = Math.min.apply(null, dayData.extremes.map(function(e){return e.height_m;}));
+      h += '<div style="font-size:11px;color:var(--text3);margin:0 0 6px">潮差：<b style="color:var(--text)">' + (hMax - hMin).toFixed(2) + 'm</b>（最高 ' + hMax.toFixed(2) + 'm / 最低 ' + hMin.toFixed(2) + 'm）</div>';
+    }
+    
     h += '<div class="te">';
     dayData.extremes.forEach(function(e) {
       var icon = e.type == 'high' ? '🔺' : '🔻';
       var lbl = e.type == 'high' ? '漲潮' : '退潮';
       if (e.height_m < 0.5) lbl += '(乾潮)';
-      h += '<div class="tei"><div class="ticon">'+icon+'</div><div class="ttime">'+e.time+'</div><div class="theight">'+e.height_m.toFixed(2)+'m</div><div class="ttype">'+lbl+'</div></div>';
+      h += '<div class="tei"><div class="ticon">'+icon+'</div><div class="ttime" style="font-size:14px;font-weight:600;color:var(--text)">'+e.time+'</div><div class="theight">'+e.height_m.toFixed(2)+'m</div><div class="ttype">'+lbl+'</div></div>';
     });
     h += '</div>';
   });
@@ -973,7 +984,7 @@ async function fetchRealtimeTide() {
 function renderTideChart(hourlyList) {
   var h = '';
   if (!hourlyList || hourlyList.length == 0) {
-    document.getElementById('tideChart').innerHTML = '<div style="text-align:center;padding:12px;color:#8899aa;font-size:13px">暫無潮汐圖表</div>';
+    document.getElementById('tideChart').innerHTML = '<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px">暫無潮汐圖表</div>';
     return;
   }
   
@@ -982,11 +993,12 @@ function renderTideChart(hourlyList) {
   var minH = dayData.min_h, maxH = dayData.max_h;
   var range = Math.max(maxH - minH, 0.5);
   
-  h += '<div class="tst"><span>'+minH.toFixed(2)+'m</span><span style="font-size:11px;color:#3dc1d3">今日潮汐曲線</span><span>'+maxH.toFixed(2)+'m</span></div>';
+  h += '<div class="tst"><span>'+minH.toFixed(2)+'m</span><span style="font-size:11px;color:var(--accent)">今日潮汐曲線</span><span>'+maxH.toFixed(2)+'m</span></div>';
   h += '<div class="tch">';
   
   var now = new Date();
   var currentHour = now.getHours();
+  var currentMin = now.getMinutes();
   
   for (var i = 0; i < 24; i++) {
     var ht = heights[i];
@@ -994,11 +1006,21 @@ function renderTideChart(hourlyList) {
     var pct = ((ht - minH) / range) * 100;
     if (pct < 3) pct = 3;
     var cls = i <= currentHour ? 'thnw' : 'thfu';
-    h += '<div class="'+cls+'" style="height:'+pct.toFixed(0)+'%" title="'+i+':00 '+ht.toFixed(2)+'m"></div>';
+    // Mark current hour with extra height
+    var extra = (i == currentHour) ? ';border-bottom:2px solid var(--accent)' : '';
+    h += '<div class="'+cls+'" style="height:'+pct.toFixed(0)+'%'+extra+'" title="'+i+':00 '+ht.toFixed(2)+'m"></div>';
   }
   
   h += '</div>';
-  h += '<div class="tst"><span>00:00</span><span>12:00</span><span>23:00</span></div>';
+  
+  // Time labels every 3 hours, more visible
+  h += '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin:2px 0">';
+  h += '<span style="color:var(--text);font-weight:600">00</span>';
+  h += '<span>03</span><span>06</span><span>09</span>';
+  h += '<span style="color:var(--accent);font-weight:700">'+currentHour+':'+(currentMin<10?'0':'')+currentMin+' ← 而家</span>';
+  h += '<span>12</span><span>15</span><span>18</span><span>21</span>';
+  h += '<span style="color:var(--text);font-weight:600">23</span>';
+  h += '</div>';
   
   document.getElementById('tideChart').innerHTML = h;
 }
