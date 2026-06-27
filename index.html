@@ -850,12 +850,35 @@ function tideDateStr(month, day) {
     (now.getMonth()+1)==month&&now.getDate()+2==day?"後日":month+"/"+day;
 }
 
-function renderTideExtremes(exList, stationCode, spotName) {
+function renderTideExtremes(exList, stationCode, spotName, hDay) {
   // Spot selector
   var h = '<div style="margin-bottom:6px;font-size:11px;color:#c0a888">📍 選擇釣魚位置（自動對應最近潮汐站）</div>';
   
-  // Show only today & tomorrow
-  var days = exList ? exList.slice(0, 2) : [];
+  // Show today & tomorrow - match extremes to hourly chart days
+  var days = [];
+  if (exList && hDay) {
+    // Use the first hourly day as reference for matching
+    var refMonth = hDay.month;
+    var refDay = hDay.day;
+    var refNextDay = refDay + 1;
+    // Handle month rollover
+    var daysInMonth = [31,28+(refMonth==2&&((new Date().getFullYear()%4==0&&new Date().getFullYear()%100!=0)||new Date().getFullYear()%400==0)?1:0),31,30,31,30,31,31,30,31,30,31][refMonth-1];
+    if (refNextDay > daysInMonth) { refNextDay = 1; }
+    
+    for (var di = 0; di < exList.length; di++) {
+      var dd = exList[di];
+      if (dd.month == refMonth && dd.day == refDay) {
+        days.push(dd);
+      } else if (dd.month == refMonth && dd.day == refNextDay) {
+        days.push(dd);
+      } else if (dd.month == (refMonth % 12) + 1 && dd.day == 1 && refDay == daysInMonth) {
+        days.push(dd);
+      }
+    }
+  }
+  if (days.length == 0 && exList) {
+    days = exList.slice(0, 2);
+  }
   
   // 生流/死流 info
   var lunar = getLunarDate(new Date());
@@ -938,9 +961,8 @@ function renderTideExtremes(exList, stationCode, spotName) {
     
     h += '<div class="te">';
     dayData.extremes.forEach(function(e) {
-      var icon = e.type == 'high' ? '🔺' : '🔻';
-      var lbl = e.type == 'high' ? '滿潮' : '乾潮';
-      if (e.height_m < 0.3) lbl += '(極低潮)';
+      var icon = e.type == 'high' ? '⬆️' : '⬇️';
+      var lbl = e.type == 'high' ? '漲盡' : '退盡';
       h += '<div class="tei"><div class="ticon">'+icon+'</div><div class="ttime" style="font-size:14px;font-weight:600;color:var(--text)">'+e.time+'</div><div class="theight">'+e.height_m.toFixed(2)+'m</div><div class="ttype">'+lbl+'</div></div>';
     });
     h += '</div>';
@@ -981,14 +1003,15 @@ async function fetchRealtimeTide() {
   } catch(e) {}
 }
 
-function renderTideChart(hourlyList) {
+function renderTideChart(hourlyList, dayIdx) {
   var h = '';
   if (!hourlyList || hourlyList.length == 0) {
     document.getElementById('tideChart').innerHTML = '<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px">暫無潮汐圖表</div>';
     return;
   }
   
-  var dayData = hourlyList[0];
+  dayIdx = dayIdx || 0;
+  var dayData = hourlyList[dayIdx] || hourlyList[0];
   var heights = dayData.heights;
   var minH = dayData.min_h, maxH = dayData.max_h;
   var range = Math.max(maxH - minH, 0.5);
@@ -1082,8 +1105,13 @@ async function loadTide(station, spotName) {
     if (!s) throw 'No data for station';
     
     document.getElementById('tideStationLabel').textContent = spotName ? '— ' + TIDE_STATIONS[station] + '（' + spotName + '）' : '— ' + TIDE_STATIONS[station];
-    renderTideExtremes(s.extremes, station, spotName);
-    renderTideChart(s.hourly);
+    // Match extremes to hourly days for correct alignment
+    var hDay = (s.hourly && s.hourly[0]) ? s.hourly[0] : null;
+    var eDay = (s.extremes && s.extremes[0]) ? s.extremes[0] : null;
+    // If extremes start from tomorrow but hourly starts from today, use tomorrow's hourly for the chart
+    var chartIdx = (hDay && eDay && !(hDay.month == eDay.month && hDay.day == eDay.day)) ? 1 : 0;
+    renderTideExtremes(s.extremes, station, spotName, hDay);
+    renderTideChart(s.hourly, chartIdx);
     renderTideCurrent(s.extremes);
   } catch(e) {
     document.getElementById('tideExtremes').innerHTML = '<div style="text-align:center;padding:20px;color:#e74c3c">❌ 載入潮汐失敗</div>';
