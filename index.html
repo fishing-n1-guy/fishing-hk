@@ -854,30 +854,32 @@ function renderTideExtremes(exList, stationCode, spotName, hDay) {
   // Spot selector
   var h = '<div style="margin-bottom:6px;font-size:11px;color:#c0a888">📍 選擇釣魚位置（自動對應最近潮汐站）</div>';
   
-  // Show today & tomorrow - match extremes to hourly chart days
+  // Show today & tomorrow - use hourly data to find actual extremes
   var days = [];
-  if (exList && hDay) {
-    // Use the first hourly day as reference for matching
-    var refMonth = hDay.month;
-    var refDay = hDay.day;
-    var refNextDay = refDay + 1;
-    // Handle month rollover
-    var daysInMonth = [31,28+(refMonth==2&&((new Date().getFullYear()%4==0&&new Date().getFullYear()%100!=0)||new Date().getFullYear()%400==0)?1:0),31,30,31,30,31,31,30,31,30,31][refMonth-1];
-    if (refNextDay > daysInMonth) { refNextDay = 1; }
-    
-    for (var di = 0; di < exList.length; di++) {
-      var dd = exList[di];
-      if (dd.month == refMonth && dd.day == refDay) {
-        days.push(dd);
-      } else if (dd.month == refMonth && dd.day == refNextDay) {
-        days.push(dd);
-      } else if (dd.month == (refMonth % 12) + 1 && dd.day == 1 && refDay == daysInMonth) {
-        days.push(dd);
+  if (hDay && hDay.heights) {
+    // Find actual high/low from hourly readings
+    function findExtremes(hd, label) {
+      var hrs = hd.heights;
+      var hMax = -1, hMin = 999;
+      var hMaxIdx = 0, hMinIdx = 0;
+      for (var hi = 0; hi < hrs.length; hi++) {
+        if (hrs[hi] === null) continue;
+        if (hrs[hi] > hMax) { hMax = hrs[hi]; hMaxIdx = hi; }
+        if (hrs[hi] < hMin) { hMin = hrs[hi]; hMinIdx = hi; }
       }
+      return {
+        month: hd.month, day: hd.day, label: label,
+        extremes: [
+          {type: hMaxIdx < hMinIdx ? 'high' : 'low', time: ('0'+hMaxIdx).slice(-2)+':00', height_m: hMax, hour: hMaxIdx, min: 0},
+          {type: hMaxIdx < hMinIdx ? 'low' : 'high', time: ('0'+hMinIdx).slice(-2)+':00', height_m: hMin, hour: hMinIdx, min: 0}
+        ]
+      };
     }
-  }
-  if (days.length == 0 && exList) {
-    days = exList.slice(0, 2);
+    days.push(findExtremes(hDay, '今日'));
+    // Tomorrow - use the next hourly entry if available
+    if (window._HOURLY_LIST && window._HOURLY_LIST[1]) {
+      days.push(findExtremes(window._HOURLY_LIST[1], '明日'));
+    }
   }
   
   // 生流/死流 info
@@ -1105,13 +1107,12 @@ async function loadTide(station, spotName) {
     if (!s) throw 'No data for station';
     
     document.getElementById('tideStationLabel').textContent = spotName ? '— ' + TIDE_STATIONS[station] + '（' + spotName + '）' : '— ' + TIDE_STATIONS[station];
-    // Match extremes to hourly days for correct alignment
+    // Store hourly list globally for extremes calculation
+    window._HOURLY_LIST = s.hourly;
+    // Show chart for the same day as extremes are derived from
     var hDay = (s.hourly && s.hourly[0]) ? s.hourly[0] : null;
-    var eDay = (s.extremes && s.extremes[0]) ? s.extremes[0] : null;
-    // If extremes start from tomorrow but hourly starts from today, use tomorrow's hourly for the chart
-    var chartIdx = (hDay && eDay && !(hDay.month == eDay.month && hDay.day == eDay.day)) ? 1 : 0;
     renderTideExtremes(s.extremes, station, spotName, hDay);
-    renderTideChart(s.hourly, chartIdx);
+    renderTideChart(s.hourly, 0);
     renderTideCurrent(s.extremes);
   } catch(e) {
     document.getElementById('tideExtremes').innerHTML = '<div style="text-align:center;padding:20px;color:#e74c3c">❌ 載入潮汐失敗</div>';
