@@ -876,6 +876,8 @@ function renderTideExtremes(exList, stationCode, spotName, hDay) {
       };
     }
     days.push(findExtremes(hDay, '今日'));
+    // Store today's extremes for renderTideCurrent
+    if (days.length > 0) window._TODAY_EXTREMES = days[0].extremes;
     // Tomorrow - use the next hourly entry if available
     if (window._HOURLY_LIST && window._HOURLY_LIST[1]) {
       days.push(findExtremes(window._HOURLY_LIST[1], '明日'));
@@ -1038,41 +1040,50 @@ function renderTideChart(hourlyList, dayIdx) {
   
   h += '</div>';
   
-  // Time labels every 3 hours, more visible
-  h += '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin:2px 0">';
-  h += '<span style="color:var(--text);font-weight:600">00</span>';
-  h += '<span>03</span><span>06</span><span>09</span>';
-  h += '<span style="color:var(--accent);font-weight:700">'+currentHour+':'+(currentMin<10?'0':'')+currentMin+' ← 而家</span>';
-  h += '<span>12</span><span>15</span><span>18</span><span>21</span>';
-  h += '<span style="color:var(--text);font-weight:600">23</span>';
+  // Time labels - 24 positions matching the 24 bars
+  h += '<div style="display:flex;gap:0;margin:2px 0;position:relative">';
+  for (var ti = 0; ti < 24; ti++) {
+    var timeLabel = '';
+    if (ti % 3 === 0) {
+      timeLabel = ('0'+ti).slice(-2);
+    }
+    var isNow = (ti === currentHour);
+    h += '<div style="flex:1;text-align:center;font-size:9px;color:'+(isNow?'var(--accent)':'var(--text3)')+';font-weight:'+(isNow?'700':'400')+'">'+
+      (isNow ? currentHour+':'+(currentMin<10?'0':'')+currentMin : timeLabel)+
+      '</div>';
+  }
   h += '</div>';
+  // Current time indicator line on chart
+  h += '<div style="text-align:right;font-size:9px;color:var(--accent);margin-top:-2px">← 而家</div>';
   
   document.getElementById('tideChart').innerHTML = h;
 }
 
 function renderTideCurrent(exList) {
-  if (!exList || exList.length == 0) return;
-  var today = exList[0];
-  if (!today || !today.extremes || today.extremes.length < 2) return;
+  // Use the same day's extremes as the chart - derived from hourly data
+  var todayData = null;
+  if (window._TODAY_EXTREMES && window._TODAY_EXTREMES.length >= 2) {
+    todayData = {extremes: window._TODAY_EXTREMES};
+  }
+  if (!todayData) return;
   
   var now = new Date();
   var currentMin = now.getHours() * 60 + now.getMinutes();
   
   // Find current tide state
   var prev = null, next = null;
-  for (var i = 0; i < today.extremes.length; i++) {
-    var e = today.extremes[i];
+  for (var i = 0; i < todayData.extremes.length; i++) {
+    var e = todayData.extremes[i];
     var eMin = e.hour * 60 + e.min;
     if (eMin <= currentMin) prev = e;
     if (eMin >= currentMin && !next) next = e;
   }
   
   if (!prev || !next) {
-    // Before first tide or after last
     if (prev) {
-      var first = today.extremes[0];
-      var last = today.extremes[today.extremes.length - 1];
-      var h = '<div class="tcur">🌊 下個漲退潮係 <b>'+first.time+'</b> ('+first.height_m.toFixed(2)+'m) — '+ (first.type=='high'?'🔺漲潮':'🔻退潮') +'</div>';
+      var first = todayData.extremes[0];
+      var lbl = first.type == 'high' ? '🔺漲潮' : '🔻退潮';
+      var h = '<div class="tcur">🌊 下個'+lbl+'：<b>'+first.time+'</b> ('+first.height_m.toFixed(2)+'m)</div>';
       document.getElementById('tideCurrent').innerHTML = h;
     }
     return;
