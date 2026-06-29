@@ -376,20 +376,28 @@ function getLunarDate(date) {
 function getTideFlow(lunarDay) {
   // 月相水流週期表 (based on lunar phase)
   if (lunarDay >= 1 && lunarDay <= 3)
-    return {type:"起流 → 生流", icon:"🌊", desc:"水流開始變急，初三達到最急（大潮）"};
+    return {type:"起流 → 生流", icon:"🌊", desc:"水流開始變急，初三達到最急（大潮）",
+      detail:"⚡ 水流由靜轉動，魚群開始活躍覓食\n🎯 適合磯釣、投釣\n🐟 黃腳鱲、黑鱲開始開口\n💡 建議用重少少嘅鉛，等餌可以到底"};
   if (lunarDay >= 4 && lunarDay <= 6)
-    return {type:"轉流 → 緩流", icon:"🌊", desc:"水流由最急逐漸減緩"};
+    return {type:"轉流 → 緩流", icon:"🌊", desc:"水流由最急逐漸減緩",
+      detail:"🌊 大潮過後，水流開始減慢\n🎯 適合艇釣、筏釣\n🐟 石斑、紅鮋等底棲魚活躍\n💡 用輕鉛、細絲，等魚唔會feel到阻力"};
   if (lunarDay >= 7 && lunarDay <= 9)
-    return {type:"死流", icon:"🌀", desc:"水流最慢，漲退落差最小（小潮）"};
+    return {type:"死流", icon:"🌀", desc:"水流最慢，漲退落差最小（小潮）",
+      detail:"🌀 水流最慢嘅時期，魚嘅活動力降低\n🎯 適合釣棚、碼頭、內灣\n🐟 泥鯭、沙鑽、細鱗等小品種\n💡 用超輕鉛、生蝦仔做餌，魚食餌會好輕口"};
   if (lunarDay >= 10 && lunarDay <= 13)
-    return {type:"起流 → 漸急", icon:"🌊", desc:"水流再次開始增強"};
+    return {type:"起流 → 漸急", icon:"🌊", desc:"水流再次開始增強",
+      detail:"⚡ 死流尾，水流開始返生\n🎯 適合磯釣、岸釣\n🐟 魚群開始恢復活動，由深水游返淺水\n💡 可以開始用返正常鉛重，釣棚由深慢慢校淺"};
   if (lunarDay >= 14 && lunarDay <= 18)
-    return {type:"大生流", icon:"🌊", desc:"配合滿月，水流再次變得很急"};
+    return {type:"大生流", icon:"🌊", desc:"配合滿月，水流再次變得很急",
+      detail:"🌕 滿月大生流，水流最急，釣魚黃金期！\n🎯 適合磯釣、重磯、船釣\n🐟 大魚最活躍！石斑、紅鮋、黃腳鱲都開口\n💡 用重磅釣組、大餌，流水急要加鉛重\n🌙 夜晚釣仲好過日頭，月光底下魚仲活躍"};
   if (lunarDay >= 19 && lunarDay <= 21)
-    return {type:"流 → 緩流", icon:"🌊", desc:"水流逐漸減慢"};
+    return {type:"流 → 緩流", icon:"🌊", desc:"水流逐漸減慢",
+      detail:"🌊 大生流尾聲，水流開始回緩\n🎯 適合艇釣、筏釣、岸釣\n🐟 魚群由深水區慢慢散去\n💡 釣棚由深校返淺，鉛重慢慢減輕"};
   if (lunarDay >= 22 && lunarDay <= 24)
-    return {type:"死流", icon:"🌀", desc:"下半月死流期，水流最慢"};
-  return {type:"起流", icon:"🌊", desc:"水流重新發動，準備下個循環"};
+    return {type:"死流", icon:"🌀", desc:"下半月死流期，水流最慢",
+      detail:"🌀 又到死流期，魚又開始收口\n🎯 適合內灣、碼頭、避風塘\n🐟 細魚為主，大魚會去深水區休息\n💡 用超輕釣組、細鉤、細餌，等魚易啲入口"};
+  return {type:"起流", icon:"🌊", desc:"水流重新發動，準備下個循環",
+      detail:"⚡ 死流尾準備返生，係下個釣魚黃金期前嘅預備\n🎯 適合試水、探釣\n🐟 魚開始由深水慢慢向淺水移動\n💡 可以開始準備重磅釣組，迎接下個生流"};
 }
 
 // Update header with lunar date
@@ -888,10 +896,11 @@ function renderTideExtremes(exList, stationCode, spotName, hDay) {
   var lunar = getLunarDate(new Date());
   var flow = lunar ? getTideFlow(lunar.day) : null;
   if (flow) {
-    h += '<div style="text-align:center;padding:8px;margin:4px 0 8px;background:rgba(240,160,48,0.1);border:1px solid rgba(240,160,48,0.2);border-radius:10px">' +
+    h += '<div style="text-align:center;padding:8px;margin:4px 0 8px;background:rgba(240,160,48,0.1);border:1px solid rgba(240,160,48,0.2);border-radius:10px;cursor:pointer" onclick="showTideDetail(\''+flow.type+'\',\''+flow.desc+'\',\''+flow.detail.replace(/'/g,"\\'").replace(/\n/g,"\\n")+'\')">' +
       '<span style="font-size:22px">' + flow.icon + '</span> ' +
       '<span style="font-size:15px;font-weight:700;color:var(--accent)">' + flow.type + '</span>' +
       '<span style="font-size:12px;color:var(--text3);margin-left:6px">' + flow.desc + '</span>' +
+      '<div style="font-size:9px;color:var(--accent);margin-top:4px">👆 撳入去睇流水對釣魚嘅影響</div>' +
       '</div>';
   }
   
@@ -1650,6 +1659,26 @@ function toggleCatchDetail(id) {
     var isOpen = el.style.display !== 'none';
     el.style.display = isOpen ? 'none' : 'block';
   }
+}
+
+// Show tide flow detail popup
+function showTideDetail(type, desc, detail) {
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;z-index:10000;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center';
+  overlay.onclick = function(){ document.body.removeChild(overlay); };
+  
+  var box = document.createElement('div');
+  box.style.cssText = 'background:linear-gradient(160deg,#2a1520,#1a0a1a);border:1px solid rgba(240,160,48,0.3);border-radius:20px;padding:24px;margin:20px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.5)';
+  box.onclick = function(e){ e.stopPropagation(); };
+  
+  box.innerHTML = '<div style="text-align:right"><button onclick="document.body.removeChild(this.parentElement.parentElement.parentElement)" style="width:32px;height:32px;border:none;background:rgba(255,255,255,0.1);color:var(--text);border-radius:50%;font-size:18px;cursor:pointer">✕</button></div>' +
+    '<div style="text-align:center;font-size:28px;margin-bottom:8px">🌊</div>' +
+    '<div style="text-align:center;font-size:18px;font-weight:800;color:var(--accent);margin-bottom:4px">'+type+'</div>' +
+    '<div style="text-align:center;font-size:13px;color:var(--text3);margin-bottom:16px">'+desc+'</div>' +
+    '<div style="font-size:14px;color:var(--text);line-height:2;white-space:pre-line">'+detail+'</div>';
+  
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
 }
 
 // Init records on page load
