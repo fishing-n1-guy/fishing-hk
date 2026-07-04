@@ -1308,6 +1308,14 @@ function initRecords() {
     var confirm = document.getElementById('catchConfirm');
     confirm.style.display = 'block';
     setTimeout(function(){ confirm.style.display = 'none'; }, 2500);
+    
+    // First record? Show sync code popup
+    if (catches.length === 1) {
+      var code = getSyncCode();
+      setTimeout(function(){
+        alert('🎉 第一條記錄！\n\n🔑 你嘅同步碼：' + code + '\n\n📱 喺其他手機/電腦輸入呢個碼\n就可以同步所有紀錄！\n\n（可以去 ☁️ 雲端同步 度睇返）');
+      }, 800);
+    }
   });
 }
 
@@ -1503,7 +1511,7 @@ function cloudFetch() {
           if (merged) renderCatches();
           cloudPush();
         }
-        status.innerHTML = '☁️ 已同步 (' + local.length + ' 條)';
+        status.innerHTML = '☁️ 已同步 ' + local.length + ' 條<br><b style="font-size:18px;letter-spacing:2px;color:#f0a030">🔑 ' + code + '</b><br><span style="font-size:10px;color:#8899aa">喺其他 device 輸入呢個碼</span>';
       } else {
         // No cloud records yet, push local
         status.innerHTML = '☁️ 新用戶';
@@ -1539,7 +1547,7 @@ function cloudPush() {
   }).then(function(r){ return r.json(); }).then(function(d){
     if (d.ok) {
       var st = document.getElementById('syncStatus');
-      if (st) st.innerHTML = '☁️ 已同步 (' + d.count + ' 條) · ' + code;
+      if (st) st.innerHTML = '☁️ 已同步 ' + d.count + ' 條<br><b style="font-size:18px;letter-spacing:2px;color:#f0a030">🔑 ' + code + '</b><br><span style="font-size:10px;color:#8899aa">喺其他 device 輸入呢個碼</span>';
     }
   }).catch(function(){});
 }
