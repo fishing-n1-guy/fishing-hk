@@ -1474,8 +1474,9 @@ var SYNC_CODE = localStorage.getItem('syncCode') || '';
 
 function getSyncCode() {
   if (!SYNC_CODE) {
-    // Generate new code
-    SYNC_CODE = 'U' + Math.random().toString(36).slice(2, 8).toUpperCase();
+    // Default: shared code so all browsers auto-sync
+    // Users can change it via the input field to create their own account
+    SYNC_CODE = 'HKFISH';
     localStorage.setItem('syncCode', SYNC_CODE);
   }
   return SYNC_CODE;
