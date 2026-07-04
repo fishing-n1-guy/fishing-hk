@@ -4,4 +4,4 @@ compatibility_date = "2024-01-01"
 
 [[kv_namespaces]]
 binding = "RECORDS_KV"
-id = "fishing-sync-kv"
+id = "af449bc847ba48d192cd09f82544bf97"
