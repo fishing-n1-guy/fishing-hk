@@ -232,20 +232,19 @@ h1 span{color:var(--text2)!important}
       <textarea id="cfNotes" rows="2" placeholder="用咩餌、水流方向..." style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:14px;color:#1a2a3a;resize:vertical;font-family:inherit"></textarea>
     </div>
 
-    <!-- Photo URL -->
+    <!-- Photo upload -->
     <div style="margin-top:10px">
-      <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">📸 魚穫相 URL</label>
-      <input type="url" id="cfPhoto" placeholder="貼上圖片連結（例如 imgur.com/xxx.jpg）" style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:13px;color:#1a2a3a" oninput="previewPhotoUrl()">
+      <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">📸 魚穫相</label>
+      <input type="file" id="cfPhoto" accept="image/*" style="width:100%;padding:8px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:13px" onchange="handlePhotoSelect()">
       <div id="cfPhotoPreview" style="display:none;margin-top:6px;position:relative">
         <img id="cfPhotoImg" style="max-width:100%;max-height:200px;border-radius:10px;object-fit:contain">
         <button type="button" onclick="clearPhoto()" style="position:absolute;top:4px;right:4px;width:28px;height:28px;border:none;background:rgba(0,0,0,0.6);color:#fff;border-radius:50%;font-size:14px;cursor:pointer">✕</button>
       </div>
     </div>
 
-    <!-- Video URL -->
-    <div style="margin-top:10px">
-      <label style="font-size:11px;color:#6a7a8a;display:block;margin-bottom:4px">🎬 釣獲短片 URL</label>
-      <input type="url" id="cfVideo" placeholder="貼上影片連結（例如 YouTube link）" style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:13px;color:#1a2a3a">
+    <!-- Video upload (coming soon) -->
+    <div style="display:none">
+      <input type="file" id="cfVideo" accept="video/*">
     </div>
 
     <button type="submit" id="cfSubmitBtn" style="width:100%;margin-top:14px;padding:12px;border:none;border-radius:14px;background:linear-gradient(135deg,#00c6a0,#00a8cc);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s">📥 記錄釣獲</button>
@@ -1232,22 +1231,75 @@ function autoFillWeather() {
 setTimeout(autoFillWeather, 3000);
 setTimeout(autoFillWeather, 7000);
 
-// Photo URL preview
-function previewPhotoUrl() {
-  var url = document.getElementById('cfPhoto').value.trim();
-  var preview = document.getElementById('cfPhotoPreview');
-  var img = document.getElementById('cfPhotoImg');
-  if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-    preview.style.display = 'block';
-    img.src = url;
-  } else {
-    preview.style.display = 'none';
-  }
+// Photo handling
+var PENDING_PHOTO = null; // base64 data URL of selected photo
+
+function handlePhotoSelect() {
+  var file = document.getElementById('cfPhoto').files[0];
+  if (!file) { clearPhoto(); return; }
+  
+  // Compress photo to thumbnail before storing
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var maxW = 400, maxH = 400;
+      var ratio = Math.min(maxW / img.width, maxH / img.height, 1);
+      canvas.width = img.width * ratio;
+      canvas.height = img.height * ratio;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      PENDING_PHOTO = canvas.toDataURL('image/jpeg', 0.7);
+      
+      var preview = document.getElementById('cfPhotoPreview');
+      var previewImg = document.getElementById('cfPhotoImg');
+      preview.style.display = 'block';
+      previewImg.src = PENDING_PHOTO;
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 function clearPhoto() {
+  PENDING_PHOTO = null;
   document.getElementById('cfPhotoPreview').style.display = 'none';
   document.getElementById('cfPhoto').value = '';
+}
+
+// Video handling
+var PENDING_VIDEO = null;
+
+function handleVideoSelect() {
+  var file = document.getElementById('cfVideo').files[0];
+  if (!file) { clearVideo(); return; }
+  
+  if (file.size > 15 * 1024 * 1024) {
+    alert('⚠️ 影片太大（上限 15MB），請揀過條細啲嘅片');
+    document.getElementById('cfVideo').value = '';
+    return;
+  }
+  
+  document.getElementById('cfVideoSize').textContent = (file.size / 1024 / 1024).toFixed(1) + 'MB';
+  
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    PENDING_VIDEO = e.target.result;
+    var preview = document.getElementById('cfVideoPreview');
+    var video = document.getElementById('cfVideoEl');
+    preview.style.display = 'block';
+    video.src = PENDING_VIDEO;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearVideo() {
+  PENDING_VIDEO = null;
+  document.getElementById('cfVideoPreview').style.display = 'none';
+  document.getElementById('cfVideoEl').src = '';
+  document.getElementById('cfVideo').value = '';
+  document.getElementById('cfVideoSize').textContent = '';
 }
 
 // --- Init ---
@@ -1276,8 +1328,6 @@ function initRecords() {
       if (!custom) { alert('請輸入魚名'); return; }
       fishName = custom;
     }
-    var photoUrl = document.getElementById('cfPhoto').value.trim() || '';
-    var videoUrl = document.getElementById('cfVideo').value.trim() || '';
     var editId = document.getElementById('cfEditId').value;
     
     var newRecord = {
@@ -1291,8 +1341,7 @@ function initRecords() {
       weather: document.getElementById('cfWeather').value || '',
       windWave: document.getElementById('cfWindWave').value || '',
       notes: document.getElementById('cfNotes').value || '',
-      photoUrl: photoUrl,
-      videoUrl: videoUrl
+      photo: PENDING_PHOTO || ''  // base64 thumbnail
     };
     
     var catches = getCatches();
@@ -1354,12 +1403,16 @@ function editCatch(id) {
   document.getElementById('cfWeather').value = c.weather || '';
   document.getElementById('cfWindWave').value = c.windWave || '';
   document.getElementById('cfNotes').value = c.notes || '';
-  document.getElementById('cfPhoto').value = c.photoUrl || '';
-  document.getElementById('cfVideo').value = c.videoUrl || '';
   document.getElementById('cfEditId').value = id;
   
-  // Show photo preview if URL exists
-  if (c.photoUrl) previewPhotoUrl();
+  // Show existing photo preview if any
+  if (c.photo) {
+    PENDING_PHOTO = c.photo;
+    document.getElementById('cfPhotoImg').src = c.photo;
+    document.getElementById('cfPhotoPreview').style.display = 'block';
+  } else {
+    clearPhoto();
+  }
   
   // Switch UI to edit mode
   document.getElementById('cfSubmitBtn').textContent = '💾 儲存修改';
@@ -1421,14 +1474,9 @@ function renderCatches() {
 
     // Media section
     var mediaHtml = '';
-    if (c.photoUrl || c.videoUrl) {
+    if (c.photo) {
       mediaHtml = '<div style="margin-top:6px;display:flex;gap:6px">';
-      if (c.photoUrl) {
-        mediaHtml += '<div class="catch-media-thumb" data-id="'+c.id+'" data-type="photo" style="width:60px;height:60px;border-radius:8px;background:#eef2f6;overflow:hidden;cursor:pointer" onclick="openCatchMedia('+c.id+',\'photo\')"><div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:24px">📸</div></div>';
-      }
-      if (c.videoUrl) {
-        mediaHtml += '<div class="catch-media-thumb" data-id="'+c.id+'" data-type="video" style="width:60px;height:60px;border-radius:8px;background:#eef2f6;overflow:hidden;cursor:pointer" onclick="openCatchMedia('+c.id+',\'video\')"><div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:24px">🎬</div></div>';
-      }
+      mediaHtml += '<div class="catch-media-thumb" data-id="'+c.id+'" data-type="photo" style="width:60px;height:60px;border-radius:8px;background:#eef2f6;overflow:hidden;cursor:pointer" onclick="openCatchMedia('+c.id+')"><div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:24px">📸</div></div>';
       mediaHtml += '</div>';
     }
 
@@ -1455,20 +1503,20 @@ function renderCatches() {
     '</div>';
   }).join('');
 
-  // Load media thumbnails from URLs
+  // Load media thumbnails from base64 data
   catches.forEach(function(c) {
-    if (c.photoUrl) {
+    if (c.photo) {
       var thumb = listEl.querySelector('.catch-media-thumb[data-id="'+c.id+'"][data-type="photo"]');
       if (thumb) {
         var img = document.createElement('img');
-        img.src = c.photoUrl;
+        img.src = c.photo;
         img.style.cssText = 'width:100%;height:100%;object-fit:cover';
         img.onerror = function(){ this.outerHTML = '📸'; };
         thumb.innerHTML = '';
         thumb.appendChild(img);
       }
     }
-    if (c.videoUrl) {
+    if (c.video) {
       var thumb2 = listEl.querySelector('.catch-media-thumb[data-id="'+c.id+'"][data-type="video"]');
       if (thumb2) {
         thumb2.innerHTML = '<div style="position:relative;width:100%;height:100%"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px">▶️</div></div>';
@@ -1477,17 +1525,14 @@ function renderCatches() {
   });
 }
 
-// Media lightbox (using URLs)
-function openCatchMedia(id, type) {
+// Photo lightbox
+function openCatchMedia(id) {
   var catches = getCatches();
   var c = null;
   for (var i=0; i<catches.length; i++) {
     if (catches[i].id === id) { c = catches[i]; break; }
   }
-  if (!c) return;
-  
-  var url = type === 'photo' ? c.photoUrl : c.videoUrl;
-  if (!url) return;
+  if (!c || !c.photo) return;
   
   var lightbox = document.getElementById('catchMediaLightbox');
   if (!lightbox) {
@@ -1506,17 +1551,9 @@ function openCatchMedia(id, type) {
   bottomBar.onclick = function(e) { e.stopPropagation(); lightbox.style.display = 'none'; };
   lightbox.appendChild(bottomBar);
   
-  var mediaEl;
-  if (type === 'photo') {
-    mediaEl = document.createElement('img');
-    mediaEl.src = url;
-    mediaEl.style.cssText = 'max-width:95%;max-height:80%;object-fit:contain;border-radius:6px';
-  } else {
-    mediaEl = document.createElement('iframe');
-    mediaEl.src = url;
-    mediaEl.style.cssText = 'max-width:95%;max-height:75%;border-radius:6px;width:560px;height:315px;border:none';
-    mediaEl.allowFullscreen = true;
-  }
+  var mediaEl = document.createElement('img');
+  mediaEl.src = c.photo;
+  mediaEl.style.cssText = 'max-width:95%;max-height:80%;object-fit:contain;border-radius:6px';
   mediaEl.onclick = function(e) { e.stopPropagation(); };
   lightbox.appendChild(mediaEl);
 }
@@ -1584,14 +1621,14 @@ function cloudPush() {
   if (catches.length === 0) return;
   var code = getSyncCode();
   
-  // Strip large data before sending (keep photoUrl/videoUrl as URLs)
+  // Strip video only (too large), keep photo thumbnail
   var clean = catches.map(function(c) {
     return {
       id: c.id, fish: c.fish, isCustom: c.isCustom,
       date: c.date, size: c.size, location: c.location,
       tidePhase: c.tidePhase, gear: c.gear,
       weather: c.weather, windWave: c.windWave,
-      notes: c.notes, photoUrl: c.photoUrl || '', videoUrl: c.videoUrl || ''
+      notes: c.notes, photo: c.photo || ''
     };
   });
   
