@@ -603,6 +603,7 @@ const FISH_IMG = {
 
 function openLightbox(s){document.getElementById("fishLightboxImg").src=s;document.getElementById("fishLightbox").classList.add("act");}
 function closeLightbox(){document.getElementById("fishLightbox").classList.remove("act");}
+function openFishLightbox(src){event.stopPropagation();openLightbox(src);}
 async function loadFishImages() {
   var g = document.getElementById('fishGrid');
   if (!g) return;
@@ -1348,7 +1349,7 @@ function renderCatches() {
   }
 
   listEl.innerHTML = catches.map(function(c){
-    var fishImg = FISH_IMG[c.fish] ? '<img src="'+FISH_IMG[c.fish]+'" style="width:44px;height:44px;border-radius:10px;object-fit:cover;background:#f0f4f8" onerror="this.style.display=`none`">' : '🐟';
+    var fishImg = FISH_IMG[c.fish] ? '<img src="'+FISH_IMG[c.fish]+'" style="width:48px;height:48px;border-radius:10px;object-fit:cover;background:#f0f4f8;cursor:pointer" onclick="event.stopPropagation();openFishLightbox(\''+FISH_IMG[c.fish]+'\')" onerror="this.style.display=`none`">' : '🐟';
     var locationDisplay = c.location || '未記錄';
     var sizeDisplay = c.size ? ' · 📏 '+c.size+'cm' : '';
     var dateParts = c.date.split('-');
@@ -1375,8 +1376,8 @@ function renderCatches() {
       '<div style="display:flex;gap:12px;align-items:flex-start">'+
         '<div style="flex-shrink:0">'+fishImg+'</div>'+
         '<div style="flex:1;min-width:0">'+
-          '<div style="font-size:15px;font-weight:600;color:'+(c.isCustom?'#e06040':'#1a2a3a')+'">'+c.fish+'</div>'+
-          '<div style="font-size:12px;color:#6a7a8a">📅 '+dateDisplay+' · 📍 '+locationDisplay+sizeDisplay+'</div>'+
+          '<div style="font-size:15px;font-weight:700;color:'+(c.isCustom?'#e06040':'#fff')+'">'+c.fish+'</div>'+
+          '<div style="font-size:12px;color:#c0a888">📅 '+dateDisplay+' · 📍 '+locationDisplay+sizeDisplay+'</div>'+
         '</div>'+
         '<button onclick="event.stopPropagation();deleteCatch('+c.id+')" style="flex-shrink:0;width:32px;height:32px;border:none;background:#fee;color:#e74c3c;border-radius:50%;font-size:16px;cursor:pointer;transition:all 0.2s">✕</button>'+
       '</div>'+
