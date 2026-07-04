@@ -248,7 +248,9 @@ h1 span{color:var(--text2)!important}
       <input type="url" id="cfVideo" placeholder="貼上影片連結（例如 YouTube link）" style="width:100%;padding:10px 12px;background:#f7fafc;border:1px solid rgba(0,0,0,0.08);border-radius:12px;font-size:13px;color:#1a2a3a">
     </div>
 
-    <button type="submit" style="width:100%;margin-top:14px;padding:12px;border:none;border-radius:14px;background:linear-gradient(135deg,#00c6a0,#00a8cc);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s">📥 記錄釣獲</button>
+    <button type="submit" id="cfSubmitBtn" style="width:100%;margin-top:14px;padding:12px;border:none;border-radius:14px;background:linear-gradient(135deg,#00c6a0,#00a8cc);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s">📥 記錄釣獲</button>
+    <button type="button" id="cfCancelBtn" onclick="cancelEdit()" style="display:none;width:100%;margin-top:6px;padding:10px;border:none;border-radius:14px;background:rgba(255,255,255,0.08);color:#8899aa;font-size:13px;cursor:pointer">✕ 取消編輯</button>
+    <input type="hidden" id="cfEditId" value="">
   </form>
   <div id="catchConfirm" style="display:none;margin-top:8px;text-align:center;padding:8px;background:#e8faf0;border-radius:10px;color:#00a87a;font-size:13px">✅ 記錄成功！</div>
 </div>
@@ -1276,11 +1278,9 @@ function initRecords() {
     }
     var photoUrl = document.getElementById('cfPhoto').value.trim() || '';
     var videoUrl = document.getElementById('cfVideo').value.trim() || '';
+    var editId = document.getElementById('cfEditId').value;
     
-    var catchId = Date.now();
-    var catches = getCatches();
-    catches.unshift({
-      id: catchId,
+    var newRecord = {
       fish: fishName,
       isCustom: fish === '__other__',
       date: document.getElementById('cfDate').value,
@@ -1293,29 +1293,34 @@ function initRecords() {
       notes: document.getElementById('cfNotes').value || '',
       photoUrl: photoUrl,
       videoUrl: videoUrl
-    });
+    };
+    
+    var catches = getCatches();
+    
+    if (editId) {
+      // Update existing record
+      for (var i = 0; i < catches.length; i++) {
+        if (catches[i].id == editId) {
+          newRecord.id = catches[i].id;
+          catches[i] = newRecord;
+          break;
+        }
+      }
+    } else {
+      // New record
+      newRecord.id = Date.now();
+      catches.unshift(newRecord);
+    }
+    
     saveCatches(catches);
     renderCatches();
-    // Auto-push to cloud
     cloudPush();
-
-    // Reset form
-    document.getElementById('catchForm').reset();
-    document.getElementById('cfDate').value = new Date().toISOString().slice(0,10);
-    clearPhoto();
-    document.getElementById('cfFishCustom').style.display = 'none';
-
+    cancelEdit();
+    
     var confirm = document.getElementById('catchConfirm');
+    confirm.textContent = editId ? '✅ 已更新！' : '✅ 記錄成功！';
     confirm.style.display = 'block';
     setTimeout(function(){ confirm.style.display = 'none'; }, 2500);
-    
-    // First record? Show sync code popup
-    if (catches.length === 1) {
-      var code = getSyncCode();
-      setTimeout(function(){
-        alert('🎉 第一條記錄！\n\n🔑 你嘅同步碼：' + code + '\n\n📱 喺其他手機/電腦輸入呢個碼\n就可以同步所有紀錄！\n\n（可以去 ☁️ 雲端同步 度睇返）');
-      }, 800);
-    }
   });
 }
 
@@ -1325,6 +1330,53 @@ function deleteCatch(id) {
   saveCatches(catches);
   renderCatches();
   cloudPush();
+}
+
+function editCatch(id) {
+  var catches = getCatches();
+  var c = null;
+  for (var i = 0; i < catches.length; i++) {
+    if (catches[i].id === id) { c = catches[i]; break; }
+  }
+  if (!c) return;
+  
+  // Fill form with record data
+  document.getElementById('cfFish').value = c.isCustom ? '__other__' : c.fish;
+  if (c.isCustom) {
+    document.getElementById('cfFishCustom').value = c.fish;
+    document.getElementById('cfFishCustom').style.display = 'block';
+  }
+  document.getElementById('cfDate').value = c.date;
+  document.getElementById('cfSize').value = c.size || '';
+  document.getElementById('cfLocation').value = c.location || '';
+  document.getElementById('cfTide').value = c.tidePhase || '';
+  document.getElementById('cfGear').value = c.gear || '';
+  document.getElementById('cfWeather').value = c.weather || '';
+  document.getElementById('cfWindWave').value = c.windWave || '';
+  document.getElementById('cfNotes').value = c.notes || '';
+  document.getElementById('cfPhoto').value = c.photoUrl || '';
+  document.getElementById('cfVideo').value = c.videoUrl || '';
+  document.getElementById('cfEditId').value = id;
+  
+  // Show photo preview if URL exists
+  if (c.photoUrl) previewPhotoUrl();
+  
+  // Switch UI to edit mode
+  document.getElementById('cfSubmitBtn').textContent = '💾 儲存修改';
+  document.getElementById('cfCancelBtn').style.display = 'block';
+  
+  // Scroll to form
+  document.getElementById('cfFish').scrollIntoView({behavior: 'smooth'});
+}
+
+function cancelEdit() {
+  document.getElementById('cfEditId').value = '';
+  document.getElementById('catchForm').reset();
+  document.getElementById('cfDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('cfSubmitBtn').textContent = '📥 記錄釣獲';
+  document.getElementById('cfCancelBtn').style.display = 'none';
+  document.getElementById('cfFishCustom').style.display = 'none';
+  clearPhoto();
 }
 
 function renderCatches() {
@@ -1387,7 +1439,8 @@ function renderCatches() {
           '<div style="font-size:15px;font-weight:700;color:'+(c.isCustom?'#e06040':'#fff')+'">'+c.fish+'</div>'+
           '<div style="font-size:12px;color:#c0a888">📅 '+dateDisplay+' · 📍 '+locationDisplay+sizeDisplay+'</div>'+
         '</div>'+
-        '<button onclick="event.stopPropagation();deleteCatch('+c.id+')" style="flex-shrink:0;width:32px;height:32px;border:none;background:#fee;color:#e74c3c;border-radius:50%;font-size:16px;cursor:pointer;transition:all 0.2s">✕</button>'+
+        '<button onclick="event.stopPropagation();editCatch('+c.id+')" style="flex-shrink:0;width:32px;height:32px;border:none;background:rgba(240,160,48,0.15);color:#f0a030;border-radius:50%;font-size:14px;cursor:pointer;margin-right:4px">✏️</button>'+
+        '<button onclick="event.stopPropagation();deleteCatch('+c.id+')" style="flex-shrink:0;width:32px;height:32px;border:none;background:#fee;color:#e74c3c;border-radius:50%;font-size:16px;cursor:pointer">✕</button>'+
       '</div>'+
       '<div id="cdetail_'+c.id+'" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(240,160,48,0.2)">'+
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px">'+
