@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>香港釣法圖表</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Noto Sans HK', 'Microsoft JhengHei', sans-serif; background: #0f1923; color: #e0e0e0; padding: 20px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 8px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap; }
+.tab { padding: 10px 24px; border-radius: 8px; border: 1px solid #2a3a4a; background: #1a2a3a; color: #8899aa; cursor: pointer; font-size: 15px; transition: all .2s; }
+.tab.active { background: #2a5a7a; color: #fff; border-color: #3dc1d3; }
+.tab:hover { border-color: #3dc1d3; }
+
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── VERSION 2: 分類圖 ── */
+.category-chart { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+.cat-group { flex: 1; min-width: 280px; max-width: 400px; background: #1a2a3a; border-radius: 16px; overflow: hidden; border: 1px solid #2a3a4a; }
+.cat-header { padding: 16px 20px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.cat-header .icon { font-size: 28px; }
+.cat-shore .cat-header { background: linear-gradient(135deg, #2d4a3a, #1a3a2a); border-bottom: 2px solid #4aaf6a; }
+.cat-sea .cat-header { background: linear-gradient(135deg, #2a3a5a, #1a2a4a); border-bottom: 2px solid #4a8fcf; }
+.cat-leisure .cat-header { background: linear-gradient(135deg, #4a3a2a, #3a2a1a); border-bottom: 2px solid #cf8f4a; }
+.cat-body { padding: 16px; }
+.cat-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 10px; margin-bottom: 8px; background: #0f1923; border: 1px solid #1a2a3a; transition: border-color .2s; }
+.cat-item:hover { border-color: #3dc1d3; }
+.cat-item .num { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+.cat-shore .num { background: #2d4a3a; color: #4aaf6a; }
+.cat-sea .num { background: #1a2a4a; color: #4a8fcf; }
+.cat-leisure .num { background: #3a2a1a; color: #cf8f4a; }
+.cat-item .info { flex: 1; }
+.cat-item .name { font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 2px; }
+.cat-item .desc { font-size: 12px; color: #8899aa; line-height: 1.5; }
+
+/* ── VERSION 3: 卡片式 ── */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.card { background: #1a2a3a; border-radius: 14px; padding: 20px; border: 1px solid #2a3a4a; transition: all .25s; position: relative; overflow: hidden; }
+.card:hover { transform: translateY(-3px); border-color: #3dc1d3; box-shadow: 0 8px 24px rgba(61,193,211,.15); }
+.card .card-num { position: absolute; top: 12px; right: 14px; font-size: 40px; font-weight: 900; color: rgba(61,193,211,.08); }
+.card .card-emoji { font-size: 36px; margin-bottom: 10px; }
+.card .card-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.card .card-location { font-size: 12px; color: #3dc1d3; margin-bottom: 10px; }
+.card .card-desc { font-size: 13px; color: #8899aa; line-height: 1.6; margin-bottom: 12px; }
+.card .card-fish { display: flex; flex-wrap: wrap; gap: 4px; }
+.card .card-fish span { font-size: 11px; padding: 3px 8px; border-radius: 20px; background: #0f1923; color: #c0a888; border: 1px solid #2a3a4a; }
+
+.card-shore { border-top: 3px solid #4aaf6a; }
+.card-sea { border-top: 3px solid #4a8fcf; }
+.card-leisure { border-top: 3px solid #cf8f4a; }
+
+/* ── VERSION 4: 信息圖 Infographic ── */
+.infographic { max-width: 900px; margin: 0 auto; }
+.info-hero { text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #1a2a3a, #0f1923); border-radius: 20px; margin-bottom: 30px; border: 1px solid #2a3a4a; }
+.info-hero h1 { font-size: 32px; color: #fff; margin-bottom: 8px; }
+.info-hero .sub { color: #3dc1d3; font-size: 16px; }
+.info-stats { display: flex; gap: 16px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
+.stat-box { flex: 1; min-width: 180px; max-width: 280px; background: #1a2a3a; border-radius: 16px; padding: 20px; text-align: center; border: 1px solid #2a3a4a; }
+.stat-box .big { font-size: 42px; font-weight: 900; }
+.stat-box .label { font-size: 13px; color: #8899aa; margin-top: 4px; }
+.stat-shore .big { color: #4aaf6a; }
+.stat-sea .big { color: #4a8fcf; }
+.stat-leisure .big { color: #cf8f4a; }
+
+.info-matrix { background: #1a2a3a; border-radius: 20px; overflow: hidden; border: 1px solid #2a3a4a; }
+.info-row { display: grid; grid-template-columns: 70px 1fr 120px 1fr 1.5fr; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid #1a2a3a; font-size: 13px; }
+.info-row.header { background: #0d1520; font-weight: 700; font-size: 12px; color: #3dc1d3; text-transform: uppercase; letter-spacing: 1px; }
+.info-row:last-child { border-bottom: none; }
+.info-row:hover { background: #1e3040; }
+.info-row .i-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; background: #0f1923; color: #3dc1d3; }
+.info-row .i-name { font-weight: 700; color: #fff; font-size: 14px; }
+.info-row .i-loc { color: #3dc1d3; font-size: 12px; }
+.info-row .i-desc { color: #8899aa; font-size: 12px; line-height: 1.5; }
+.info-row .i-fish { color: #c0a888; font-size: 11px; }
+
+.info-footer { text-align: center; padding: 24px; color: #667788; font-size: 12px; }
+
+@media (max-width: 768px) {
+  .info-row { grid-template-columns: 40px 1fr; gap: 2px; padding: 10px 12px; }
+  .info-row .i-loc, .info-row .i-fish { display: none; }
+  .info-row.header { display: none; }
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchView('v2')">📂 分類圖</div>
+  <div class="tab" onclick="switchView('v3')">🃏 卡片式</div>
+  <div class="tab" onclick="switchView('v4')">📊 信息圖</div>
+</div>
+
+<!-- ═══ VERSION 2: 分類圖 ═══ -->
+<div id="v2" class="view active">
+<div class="category-chart">
+
+  <!-- 岸上 -->
+  <div class="cat-group cat-shore">
+    <div class="cat-header"><span class="icon">🏖️</span>岸上篇</div>
+    <div class="cat-body">
+      <div class="cat-item"><div class="num">1</div><div class="info"><div class="name">筏釣</div><div class="desc">魚排小艇｜垂直落絲，睇竿頭微震判斷魚訊</div></div></div>
+      <div class="cat-item"><div class="num">2</div><div class="info"><div class="name">磯釣</div><div class="desc">岸邊礁石｜浮波控層，誘餌粉引魚埋嚟</div></div></div>
+      <div class="cat-item"><div class="num">3</div><div class="info"><div class="name">投釣</div><div class="desc">沙灘碼頭｜遠投沉底，最簡單入門玩法</div></div></div>
+      <div class="cat-item"><div class="num">4</div><div class="info"><div class="name">前打／落入</div><div class="desc">碼頭直壆｜輕鉛貼壆，逐寸試探藏魚位</div></div></div>
+      <div class="cat-item"><div class="num">5</div><div class="info"><div class="name">路亞</div><div class="desc">全海域｜假餌模仿小魚，引掠食魚攻擊</div></div></div>
+      <div class="cat-item"><div class="num">6</div><div class="info"><div class="name">岸拋（Casting）</div><div class="desc">防波堤｜重餌遠投，專攻外海大型迴游魚</div></div></div>
+      <div class="cat-item"><div class="num">7</div><div class="info"><div class="name">餌木釣（Fit 魷）</div><div class="desc">碼頭礁石｜姣蝦跳底，引魷魚抱餌</div></div></div>
+      <div class="cat-item"><div class="num">8</div><div class="info"><div class="name">飛蠅（Fly）</div><div class="desc">溪河水塘｜靠線重拋羽毛假餌，輕盈如蜻蜓</div></div></div>
+    </div>
+  </div>
+
+  <!-- 海上 -->
+  <div class="cat-group cat-sea">
+    <div class="cat-header"><span class="icon">⛵</span>海上篇</div>
+    <div class="cat-body">
+      <div class="cat-item"><div class="num">9</div><div class="info"><div class="name">船釣／艇釣</div><div class="desc">近海小艇｜揸艇到標點，竿或手絲不拘</div></div></div>
+      <div class="cat-item"><div class="num">10</div><div class="info"><div class="name">深海 Jigging</div><div class="desc">南油外海｜鐵板垂直跳底，搏深海巨物</div></div></div>
+      <div class="cat-item"><div class="num">11</div><div class="info"><div class="name">手絲</div><div class="desc">艇上碼頭｜唔用竿，絲直接揸手最直接</div></div></div>
+      <div class="cat-item"><div class="num">12</div><div class="info"><div class="name">重磯／石鯛</div><div class="desc">外礁大湧｜超重型磯釣，搏怪獸級大魚</div></div></div>
+    </div>
+  </div>
+
+  <!-- 休閒 -->
+  <div class="cat-group cat-leisure">
+    <div class="cat-header"><span class="icon">🧘</span>休閒篇</div>
+    <div class="cat-body">
+      <div class="cat-item"><div class="num">13</div><div class="info"><div class="name">淡水釣</div><div class="desc">水塘河流｜手竿台釣，香港水塘任釣</div></div></div>
+      <div class="cat-item"><div class="num">14</div><div class="info"><div class="name">塘釣</div><div class="desc">付費魚塘｜俾錢入場保證有魚，hea 住釣</div></div></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══ VERSION 3: 卡片式 ═══ -->
+<div id="v3" class="view">
+<div class="card-grid">
+
+  <div class="card card-shore"><div class="card-num">01</div>
+    <div class="card-emoji">🛶</div>
+    <div class="card-title">筏釣</div>
+    <div class="card-location">📍 魚排、小艇</div>
+    <div class="card-desc">垂直落絲到底，靠睇竿頭微震判斷魚訊。香港最普及釣法，魚排有瓦遮頭最 hea。</div>
+    <div class="card-fish"><span>烏頭</span><span>鱲魚</span><span>石斑</span></div>
+  </div>
+
+  <div class="card card-shore"><div class="card-num">02</div>
+    <div class="card-emoji">🪨</div>
+    <div class="card-title">磯釣</div>
+    <div class="card-location">📍 岸邊礁石、消波塊</div>
+    <div class="card-desc">用浮波控制釣層，配合誘餌粉引魚埋嚟。裝備最講究，技術含量最高。</div>
+    <div class="card-fish"><span>黑沙鱲</span><span>黃腳鱲</span><span>黑毛</span></div>
+  </div>
+
+  <div class="card card-shore"><div class="card-num">03</div>
+    <div class="card-emoji">🏖️</div>
+    <div class="card-title">投釣</div>
+    <div class="card-location">📍 沙灘、碼頭</div>
+    <div class="card-desc">遠投沉底，置竿等魚。最簡單入門玩法，唔使技術，拋出去就等運到。</div>
+    <div class="card-fish"><span>沙鑽</span><span>連米</span><span>鱸魚</span></div>
+  </div>
+
+  <div class="card card-shore"><div class="card-num">04</div>
+    <div class="card-emoji">🧱</div>
+    <div class="card-title">前打／落入</div>
+    <div class="card-location">📍 碼頭、直壆</div>
+    <div class="card-desc">輕鉛直感，貼住壆邊逐寸試探藏魚位。冇浮標，純手感，高手向玩法。</div>
+    <div class="card-fish"><span>石蚌</span><span>火點</span><span>鱲魚</span></div>
+  </div>
+
+  <div class="card card-shore"><div class="card-num">05</div>
+    <div class="card-emoji">🐟</div>
+    <div class="card-title">路亞</div>
+    <div class="card-location">📍 全海域</div>
+    <div class="card-desc">用假餌模仿小魚泳姿，引掠食魚主動攻擊。唔使買生餌，一盒假餌走天涯。</div>
+    <div class="card-fish"><span>鱸魚</span><span>GT</span><span>海狼</span></div>
+  </div>
+
+  <div class="card card-shore"><div class="card-num">06</div>
+    <div class="card-emoji">💪</div>
+    <div class="card-title">岸拋（Casting）</div>
+    <div class="card-location">📍 岸邊、防波堤</div>
+    <div class="card-desc">重型假餌全力遠投，專攻外海大型迴游魚。體力＋技術，中魚一刻最震撼。</div>
+    <div class="card-fish"><span>GT</span><span>煙仔</span><span>黃鰭吞拿</span></div>
+  </div>
+
+  <div class="card card-shore"><div class="card-num">07</div>
+    <div class="card-emoji">🦑</div>
+    <div class="card-title">餌木釣（Fit 魷）</div>
+    <div class="card-location">📍 碼頭、礁石</div>
+    <div class="card-desc">路亞分支，用姣蝦跳底引魷魚抱餌。香港夜水最受歡迎，一家大細都玩得。</div>
+    <div class="card-fish"><span>大尾魷</span><span>針墨</span></div>
+  </div>
+
+  <div class="card card-shore"><div class="card-num">08</div>
+    <div class="card-emoji">🪶</div>
+    <div class="card-title">飛蠅（Fly Fishing）</div>
+    <div class="card-location">📍 溪河、水塘</div>
+    <div class="card-desc">靠線重拋出羽毛假餌，輕盈如蜻蜓點水。最優雅釣法，香港少人玩但好有型。</div>
+    <div class="card-fish"><span>鯉魚</span><span>塘虱</span><span>鱸魚</span></div>
+  </div>
+
+  <div class="card card-sea"><div class="card-num">09</div>
+    <div class="card-emoji">🚤</div>
+    <div class="card-title">船釣／艇釣</div>
+    <div class="card-location">📍 近海小艇</div>
+    <div class="card-desc">揸艇到標點，竿或手絲不拘。最自由玩法，約齊班 friend 出海最開心。</div>
+    <div class="card-fish"><span>石斑</span><span>紅鮋</span><span>細鱗</span></div>
+  </div>
+
+  <div class="card card-sea"><div class="card-num">10</div>
+    <div class="card-emoji">🌊</div>
+    <div class="card-title">深海 Jigging</div>
+    <div class="card-location">📍 南油、外海</div>
+    <div class="card-desc">垂直放鐵板到底再上下抽動，搏深海巨物。男人嘅浪漫，體力消耗極大。</div>
+    <div class="card-fish"><span>章雄</span><span>黃鰭吞拿</span><span>GT</span></div>
+  </div>
+
+  <div class="card card-sea"><div class="card-num">11</div>
+    <div class="card-emoji">🤚</div>
+    <div class="card-title">手絲</div>
+    <div class="card-location">📍 艇、碼頭</div>
+    <div class="card-desc">唔用竿，絲直接揸手。中魚最直接手感，香港傳統漁民玩法，簡單粗暴。</div>
+    <div class="card-fish"><span>石斑</span><span>紅鮋</span><span>雜魚</span></div>
+  </div>
+
+  <div class="card card-sea"><div class="card-num">12</div>
+    <div class="card-emoji">🏋️</div>
+    <div class="card-title">重磯／石鯛</div>
+    <div class="card-location">📍 外礁大湧位</div>
+    <div class="card-desc">超重型磯釣，粗竿粗絲搏怪獸級大魚。終極釣法，裝備過萬，非狂熱者勿試。</div>
+    <div class="card-fish"><span>石鯛</span><span>巨石斑</span></div>
+  </div>
+
+  <div class="card card-leisure"><div class="card-num">13</div>
+    <div class="card-emoji">🏞️</div>
+    <div class="card-title">淡水釣</div>
+    <div class="card-location">📍 水塘、河流</div>
+    <div class="card-desc">手竿或台釣，標仔睇魚訊。香港水塘任釣，唔使出海，市區就近都有得玩。</div>
+    <div class="card-fish"><span>鯉魚</span><span>鯪魚</span><span>羅非</span></div>
+  </div>
+
+  <div class="card card-leisure"><div class="card-num">14</div>
+    <div class="card-emoji">🎣</div>
+    <div class="card-title">塘釣</div>
+    <div class="card-location">📍 付費魚塘</div>
+    <div class="card-desc">俾錢入場保證有魚，hea 住釣唔使技術。最啱一家大細，BBQ＋釣魚一日遊。</div>
+    <div class="card-fish"><span>盲曹</span><span>黃鱲鯧</span><span>羅非</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══ VERSION 4: 信息圖 ═══ -->
+<div id="v4" class="view">
+<div class="infographic">
+
+  <div class="info-hero">
+    <h1>🎣 香港釣法完全圖鑑</h1>
+    <div class="sub">14 種釣法 · 三大類別 · 一圖睇晒</div>
+  </div>
+
+  <div class="info-stats">
+    <div class="stat-box stat-shore"><div class="big">8</div><div class="label">🏖️ 岸上釣法</div></div>
+    <div class="stat-box stat-sea"><div class="big">4</div><div class="label">⛵ 海上釣法</div></div>
+    <div class="stat-box stat-leisure"><div class="big">2</div><div class="label">🧘 休閒釣法</div></div>
+  </div>
+
+  <div class="info-matrix">
+    <div class="info-row header">
+      <div>#</div><div>釣法</div><div>場地</div><div>特性</div><div>常見魚獲</div>
+    </div>
+    <div class="info-row"><div class="i-num">1</div><div class="i-name">筏釣</div><div class="i-loc">魚排、小艇</div><div class="i-desc">垂直落絲到底，靠睇竿頭微震判斷魚訊</div><div class="i-fish">烏頭、鱲魚、石斑</div></div>
+    <div class="info-row"><div class="i-num">2</div><div class="i-name">磯釣</div><div class="i-loc">岸邊礁石</div><div class="i-desc">用浮波控制釣層，配合誘餌粉引魚埋嚟</div><div class="i-fish">黑沙鱲、黃腳鱲、黑毛</div></div>
+    <div class="info-row"><div class="i-num">3</div><div class="i-name">投釣</div><div class="i-loc">沙灘、碼頭</div><div class="i-desc">遠投沉底，置竿等魚，最簡單入門玩法</div><div class="i-fish">沙鑽、連米、鱸魚</div></div>
+    <div class="info-row"><div class="i-num">4</div><div class="i-name">前打／落入</div><div class="i-loc">碼頭、直壆</div><div class="i-desc">輕鉛直感，貼住壆邊逐寸試探藏魚位</div><div class="i-fish">石蚌、火點、鱲魚</div></div>
+    <div class="info-row"><div class="i-num">5</div><div class="i-name">路亞</div><div class="i-loc">全海域</div><div class="i-desc">用假餌模仿小魚泳姿，引掠食魚主動攻擊</div><div class="i-fish">鱸魚、GT、海狼</div></div>
+    <div class="info-row"><div class="i-num">6</div><div class="i-name">岸拋 (Casting)</div><div class="i-loc">岸邊、防波堤</div><div class="i-desc">重型假餌全力遠投，專攻外海大型迴游魚</div><div class="i-fish">GT、煙仔、黃鰭吞拿</div></div>
+    <div class="info-row"><div class="i-num">7</div><div class="i-name">餌木釣 (Fit 魷)</div><div class="i-loc">碼頭、礁石</div><div class="i-desc">路亞分支，用姣蝦跳底引魷魚抱餌</div><div class="i-fish">大尾魷、針墨</div></div>
+    <div class="info-row"><div class="i-num">8</div><div class="i-name">飛蠅 (Fly)</div><div class="i-loc">溪河、水塘</div><div class="i-desc">靠線重拋出羽毛假餌，輕盈如蜻蜓點水</div><div class="i-fish">鯉魚、塘虱、鱸魚</div></div>
+    <div class="info-row"><div class="i-num">9</div><div class="i-name">船釣／艇釣</div><div class="i-loc">近海小艇</div><div class="i-desc">揸艇到標點，竿或手絲不拘，最自由玩法</div><div class="i-fish">石斑、紅鮋、細鱗</div></div>
+    <div class="info-row"><div class="i-num">10</div><div class="i-name">深海 Jigging</div><div class="i-loc">南油、外海</div><div class="i-desc">垂直放鐵板到底再上下抽動，搏深海巨物</div><div class="i-fish">章雄、黃鰭吞拿、GT</div></div>
+    <div class="info-row"><div class="i-num">11</div><div class="i-name">手絲</div><div class="i-loc">艇、碼頭</div><div class="i-desc">唔用竿，絲直接揸手，中魚最直接手感</div><div class="i-fish">石斑、紅鮋、雜魚</div></div>
+    <div class="info-row"><div class="i-num">12</div><div class="i-name">重磯／石鯛</div><div class="i-loc">外礁大湧位</div><div class="i-desc">超重型磯釣，粗竿粗絲搏怪獸級大魚</div><div class="i-fish">石鯛、巨石斑</div></div>
+    <div class="info-row"><div class="i-num">13</div><div class="i-name">淡水釣</div><div class="i-loc">水塘、河流</div><div class="i-desc">手竿或台釣，標仔睇魚訊，香港水塘任釣</div><div class="i-fish">鯉魚、鯪魚、羅非</div></div>
+    <div class="info-row"><div class="i-num">14</div><div class="i-name">塘釣</div><div class="i-loc">付費魚塘</div><div class="i-desc">俾錢入場保證有魚，hea 住釣唔使技術</div><div class="i-fish">盲曹、黃鱲鯧、羅非</div></div>
+  </div>
+
+  <div class="info-footer">香港釣魚資訊站 · 14 種釣法完整收錄</div>
+
+</div>
+</div>
+
+<script>
+function switchView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
