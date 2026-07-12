@@ -42,6 +42,8 @@ body { font-family: 'Noto Sans HK', 'Microsoft JhengHei', sans-serif; background
 .modal-header .m-emoji { font-size: 48px; margin-bottom: 8px; }
 .modal-header .m-title { font-size: 28px; font-weight: 900; color: #fff; }
 .modal-header .m-loc { font-size: 14px; color: #3dc1d3; margin-top: 4px; }
+.m-img { margin-top: 14px; border-radius: 12px; overflow: hidden; }
+.m-img img { width: 100%; max-height: 250px; object-fit: cover; display: block; border-radius: 12px; border: 1px solid #2a3a4a; }
 .modal-body { padding: 24px 28px 32px; }
 .modal-body h3 { font-size: 15px; color: #3dc1d3; margin: 20px 0 10px; text-transform: uppercase; letter-spacing: 1px; }
 .modal-body h3:first-child { margin-top: 0; }
@@ -118,6 +120,7 @@ body { font-family: 'Noto Sans HK', 'Microsoft JhengHei', sans-serif; background
 const METHODS = {
   raft: {
     emoji:'🛶', title:'筏釣', location:'魚排、小艇、橋墩',
+    img:'images/gear/raft.jpg',
     intro:'香港最普及嘅釣法之一。喺魚排或小艇上垂直落絲作釣，靠觀察竿頭嘅微震判斷魚訊，唔使用浮標。適合新手入門，亦係資深釣友玩精準魚訊首選。',
     gear:'筏竿（1.5-1.8m 中硬調最萬用）、筏釣專用魚輪（餅仔絞）、幼絲直出。鉛只用夾鉛或中通鉛，視乎流水調整重量。',
     bait:'南極蝦（最方便萬能餌）、紅蟲／青蟲（本地魚最愛）、生蝦（針對石斑紅鮋）、重皮蟹（夏天限定）、麵包（釣烏頭）。多數配合團子誘餌粉打窩聚魚。',
@@ -126,6 +129,7 @@ const METHODS = {
   },
   iso: {
     emoji:'🪨', title:'磯釣', location:'岸邊礁石、消波塊、外礁',
+    img:'images/gear/iso.jpg',
     intro:'磯釣係香港最熱血嘅岸釣方式，裝備最為講究。「磯」係日文漢字，意思係海岸邊或礁石上。用浮波控制釣層，配合誘餌粉引魚，技術含量極高。',
     gear:'磯竿（約 5.3m）、手煞捲線器（LB 絞）、浮波／阿波（核心裝備，按場地揀浮力）、誘餌桶＋餌勺（打誘餌必備）。⚠️ 救生衣＋防滑釘鞋係磯釣必備安全裝備。',
     bait:'南極蝦（誘餌＋釣餌二合一）、蝦仁、青蟲。重點唔係用咩餌，而係誘餌同步——誘餌粉同釣餌要同一條水流線，引魚埋嚟但食你粒餌。',
@@ -135,6 +139,7 @@ const METHODS = {
   },
   surf: {
     emoji:'🏖️', title:'投釣', location:'沙灘、碼頭、岸邊',
+    img:'images/gear/surf.jpg',
     intro:'最簡單入門玩法，拋出去就等魚訊到。',
     gear:'投竿（較長較硬，方便遠投）、紡車式魚絞、沉底釣組（中通鉛＋擰圈＋子線＋魚鈎）。竿架或用石頭頂住支竿等魚。',
     bait:'青蟲、紅蟲（最常用）、蝦仁、魷魚條。由於係沉底等魚，用比較韌嘅餌冇咁易被小魚盜餌。',
@@ -143,6 +148,7 @@ const METHODS = {
   },
   maezuri: {
     emoji:'🧱', title:'前打／落入', location:'碼頭、直壆、堤防',
+    img:'images/gear/maezuri.jpg',
     intro:'冇浮標、純手感嘅高手向釣法。用輕鉛直感，貼住壆邊逐寸試探石隙、樁柱等藏魚位。中魚嗰下直接傳到手掌心，手感一流。',
     gear:'前打竿（軟調、竿先極敏感）、前打絞或小橫絞、極輕鉛、直出幼絲。重點係竿先要夠敏感，要 feel 到最輕微嘅魚訊。',
     bait:'生蝦（首選，鈎頭或鈎尾令蝦保持生猛）、小蟹、青蟲。餌要自然飄落，模仿小生物跌落水嘅動態。',
@@ -151,6 +157,7 @@ const METHODS = {
   },
   lure: {
     emoji:'🐟', title:'路亞（Lure Fishing）', location:'全海域（岸、艇、溪、塘）',
+    img:'images/gear/lure.jpg',
     intro:'用假餌模仿小魚／蝦／蟲嘅泳姿，引誘掠食性魚類主動攻擊。唔使買生餌，一盒假餌走天涯。近年香港越來越流行，機動性強。',
     gear:'路亞竿（按餌重揀硬度）、紡車絞或橫絞、PE 編織線＋碳線前導。重點係竿同餌重要匹配——竿身有標示適用餌重範圍。',
     bait:'唔用真餌，全部假餌。分水面系（Popper、Pencil）、中層系（Minnow、Crank）、底層系（軟蟲、金屬 Jig）。唔同假餌配唔同操作手法。',
@@ -159,6 +166,7 @@ const METHODS = {
   },
   casting: {
     emoji:'💪', title:'岸拋（Shore Casting）', location:'岸邊、防波堤、燈塔、外礁',
+    img:'images/gear/casting.jpg',
     intro:'路亞嘅「重火力版」。用重型假餌（鐵板、大型 Popper）全力遠投，專攻外海大型迴游魚。體力消耗大，但中魚嗰下嘅爆發力冇得頂。',
     gear:'岸拋竿（9-10ft，較硬）、大型紡車絞、PE 粗線。鐵板/Popper 重量由 20g 去到 150g+，視乎目標魚種同釣場。',
     bait:'金屬鐵板（Metal Jig）、大型 Popper、Pencil、水球。鐵板分慢搖（Slow Jig）同快抽（Speed Jig），唔同魚種有唔同偏好。',
@@ -168,6 +176,7 @@ const METHODS = {
   },
   egi: {
     emoji:'🦑', title:'餌木釣（Fit 魷／Egi）', location:'碼頭、礁石、防波堤',
+    img:'images/gear/egi.jpg',
     intro:'路亞嘅一個分支，專門用「姣蝦」（餌木）釣魷魚。香港夜水最受歡迎嘅玩法，一家大細都玩得，裝備門檻低，成功率相對高。',
     gear:'專用餌木竿（或軟調路亞竿）、紡車絞、PE 線＋碳線前導。最關鍵係姣蝦——分唔同 size（2.5-4.0 號）同顏色，夜水用螢光色、日光用自然色。',
     bait:'姣蝦（餌木）——底部有兩排傘鉤，魷魚一抱就中。分沉水型同淺場型，視乎水深揀。',
@@ -176,6 +185,7 @@ const METHODS = {
   },
   fly: {
     emoji:'🪶', title:'飛蠅（Fly Fishing）', location:'溪河、水塘、岸邊',
+    img:'images/gear/fly.jpg',
     intro:'最優雅嘅釣法。唔靠餌重拋投，而係靠飛蠅線（Fly Line）嘅重量將輕如無物嘅羽毛假餌送到標點。香港少人玩，但極具觀賞性。',
     gear:'飛蠅竿（較長較軟）、飛蠅絞、飛蠅線（Weight Forward 最常用）、前導線。假餌係人手紮嘅羽毛鈎（Fly），模仿昆蟲或小魚。',
     bait:'乾式毛鈎（浮水面模仿跌落水嘅昆蟲）、濕式毛鈎（沉水模仿幼蟲或小魚）。香港水塘常用蜻蜓款、蚊型款。',
@@ -184,6 +194,7 @@ const METHODS = {
   },
   boat: {
     emoji:'🚤', title:'船釣／艇釣', location:'近海小艇、西貢、南丫島',
+    img:'images/gear/boat.jpg',
     intro:'揸小艇出海到標點作釣，竿同手絲不拘，係最自由嘅釣法。約齊三五知己，吹住海風釣魚，香港週末最寫意嘅活動之一。',
     gear:'船竿或萬用竿、紡車絞或橫絞均可。有人鍾意用竿，有人鍾意手絲——冇規定。船家通常會提供基本裝備。',
     bait:'生蝦、魷魚仔、青蟲、蝦仁。船家多數會幫手準備釣餌。亦可用誘餌粉打窩，效果更好。',
@@ -192,6 +203,7 @@ const METHODS = {
   },
   jigging: {
     emoji:'🌊', title:'深海 Jigging', location:'南油、擔桿、外海油井',
+    img:'images/gear/jigging.jpg',
     intro:'終極深海釣法，被稱為「男人嘅浪漫」。坐大船到外海油井附近，用重鐵板垂直放到海底（有時過百米深），再大力上下抽動搏深海巨物。體力消耗極大，但中魚嘅震撼冇其他釣法可比。',
     gear:'Jigging 專用竿（短而硬，專門應付大物）、大型橫絞或紡車絞、PE 粗線。鐵板由 100g 到 500g+。需要肚頂（fighting belt）輔助搏魚。',
     bait:'只用金屬鐵板（Metal Jig），唔使真餌。鐵板有分速度型（快抽）同飄逸型（慢搖），視乎當日魚嘅活性揀。',
@@ -201,6 +213,7 @@ const METHODS = {
   },
   handline: {
     emoji:'🤚', title:'手絲', location:'艇上、碼頭、直壆',
+    img:'images/gear/handline.jpg',
     intro:'最原始、最直接嘅釣魚方式。唔使用竿，一條絲直接揸喺手，魚一咬就即刻 feel 到。香港傳統漁民玩法，簡單粗暴但好有效。',
     gear:'冇竿！只有手絲排（塑膠排或木排）、鉛墜、擰圈、魚鈎。成本極低，幾十蚊就開到工。',
     bait:'蝦仁、魷魚、青蟲、生蝦。手絲因為冇竿緩衝，用比較韌嘅餌避免被盜。',
@@ -209,6 +222,7 @@ const METHODS = {
   },
   heavy: {
     emoji:'🏋️', title:'重磯／石鯛', location:'外礁大湧位、離島大石',
+    img:'images/gear/heavy.jpg',
     intro:'終極釣法。用超重型磯竿、粗絲、大鈎，專攻石鯛、巨石斑等怪獸級底棲魚。裝備過萬，技術要求極高，非狂熱發燒友唔會掂。',
     gear:'石鯛竿（極硬極粗，專為搏大物設計）、大型橫絞、粗絲（幾十磅起跳）、鋼絲腳（防魚咬斷）、大型魚鈎。成 set 裝備重到要用手推車搬去釣點。',
     bait:'大蟹、大生蝦、八爪魚、魚頭。餌要夠大夠硬，頂得住小魚盜餌，等大魚埋嚟一啖吞。',
@@ -218,6 +232,7 @@ const METHODS = {
   },
   fresh: {
     emoji:'🏞️', title:'淡水釣', location:'水塘、河流、溪澗',
+    img:'images/gear/fresh.jpg',
     intro:'香港多個水塘開放俾公眾釣魚（需申請牌照），唔使出海的釣魚選擇。手竿或台釣為主，標仔睇魚訊，悠閒舒服。',
     gear:'手竿（最常用）、台釣竿、小紡車絞。淡水釣組較輕巧纖細，標仔（浮標）係核心。香港水塘釣魚需向水務署申請免費牌照。',
     bait:'麵粉餌、花生麩、麵包、蚯蚓、玉米。淡水魚口味同海魚唔同，用腥味或香甜味餌。',
@@ -226,6 +241,7 @@ const METHODS = {
   },
   pond: {
     emoji:'🎣', title:'塘釣', location:'付費魚塘（新界、元朗）',
+    img:'images/gear/pond.jpg',
     intro:'俾錢入場保證有魚嘅休閒釣魚。唔使技術、唔使睇天氣、唔使買裝備（多數有得租）。最啱一家大細 weekend 活動，多數仲有 BBQ 設施。',
     gear:'魚塘多數提供租竿服務，空手入場都得。自己帶嘅話，萬用竿或手竿已夠。唔需要太專業裝備。',
     bait:'魚塘通常包埋釣餌（蝦仁、麵包等），或喺現場買。部份魚塘規定要用佢提供嘅餌，確保水質。',
@@ -241,6 +257,9 @@ function openMethod(key) {
   html += '<div class="m-emoji">'+m.emoji+'</div>';
   html += '<div class="m-title">'+m.title+'</div>';
   html += '<div class="m-loc">📍 '+m.location+'</div>';
+  if(m.img){
+    html += '<div class="m-img"><img src="'+m.img+'" alt="'+m.title+' 裝備" onerror="this.style.display=\'none\'"></div>';
+  }
   html += '</div>';
   html += '<div class="modal-body">';
   html += '<h3>簡介</h3><p>'+m.intro+'</p>';
