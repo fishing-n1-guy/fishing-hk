@@ -3,304 +3,269 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>香港釣法圖表</title>
+<title>香港釣法圖鑑</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Noto Sans HK', 'Microsoft JhengHei', sans-serif; background: #0f1923; color: #e0e0e0; padding: 20px; }
+body { font-family: 'Noto Sans HK', 'Microsoft JhengHei', sans-serif; background: #0f1923; color: #e0e0e0; min-height: 100vh; }
 
-/* Tabs */
-.tabs { display: flex; gap: 8px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap; }
-.tab { padding: 10px 24px; border-radius: 8px; border: 1px solid #2a3a4a; background: #1a2a3a; color: #8899aa; cursor: pointer; font-size: 15px; transition: all .2s; }
-.tab.active { background: #2a5a7a; color: #fff; border-color: #3dc1d3; }
-.tab:hover { border-color: #3dc1d3; }
+/* ═══ 頂部 ═══ */
+.hero { text-align: center; padding: 48px 20px 32px; }
+.hero h1 { font-size: 36px; color: #fff; margin-bottom: 6px; }
+.hero .sub { color: #3dc1d3; font-size: 15px; }
 
-.view { display: none; }
-.view.active { display: block; }
-
-/* ── VERSION 2: 分類圖 ── */
-.category-chart { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-.cat-group { flex: 1; min-width: 280px; max-width: 400px; background: #1a2a3a; border-radius: 16px; overflow: hidden; border: 1px solid #2a3a4a; }
+/* ═══ 分類圖 ═══ */
+.category-chart { display: flex; gap: 20px; padding: 0 20px 40px; flex-wrap: wrap; justify-content: center; max-width: 1300px; margin: 0 auto; }
+.cat-group { flex: 1; min-width: 280px; max-width: 420px; background: #1a2a3a; border-radius: 16px; overflow: hidden; border: 1px solid #2a3a4a; }
 .cat-header { padding: 16px 20px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
 .cat-header .icon { font-size: 28px; }
-.cat-shore .cat-header { background: linear-gradient(135deg, #2d4a3a, #1a3a2a); border-bottom: 2px solid #4aaf6a; }
-.cat-sea .cat-header { background: linear-gradient(135deg, #2a3a5a, #1a2a4a); border-bottom: 2px solid #4a8fcf; }
-.cat-leisure .cat-header { background: linear-gradient(135deg, #4a3a2a, #3a2a1a); border-bottom: 2px solid #cf8f4a; }
-.cat-body { padding: 16px; }
-.cat-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 10px; margin-bottom: 8px; background: #0f1923; border: 1px solid #1a2a3a; transition: border-color .2s; }
-.cat-item:hover { border-color: #3dc1d3; }
+.cat-shore .cat-header { background: linear-gradient(135deg, #1e3a2a, #152a1a); border-bottom: 2px solid #4aaf6a; }
+.cat-sea .cat-header { background: linear-gradient(135deg, #1e2a4a, #15203a); border-bottom: 2px solid #4a8fcf; }
+.cat-leisure .cat-header { background: linear-gradient(135deg, #3a2a15, #2a1a10); border-bottom: 2px solid #cf8f4a; }
+.cat-body { padding: 12px 16px 16px; }
+.cat-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px; margin-bottom: 6px; background: #0f1923; border: 1px solid #1a2a3a; cursor: pointer; transition: all .2s; }
+.cat-item:hover { border-color: #3dc1d3; transform: translateX(4px); background: #152230; }
+.cat-item:active { transform: scale(.98); }
 .cat-item .num { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
-.cat-shore .num { background: #2d4a3a; color: #4aaf6a; }
-.cat-sea .num { background: #1a2a4a; color: #4a8fcf; }
-.cat-leisure .num { background: #3a2a1a; color: #cf8f4a; }
-.cat-item .info { flex: 1; }
-.cat-item .name { font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 2px; }
-.cat-item .desc { font-size: 12px; color: #8899aa; line-height: 1.5; }
+.cat-shore .num { background: #1e3a2a; color: #4aaf6a; }
+.cat-sea .num { background: #15203a; color: #4a8fcf; }
+.cat-leisure .num { background: #2a1a10; color: #cf8f4a; }
+.cat-item .name { font-weight: 700; font-size: 15px; color: #fff; }
+.cat-item .hint { font-size: 11px; color: #556677; margin-left: auto; }
 
-/* ── VERSION 3: 卡片式 ── */
-.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-.card { background: #1a2a3a; border-radius: 14px; padding: 20px; border: 1px solid #2a3a4a; transition: all .25s; position: relative; overflow: hidden; }
-.card:hover { transform: translateY(-3px); border-color: #3dc1d3; box-shadow: 0 8px 24px rgba(61,193,211,.15); }
-.card .card-num { position: absolute; top: 12px; right: 14px; font-size: 40px; font-weight: 900; color: rgba(61,193,211,.08); }
-.card .card-emoji { font-size: 36px; margin-bottom: 10px; }
-.card .card-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-.card .card-location { font-size: 12px; color: #3dc1d3; margin-bottom: 10px; }
-.card .card-desc { font-size: 13px; color: #8899aa; line-height: 1.6; margin-bottom: 12px; }
-.card .card-fish { display: flex; flex-wrap: wrap; gap: 4px; }
-.card .card-fish span { font-size: 11px; padding: 3px 8px; border-radius: 20px; background: #0f1923; color: #c0a888; border: 1px solid #2a3a4a; }
+/* ═══ Modal ═══ */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.show { display: flex; }
+.modal { background: #1a2a3a; border-radius: 20px; max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto; border: 1px solid #2a3a4a; box-shadow: 0 20px 60px rgba(0,0,0,.5); position: relative; }
+.modal-close { position: sticky; top: 12px; right: 12px; float: right; width: 36px; height: 36px; border-radius: 50%; background: #0f1923; border: 1px solid #2a3a4a; color: #8899aa; font-size: 18px; cursor: pointer; z-index: 2; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+.modal-close:hover { border-color: #e06040; color: #e06040; }
+.modal-header { padding: 28px 28px 0; }
+.modal-header .m-emoji { font-size: 48px; margin-bottom: 8px; }
+.modal-header .m-title { font-size: 28px; font-weight: 900; color: #fff; }
+.modal-header .m-loc { font-size: 14px; color: #3dc1d3; margin-top: 4px; }
+.modal-body { padding: 24px 28px 32px; }
+.modal-body h3 { font-size: 15px; color: #3dc1d3; margin: 20px 0 10px; text-transform: uppercase; letter-spacing: 1px; }
+.modal-body h3:first-child { margin-top: 0; }
+.modal-body p { font-size: 14px; color: #c0c8d0; line-height: 1.8; }
+.modal-body .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.modal-body .tag { font-size: 12px; padding: 4px 12px; border-radius: 20px; background: #0f1923; color: #c0a888; border: 1px solid #2a3a4a; }
+.modal-body .tag.warn { color: #e06040; border-color: #3a2018; background: #1a1510; }
+.modal-body ul { margin: 6px 0 0 16px; }
+.modal-body li { font-size: 13px; color: #99aabb; line-height: 1.8; }
 
-.card-shore { border-top: 3px solid #4aaf6a; }
-.card-sea { border-top: 3px solid #4a8fcf; }
-.card-leisure { border-top: 3px solid #cf8f4a; }
-
-/* ── VERSION 4: 信息圖 Infographic ── */
-.infographic { max-width: 900px; margin: 0 auto; }
-.info-hero { text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #1a2a3a, #0f1923); border-radius: 20px; margin-bottom: 30px; border: 1px solid #2a3a4a; }
-.info-hero h1 { font-size: 32px; color: #fff; margin-bottom: 8px; }
-.info-hero .sub { color: #3dc1d3; font-size: 16px; }
-.info-stats { display: flex; gap: 16px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
-.stat-box { flex: 1; min-width: 180px; max-width: 280px; background: #1a2a3a; border-radius: 16px; padding: 20px; text-align: center; border: 1px solid #2a3a4a; }
-.stat-box .big { font-size: 42px; font-weight: 900; }
-.stat-box .label { font-size: 13px; color: #8899aa; margin-top: 4px; }
-.stat-shore .big { color: #4aaf6a; }
-.stat-sea .big { color: #4a8fcf; }
-.stat-leisure .big { color: #cf8f4a; }
-
-.info-matrix { background: #1a2a3a; border-radius: 20px; overflow: hidden; border: 1px solid #2a3a4a; }
-.info-row { display: grid; grid-template-columns: 70px 1fr 120px 1fr 1.5fr; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid #1a2a3a; font-size: 13px; }
-.info-row.header { background: #0d1520; font-weight: 700; font-size: 12px; color: #3dc1d3; text-transform: uppercase; letter-spacing: 1px; }
-.info-row:last-child { border-bottom: none; }
-.info-row:hover { background: #1e3040; }
-.info-row .i-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; background: #0f1923; color: #3dc1d3; }
-.info-row .i-name { font-weight: 700; color: #fff; font-size: 14px; }
-.info-row .i-loc { color: #3dc1d3; font-size: 12px; }
-.info-row .i-desc { color: #8899aa; font-size: 12px; line-height: 1.5; }
-.info-row .i-fish { color: #c0a888; font-size: 11px; }
-
-.info-footer { text-align: center; padding: 24px; color: #667788; font-size: 12px; }
+/* ═══ 底部 ═══ */
+.footer { text-align: center; padding: 20px; color: #445566; font-size: 12px; }
 
 @media (max-width: 768px) {
-  .info-row { grid-template-columns: 40px 1fr; gap: 2px; padding: 10px 12px; }
-  .info-row .i-loc, .info-row .i-fish { display: none; }
-  .info-row.header { display: none; }
-  .card-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .hero h1 { font-size: 26px; }
+  .cat-group { min-width: 100%; }
 }
 </style>
 </head>
 <body>
 
-<div class="tabs">
-  <div class="tab active" onclick="switchView('v2')">📂 分類圖</div>
-  <div class="tab" onclick="switchView('v3')">🃏 卡片式</div>
-  <div class="tab" onclick="switchView('v4')">📊 信息圖</div>
+<div class="hero">
+  <h1>🎣 香港釣法圖鑑</h1>
+  <div class="sub">14 種釣法 · 三大類別 · Click 即睇詳細教學</div>
 </div>
 
-<!-- ═══ VERSION 2: 分類圖 ═══ -->
-<div id="v2" class="view active">
 <div class="category-chart">
 
-  <!-- 岸上 -->
+  <!-- 岸上篇 -->
   <div class="cat-group cat-shore">
-    <div class="cat-header"><span class="icon">🏖️</span>岸上篇</div>
+    <div class="cat-header"><span class="icon">🏖️</span>岸上篇 · 8 種</div>
     <div class="cat-body">
-      <div class="cat-item"><div class="num">1</div><div class="info"><div class="name">筏釣</div><div class="desc">魚排小艇｜垂直落絲，睇竿頭微震判斷魚訊</div></div></div>
-      <div class="cat-item"><div class="num">2</div><div class="info"><div class="name">磯釣</div><div class="desc">岸邊礁石｜浮波控層，誘餌粉引魚埋嚟</div></div></div>
-      <div class="cat-item"><div class="num">3</div><div class="info"><div class="name">投釣</div><div class="desc">沙灘碼頭｜遠投沉底，最簡單入門玩法</div></div></div>
-      <div class="cat-item"><div class="num">4</div><div class="info"><div class="name">前打／落入</div><div class="desc">碼頭直壆｜輕鉛貼壆，逐寸試探藏魚位</div></div></div>
-      <div class="cat-item"><div class="num">5</div><div class="info"><div class="name">路亞</div><div class="desc">全海域｜假餌模仿小魚，引掠食魚攻擊</div></div></div>
-      <div class="cat-item"><div class="num">6</div><div class="info"><div class="name">岸拋（Casting）</div><div class="desc">防波堤｜重餌遠投，專攻外海大型迴游魚</div></div></div>
-      <div class="cat-item"><div class="num">7</div><div class="info"><div class="name">餌木釣（Fit 魷）</div><div class="desc">碼頭礁石｜姣蝦跳底，引魷魚抱餌</div></div></div>
-      <div class="cat-item"><div class="num">8</div><div class="info"><div class="name">飛蠅（Fly）</div><div class="desc">溪河水塘｜靠線重拋羽毛假餌，輕盈如蜻蜓</div></div></div>
+      <div class="cat-item" onclick="openMethod('raft')"><div class="num">1</div><div class="name">筏釣</div><div class="hint">→</div></div>
+      <div class="cat-item" onclick="openMethod('iso')"><div class="num">2</div><div class="name">磯釣</div><div class="hint">→</div></div>
+      <div class="cat-item" onclick="openMethod('surf')"><div class="num">3</div><div class="name">投釣</div><div class="hint">→</div></div>
+      <div class="cat-item" onclick="openMethod('maezuri')"><div class="num">4</div><div class="name">前打／落入</div><div class="hint">→</div></div>
+      <div class="cat-item" onclick="openMethod('lure')"><div class="num">5</div><div class="name">路亞</div><div class="hint">→</div></div>
+      <div class="cat-item" onclick="openMethod('casting')"><div class="num">6</div><div class="name">岸拋（Casting）</div><div class="hint">→</div></div>
+      <div class="cat-item" onclick="openMethod('egi')"><div class="num">7</div><div class="name">餌木釣（Fit 魷）</div><div class="hint">→</div></div>
+      <div class="cat-item" onclick="openMethod('fly')"><div class="num">8</div><div class="name">飛蠅（Fly）</div><div class="hint">→</div></div>
     </div>
   </div>
 
-  <!-- 海上 -->
+  <!-- 海上篇 -->
   <div class="cat-group cat-sea">
-    <div class="cat-header"><span class="icon">⛵</span>海上篇</div>
+    <div class="cat-header"><span class="icon">⛵</span>海上篇 · 4 種</div>
     <div class="cat-body">
-      <div class="cat-item"><div class="num">9</div><div class="info"><div class="name">船釣／艇釣</div><div class="desc">近海小艇｜揸艇到標點，竿或手絲不拘</div></div></div>
-      <div class="cat-item"><div class="num">10</div><div class="info"><div class="name">深海 Jigging</div><div class="desc">南油外海｜鐵板垂直跳底，搏深海巨物</div></div></div>
-      <div class="cat-item"><div class="num">11</div><div class="info"><div class="name">手絲</div><div class="desc">艇上碼頭｜唔用竿，絲直接揸手最直接</div></div></div>
-      <div class="cat-item"><div class="num">12</div><div class="info"><div class="name">重磯／石鯛</div><div class="desc">外礁大湧｜超重型磯釣，搏怪獸級大魚</div></div></div>
+      <div class="cat-item" onclick="openMethod('boat')"><div class="num">9</div><div class="name">船釣／艇釣</div><div class="hint">→</div></div>
+      <div class="cat-item" onclick="openMethod('jigging')"><div class="num">10</div><div class="name">深海 Jigging</div><div class="hint">→</div></div>
+      <div class="cat-item" onclick="openMethod('handline')"><div class="num">11</div><div class="name">手絲</div><div class="hint">→</div></div>
+      <div class="cat-item" onclick="openMethod('heavy')"><div class="num">12</div><div class="name">重磯／石鯛</div><div class="hint">→</div></div>
     </div>
   </div>
 
-  <!-- 休閒 -->
+  <!-- 休閒篇 -->
   <div class="cat-group cat-leisure">
-    <div class="cat-header"><span class="icon">🧘</span>休閒篇</div>
+    <div class="cat-header"><span class="icon">🧘</span>休閒篇 · 2 種</div>
     <div class="cat-body">
-      <div class="cat-item"><div class="num">13</div><div class="info"><div class="name">淡水釣</div><div class="desc">水塘河流｜手竿台釣，香港水塘任釣</div></div></div>
-      <div class="cat-item"><div class="num">14</div><div class="info"><div class="name">塘釣</div><div class="desc">付費魚塘｜俾錢入場保證有魚，hea 住釣</div></div></div>
+      <div class="cat-item" onclick="openMethod('fresh')"><div class="num">13</div><div class="name">淡水釣</div><div class="hint">→</div></div>
+      <div class="cat-item" onclick="openMethod('pond')"><div class="num">14</div><div class="name">塘釣</div><div class="hint">→</div></div>
     </div>
   </div>
 
 </div>
-</div>
 
-<!-- ═══ VERSION 3: 卡片式 ═══ -->
-<div id="v3" class="view">
-<div class="card-grid">
+<div class="footer">香港釣魚資訊站 · 挑選最適合你嘅釣法，享受釣魚樂趣</div>
 
-  <div class="card card-shore"><div class="card-num">01</div>
-    <div class="card-emoji">🛶</div>
-    <div class="card-title">筏釣</div>
-    <div class="card-location">📍 魚排、小艇</div>
-    <div class="card-desc">垂直落絲到底，靠睇竿頭微震判斷魚訊。香港最普及釣法，魚排有瓦遮頭最 hea。</div>
-    <div class="card-fish"><span>烏頭</span><span>鱲魚</span><span>石斑</span></div>
-  </div>
-
-  <div class="card card-shore"><div class="card-num">02</div>
-    <div class="card-emoji">🪨</div>
-    <div class="card-title">磯釣</div>
-    <div class="card-location">📍 岸邊礁石、消波塊</div>
-    <div class="card-desc">用浮波控制釣層，配合誘餌粉引魚埋嚟。裝備最講究，技術含量最高。</div>
-    <div class="card-fish"><span>黑沙鱲</span><span>黃腳鱲</span><span>黑毛</span></div>
-  </div>
-
-  <div class="card card-shore"><div class="card-num">03</div>
-    <div class="card-emoji">🏖️</div>
-    <div class="card-title">投釣</div>
-    <div class="card-location">📍 沙灘、碼頭</div>
-    <div class="card-desc">遠投沉底，置竿等魚。最簡單入門玩法，唔使技術，拋出去就等運到。</div>
-    <div class="card-fish"><span>沙鑽</span><span>連米</span><span>鱸魚</span></div>
-  </div>
-
-  <div class="card card-shore"><div class="card-num">04</div>
-    <div class="card-emoji">🧱</div>
-    <div class="card-title">前打／落入</div>
-    <div class="card-location">📍 碼頭、直壆</div>
-    <div class="card-desc">輕鉛直感，貼住壆邊逐寸試探藏魚位。冇浮標，純手感，高手向玩法。</div>
-    <div class="card-fish"><span>石蚌</span><span>火點</span><span>鱲魚</span></div>
-  </div>
-
-  <div class="card card-shore"><div class="card-num">05</div>
-    <div class="card-emoji">🐟</div>
-    <div class="card-title">路亞</div>
-    <div class="card-location">📍 全海域</div>
-    <div class="card-desc">用假餌模仿小魚泳姿，引掠食魚主動攻擊。唔使買生餌，一盒假餌走天涯。</div>
-    <div class="card-fish"><span>鱸魚</span><span>GT</span><span>海狼</span></div>
-  </div>
-
-  <div class="card card-shore"><div class="card-num">06</div>
-    <div class="card-emoji">💪</div>
-    <div class="card-title">岸拋（Casting）</div>
-    <div class="card-location">📍 岸邊、防波堤</div>
-    <div class="card-desc">重型假餌全力遠投，專攻外海大型迴游魚。體力＋技術，中魚一刻最震撼。</div>
-    <div class="card-fish"><span>GT</span><span>煙仔</span><span>黃鰭吞拿</span></div>
-  </div>
-
-  <div class="card card-shore"><div class="card-num">07</div>
-    <div class="card-emoji">🦑</div>
-    <div class="card-title">餌木釣（Fit 魷）</div>
-    <div class="card-location">📍 碼頭、礁石</div>
-    <div class="card-desc">路亞分支，用姣蝦跳底引魷魚抱餌。香港夜水最受歡迎，一家大細都玩得。</div>
-    <div class="card-fish"><span>大尾魷</span><span>針墨</span></div>
-  </div>
-
-  <div class="card card-shore"><div class="card-num">08</div>
-    <div class="card-emoji">🪶</div>
-    <div class="card-title">飛蠅（Fly Fishing）</div>
-    <div class="card-location">📍 溪河、水塘</div>
-    <div class="card-desc">靠線重拋出羽毛假餌，輕盈如蜻蜓點水。最優雅釣法，香港少人玩但好有型。</div>
-    <div class="card-fish"><span>鯉魚</span><span>塘虱</span><span>鱸魚</span></div>
-  </div>
-
-  <div class="card card-sea"><div class="card-num">09</div>
-    <div class="card-emoji">🚤</div>
-    <div class="card-title">船釣／艇釣</div>
-    <div class="card-location">📍 近海小艇</div>
-    <div class="card-desc">揸艇到標點，竿或手絲不拘。最自由玩法，約齊班 friend 出海最開心。</div>
-    <div class="card-fish"><span>石斑</span><span>紅鮋</span><span>細鱗</span></div>
-  </div>
-
-  <div class="card card-sea"><div class="card-num">10</div>
-    <div class="card-emoji">🌊</div>
-    <div class="card-title">深海 Jigging</div>
-    <div class="card-location">📍 南油、外海</div>
-    <div class="card-desc">垂直放鐵板到底再上下抽動，搏深海巨物。男人嘅浪漫，體力消耗極大。</div>
-    <div class="card-fish"><span>章雄</span><span>黃鰭吞拿</span><span>GT</span></div>
-  </div>
-
-  <div class="card card-sea"><div class="card-num">11</div>
-    <div class="card-emoji">🤚</div>
-    <div class="card-title">手絲</div>
-    <div class="card-location">📍 艇、碼頭</div>
-    <div class="card-desc">唔用竿，絲直接揸手。中魚最直接手感，香港傳統漁民玩法，簡單粗暴。</div>
-    <div class="card-fish"><span>石斑</span><span>紅鮋</span><span>雜魚</span></div>
-  </div>
-
-  <div class="card card-sea"><div class="card-num">12</div>
-    <div class="card-emoji">🏋️</div>
-    <div class="card-title">重磯／石鯛</div>
-    <div class="card-location">📍 外礁大湧位</div>
-    <div class="card-desc">超重型磯釣，粗竿粗絲搏怪獸級大魚。終極釣法，裝備過萬，非狂熱者勿試。</div>
-    <div class="card-fish"><span>石鯛</span><span>巨石斑</span></div>
-  </div>
-
-  <div class="card card-leisure"><div class="card-num">13</div>
-    <div class="card-emoji">🏞️</div>
-    <div class="card-title">淡水釣</div>
-    <div class="card-location">📍 水塘、河流</div>
-    <div class="card-desc">手竿或台釣，標仔睇魚訊。香港水塘任釣，唔使出海，市區就近都有得玩。</div>
-    <div class="card-fish"><span>鯉魚</span><span>鯪魚</span><span>羅非</span></div>
-  </div>
-
-  <div class="card card-leisure"><div class="card-num">14</div>
-    <div class="card-emoji">🎣</div>
-    <div class="card-title">塘釣</div>
-    <div class="card-location">📍 付費魚塘</div>
-    <div class="card-desc">俾錢入場保證有魚，hea 住釣唔使技術。最啱一家大細，BBQ＋釣魚一日遊。</div>
-    <div class="card-fish"><span>盲曹</span><span>黃鱲鯧</span><span>羅非</span></div>
-  </div>
-
-</div>
-</div>
-
-<!-- ═══ VERSION 4: 信息圖 ═══ -->
-<div id="v4" class="view">
-<div class="infographic">
-
-  <div class="info-hero">
-    <h1>🎣 香港釣法完全圖鑑</h1>
-    <div class="sub">14 種釣法 · 三大類別 · 一圖睇晒</div>
-  </div>
-
-  <div class="info-stats">
-    <div class="stat-box stat-shore"><div class="big">8</div><div class="label">🏖️ 岸上釣法</div></div>
-    <div class="stat-box stat-sea"><div class="big">4</div><div class="label">⛵ 海上釣法</div></div>
-    <div class="stat-box stat-leisure"><div class="big">2</div><div class="label">🧘 休閒釣法</div></div>
-  </div>
-
-  <div class="info-matrix">
-    <div class="info-row header">
-      <div>#</div><div>釣法</div><div>場地</div><div>特性</div><div>常見魚獲</div>
-    </div>
-    <div class="info-row"><div class="i-num">1</div><div class="i-name">筏釣</div><div class="i-loc">魚排、小艇</div><div class="i-desc">垂直落絲到底，靠睇竿頭微震判斷魚訊</div><div class="i-fish">烏頭、鱲魚、石斑</div></div>
-    <div class="info-row"><div class="i-num">2</div><div class="i-name">磯釣</div><div class="i-loc">岸邊礁石</div><div class="i-desc">用浮波控制釣層，配合誘餌粉引魚埋嚟</div><div class="i-fish">黑沙鱲、黃腳鱲、黑毛</div></div>
-    <div class="info-row"><div class="i-num">3</div><div class="i-name">投釣</div><div class="i-loc">沙灘、碼頭</div><div class="i-desc">遠投沉底，置竿等魚，最簡單入門玩法</div><div class="i-fish">沙鑽、連米、鱸魚</div></div>
-    <div class="info-row"><div class="i-num">4</div><div class="i-name">前打／落入</div><div class="i-loc">碼頭、直壆</div><div class="i-desc">輕鉛直感，貼住壆邊逐寸試探藏魚位</div><div class="i-fish">石蚌、火點、鱲魚</div></div>
-    <div class="info-row"><div class="i-num">5</div><div class="i-name">路亞</div><div class="i-loc">全海域</div><div class="i-desc">用假餌模仿小魚泳姿，引掠食魚主動攻擊</div><div class="i-fish">鱸魚、GT、海狼</div></div>
-    <div class="info-row"><div class="i-num">6</div><div class="i-name">岸拋 (Casting)</div><div class="i-loc">岸邊、防波堤</div><div class="i-desc">重型假餌全力遠投，專攻外海大型迴游魚</div><div class="i-fish">GT、煙仔、黃鰭吞拿</div></div>
-    <div class="info-row"><div class="i-num">7</div><div class="i-name">餌木釣 (Fit 魷)</div><div class="i-loc">碼頭、礁石</div><div class="i-desc">路亞分支，用姣蝦跳底引魷魚抱餌</div><div class="i-fish">大尾魷、針墨</div></div>
-    <div class="info-row"><div class="i-num">8</div><div class="i-name">飛蠅 (Fly)</div><div class="i-loc">溪河、水塘</div><div class="i-desc">靠線重拋出羽毛假餌，輕盈如蜻蜓點水</div><div class="i-fish">鯉魚、塘虱、鱸魚</div></div>
-    <div class="info-row"><div class="i-num">9</div><div class="i-name">船釣／艇釣</div><div class="i-loc">近海小艇</div><div class="i-desc">揸艇到標點，竿或手絲不拘，最自由玩法</div><div class="i-fish">石斑、紅鮋、細鱗</div></div>
-    <div class="info-row"><div class="i-num">10</div><div class="i-name">深海 Jigging</div><div class="i-loc">南油、外海</div><div class="i-desc">垂直放鐵板到底再上下抽動，搏深海巨物</div><div class="i-fish">章雄、黃鰭吞拿、GT</div></div>
-    <div class="info-row"><div class="i-num">11</div><div class="i-name">手絲</div><div class="i-loc">艇、碼頭</div><div class="i-desc">唔用竿，絲直接揸手，中魚最直接手感</div><div class="i-fish">石斑、紅鮋、雜魚</div></div>
-    <div class="info-row"><div class="i-num">12</div><div class="i-name">重磯／石鯛</div><div class="i-loc">外礁大湧位</div><div class="i-desc">超重型磯釣，粗竿粗絲搏怪獸級大魚</div><div class="i-fish">石鯛、巨石斑</div></div>
-    <div class="info-row"><div class="i-num">13</div><div class="i-name">淡水釣</div><div class="i-loc">水塘、河流</div><div class="i-desc">手竿或台釣，標仔睇魚訊，香港水塘任釣</div><div class="i-fish">鯉魚、鯪魚、羅非</div></div>
-    <div class="info-row"><div class="i-num">14</div><div class="i-name">塘釣</div><div class="i-loc">付費魚塘</div><div class="i-desc">俾錢入場保證有魚，hea 住釣唔使技術</div><div class="i-fish">盲曹、黃鱲鯧、羅非</div></div>
-  </div>
-
-  <div class="info-footer">香港釣魚資訊站 · 14 種釣法完整收錄</div>
-
-</div>
+<!-- ═══ Modal ═══ -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
 </div>
 
 <script>
-function switchView(id) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  event.target.classList.add('active');
+const METHODS = {
+  raft: {
+    emoji:'🛶', title:'筏釣', location:'魚排、小艇、橋墩',
+    intro:'香港最普及嘅釣法之一。喺魚排或小艇上垂直落絲作釣，靠觀察竿頭嘅微震判斷魚訊，唔使用浮標。適合新手入門，亦係資深釣友 hea 釣首選。',
+    gear:'筏竿（1.5-1.8m 中硬調最萬用）、小型橫絞或鼓式絞（維京型）、幼絲直出冇子線。鉛只用夾鉛或中通鉛，視乎流水調整重量。',
+    bait:'南極蝦（最方便萬能餌）、紅蟲／青蟲（本地魚最愛）、生蝦（針對石斑紅鮋）、重皮蟹（夏天限定）、麵包（釣烏頭）。多數配合團子誘餌粉打窩聚魚。',
+    skill:'① 打團子誘餌定時打入釣點聚魚；② 手指輕按魚絞控制放線速度，保持直出冇虛絲；③ 專注睇竿頭——抖動或微微彎曲即揚竿；④ 長時間冇魚訊就換位或換餌。',
+    fish:['烏頭','鱲魚','石斑','紅鮋','鱸魚']
+  },
+  iso: {
+    emoji:'🪨', title:'磯釣', location:'岸邊礁石、消波塊、外礁',
+    intro:'磯釣係香港最熱血嘅岸釣方式，裝備最為講究。「磯」係日文漢字，意思係海岸邊或礁石上。用浮波控制釣層，配合誘餌粉引魚，技術含量極高。',
+    gear:'磯竿（約 5.3m）、手煞捲線器（LB 絞）、浮波／阿波（核心裝備，按場地揀浮力）、誘餌桶＋餌勺（打誘餌必備）。⚠️ 救生衣＋防滑釘鞋係磯釣必備安全裝備。',
+    bait:'南極蝦（誘餌＋釣餌二合一）、蝦仁、青蟲。重點唔係用咩餌，而係誘餌同步——誘餌粉同釣餌要同一條水流線，引魚埋嚟但食你粒餌。',
+    skill:'① 睇流水——漲退潮交界最靚，流水決定釣組設定；② 誘餌同步係核心，唔同步等於幫人餵魚；③ 由底開始釣，逐步調整棚深搵魚層；④ 浮波一沉或橫移即揚竿。進階可試全遊動釣法。',
+    fish:['黑沙鱲','黃腳鱲','白鱲','牛屎鱲','黑毛','石斑'],
+    warn:['外礁危險！必須著救生衣+釘鞋','注意湧浪，唔好背對大海','天氣變差即撤退']
+  },
+  surf: {
+    emoji:'🏖️', title:'投釣', location:'沙灘、碼頭、岸邊',
+    intro:'最簡單嘅入門釣法。用長投竿將釣組遠遠拋出，鉛墜沉底後置竿等魚。唔使睇竿頭、唔使打誘餌，拋出去就等運到，hea 釣之王。',
+    gear:'投竿（較長較硬，方便遠投）、紡車式魚絞、沉底釣組（中通鉛＋擰圈＋子線＋魚鈎）。竿架或用石頭頂住支竿等魚。',
+    bait:'青蟲、紅蟲（最常用）、蝦仁、魷魚條。由於係沉底等魚，用比較韌嘅餌冇咁易被小魚盜餌。',
+    skill:'① 掌握拋投技巧，唔好炒粉；② 揀沙灘流水位——有泡沬帶、深淺交界位多魚；③ 竿頭大彎或竿被拉郁先揚竿，小魚啄唔使理；④ 可以同時開兩三支竿增加機會。',
+    fish:['沙鑽','連米','鱸魚','黃腳鱲','細鱗']
+  },
+  maezuri: {
+    emoji:'🧱', title:'前打／落入', location:'碼頭、直壆、堤防',
+    intro:'冇浮標、純手感嘅高手向釣法。用輕鉛直感，貼住壆邊逐寸試探石隙、樁柱等藏魚位。中魚嗰下直接傳到手掌心，手感一流。',
+    gear:'前打竿（軟調、竿先極敏感）、前打絞或小橫絞、極輕鉛、直出幼絲。重點係竿先要夠敏感，要 feel 到最輕微嘅魚訊。',
+    bait:'生蝦（首選，鈎頭或鈎尾令蝦保持生猛）、小蟹、青蟲。餌要自然飄落，模仿小生物跌落水嘅動態。',
+    skill:'① 貼壆邊垂直落餌，逐段逐寸試探；② 感覺到「啄啄吓」可能係魚試餌，等实口先揪；③ 要控制線嘅張力——太緊魚唔敢食，太鬆 feel 唔到魚訊；④ 沿壆邊一路行一路試，主動搵魚唔係等魚。',
+    fish:['石蚌','火點','鱲魚','紅鮋','細鱗']
+  },
+  lure: {
+    emoji:'🐟', title:'路亞（Lure Fishing）', location:'全海域（岸、艇、溪、塘）',
+    intro:'用假餌模仿小魚／蝦／蟲嘅泳姿，引誘掠食性魚類主動攻擊。唔使買生餌，一盒假餌走天涯。近年香港越來越流行，機動性強。',
+    gear:'路亞竿（按餌重揀硬度）、紡車絞或橫絞、PE 編織線＋碳線前導。重點係竿同餌重要匹配——竿身有標示適用餌重範圍。',
+    bait:'唔用真餌，全部假餌。分水面系（Popper、Pencil）、中層系（Minnow、Crank）、底層系（軟蟲、金屬 Jig）。唔同假餌配唔同操作手法。',
+    skill:'① 平收（Steady Retrieve）最基礎，穩定速度收線；② Stop & Go 模仿受傷小魚最有效；③ Jerking 大幅抽竿引魚反射攻擊；④ 軟蟲跳底適合底棲魚；⑤ 勤換假餌——一種唔得就試另一種。',
+    fish:['鱸魚','GT','海狼','煙仔','火點','石斑']
+  },
+  casting: {
+    emoji:'💪', title:'岸拋（Shore Casting）', location:'岸邊、防波堤、燈塔、外礁',
+    intro:'路亞嘅「重火力版」。用重型假餌（鐵板、大型 Popper）全力遠投，專攻外海大型迴游魚。體力消耗大，但中魚嗰下嘅爆發力冇得頂。',
+    gear:'岸拋竿（9-10ft，較硬）、大型紡車絞、PE 粗線。鐵板/Popper 重量由 20g 去到 150g+，視乎目標魚種同釣場。',
+    bait:'金屬鐵板（Metal Jig）、大型 Popper、Pencil、水球。鐵板分慢搖（Slow Jig）同快抽（Speed Jig），唔同魚種有唔同偏好。',
+    skill:'① 全力遠投係基本功，距離決定搜索範圍；② 鐵板落底後用竿尖上下跳動（Jigging）；③ Popper 撞水花要夠大力，模擬小魚驚逃；④ 長時間冇魚訊係常態（打龜係岸拋日常），堅持就係勝利。',
+    fish:['GT（牛港）','煙仔','黃鰭吞拿','海狼','鱸魚'],
+    warn:['體力消耗極大，新手建議由輕鐵板開始','注意周圍行人，確保拋投範圍安全']
+  },
+  egi: {
+    emoji:'🦑', title:'餌木釣（Fit 魷／Egi）', location:'碼頭、礁石、防波堤',
+    intro:'路亞嘅一個分支，專門用「姣蝦」（餌木）釣魷魚。香港夜水最受歡迎嘅玩法，一家大細都玩得，裝備門檻低，成功率相對高。',
+    gear:'專用餌木竿（或軟調路亞竿）、紡車絞、PE 線＋碳線前導。最關鍵係姣蝦——分唔同 size（2.5-4.0 號）同顏色，夜水用螢光色、日光用自然色。',
+    bait:'姣蝦（餌木）——底部有兩排傘鉤，魷魚一抱就中。分沉水型同淺場型，視乎水深揀。',
+    skill:'① 拋出姣蝦等佢沉到底；② 竿尖大幅度抽一下令姣蝦跳起；③ 停頓等佢再沉——魷魚多數喺下沉嗰下攻擊；④ 重複抽→停→沉；⑤ 感覺到「重咗」或有拉力即揚竿，魷魚係抱唔係咬。',
+    fish:['大尾魷','針墨','魷魚']
+  },
+  fly: {
+    emoji:'🪶', title:'飛蠅（Fly Fishing）', location:'溪河、水塘、岸邊',
+    intro:'最優雅嘅釣法。唔靠餌重拋投，而係靠飛蠅線（Fly Line）嘅重量將輕如無物嘅羽毛假餌送到標點。香港少人玩，但極具觀賞性。',
+    gear:'飛蠅竿（較長較軟）、飛蠅絞、飛蠅線（Weight Forward 最常用）、前導線。假餌係人手紮嘅羽毛鈎（Fly），模仿昆蟲或小魚。',
+    bait:'乾式毛鈎（浮水面模仿跌落水嘅昆蟲）、濕式毛鈎（沉水模仿幼蟲或小魚）。香港水塘常用蜻蜓款、蚊型款。',
+    skill:'① 基本拋投要學「鐘擺動作」——竿尖由 10 點到 2 點方向；② 控制線嘅 loop 要窄，唔好太大弧度；③ 讀水——觀察水面漣漪判斷魚喺邊；④ 乾鈎要輕放水面，唔好嚇走魚；⑤ 呢個釣法學習曲線较長，建議揾教練學基本功。',
+    fish:['鯉魚','塘虱','羅非','鱸魚']
+  },
+  boat: {
+    emoji:'🚤', title:'船釣／艇釣', location:'近海小艇、西貢、南丫島',
+    intro:'揸小艇出海到標點作釣，竿同手絲不拘，係最自由嘅釣法。約齊三五知己，吹住海風釣魚，香港週末最寫意嘅活動之一。',
+    gear:'船竿或萬用竿、紡車絞或橫絞均可。有人鍾意用竿，有人鍾意手絲——冇規定。船家通常會提供基本裝備。',
+    bait:'生蝦、魷魚仔、青蟲、蝦仁。船家多數會幫手準備釣餌。亦可用誘餌粉打窩，效果更好。',
+    skill:'① 上船前 check 天氣，太大風浪唔好勉強；② 聽船家指示——佢哋最熟邊個位有咩魚；③ 如易暈船浪，出發前半小時食定暈浪丸；④ 船釣最緊要安全，全程著救生衣。',
+    fish:['石斑','紅鮋','細鱗','黃花','馬友']
+  },
+  jigging: {
+    emoji:'🌊', title:'深海 Jigging', location:'南油、擔桿、外海油井',
+    intro:'終極深海釣法，被稱為「男人嘅浪漫」。坐大船到外海油井附近，用重鐵板垂直放到海底（有時過百米深），再大力上下抽動搏深海巨物。體力消耗極大，但中魚嘅震撼冇其他釣法可比。',
+    gear:'Jigging 專用竿（短而硬，專門應付大物）、大型橫絞或紡車絞、PE 粗線。鐵板由 100g 到 500g+。需要肚頂（fighting belt）輔助搏魚。',
+    bait:'只用金屬鐵板（Metal Jig），唔使真餌。鐵板有分速度型（快抽）同飄逸型（慢搖），視乎當日魚嘅活性揀。',
+    skill:'① 鐵板到底後用全身力氣大幅抽竿——用腰唔係用手；② 規律跳底（一格一格抽）覆蓋唔同水深；③ 中魚後要控制洩力，慢慢收慢慢磨，急唔嚟；④ 深海 Jigging 係體力戰，練好體能係基本功。',
+    fish:['章雄','黃鰭吞拿','GT','大眼雞','紅寶石'],
+    warn:['體力消耗極大，新手建議先練體能','南油行程長（通常過夜），要預充足時間','船費較高，出發前 confirm 天氣']
+  },
+  handline: {
+    emoji:'🤚', title:'手絲', location:'艇上、碼頭、直壆',
+    intro:'最原始、最直接嘅釣魚方式。唔使用竿，一條絲直接揸喺手，魚一咬就即刻 feel 到。香港傳統漁民玩法，簡單粗暴但好有效。',
+    gear:'冇竿！只有手絲排（塑膠排或木排）、鉛墜、擰圈、魚鈎。成本極低，幾十蚊就開到工。',
+    bait:'蝦仁、魷魚、青蟲、生蝦。手絲因為冇竿緩衝，用比較韌嘅餌避免被盜。',
+    skill:'① 手指要 sensitive，feel 到最輕微嘅「啄」；② 感覺到實口先大力抽——手絲冇竿嘅緩衝，抽竿要更快更狠；③ 中大魚要用手套或布包住絲先慢慢收，避免燒手；④ 收放自如，適當俾魚走一陣消耗體力。',
+    fish:['石斑','紅鮋','雜魚','魷魚']
+  },
+  heavy: {
+    emoji:'🏋️', title:'重磯／石鯛', location:'外礁大湧位、離島大石',
+    intro:'終極釣法。用超重型磯竿、粗絲、大鈎，專攻石鯛、巨石斑等怪獸級底棲魚。裝備過萬，技術要求極高，非狂熱發燒友唔會掂。',
+    gear:'石鯛竿（極硬極粗，專為搏大物設計）、大型橫絞、粗絲（幾十磅起跳）、鋼絲腳（防魚咬斷）、大型魚鈎。成 set 裝備重到要用手推車搬去釣點。',
+    bait:'大蟹、大生蝦、八爪魚、魚頭。餌要夠大夠硬，頂得住小魚盜餌，等大魚埋嚟一啖吞。',
+    skill:'① 揀位係最重要——要有深水、有暗礁、有大湧；② 釣組要夠重先定到位，唔係會被浪沖走；③ 中魚後唔好急，慢慢磨，怪獸級魚可以搏成個鐘；④ ⚠️ 極高危——必須有 partner、救生衣、防滑鞋，夜晚或大浪絕對唔好去。',
+    fish:['石鯛','巨石斑','大紅鮋','鯆魚'],
+    warn:['⚠️ 極高危釣法！必須結伴同行','必須著救生衣＋防滑釘鞋＋安全繩','天氣稍差不應前往','裝備重，搬運要小心']
+  },
+  fresh: {
+    emoji:'🏞️', title:'淡水釣', location:'水塘、河流、溪澗',
+    intro:'香港多個水塘開放俾公眾釣魚（需申請牌照），唔使出海的釣魚選擇。手竿或台釣為主，標仔睇魚訊，悠閒舒服。',
+    gear:'手竿（最常用）、台釣竿、小紡車絞。淡水釣組較輕巧纖細，標仔（浮標）係核心。香港水塘釣魚需向水務署申請免費牌照。',
+    bait:'麵粉餌、花生麩、麵包、蚯蚓、玉米。淡水魚口味同海魚唔同，用腥味或香甜味餌。',
+    skill:'① 調標係基本功——要校到標身刚好浮出水面；② 打窩（撒誘餌）聚魚；③ 標仔輕微下沉或上頂即揚竿；④ 淡水魚多數較精口，保持安靜，唔好大動作嚇魚。',
+    fish:['鯉魚','鯪魚','羅非','塘虱','鯽魚']
+  },
+  pond: {
+    emoji:'🎣', title:'塘釣', location:'付費魚塘（新界、元朗）',
+    intro:'俾錢入場保證有魚嘅休閒釣魚。唔使技術、唔使睇天氣、唔使買裝備（多數有得租）。最啱一家大細 weekend 活動，多數仲有 BBQ 設施。',
+    gear:'魚塘多數提供租竿服務，空手入場都得。自己帶嘅話，萬用竿或手竿已夠。唔需要太專業裝備。',
+    bait:'魚塘通常包埋釣餌（蝦仁、麵包等），或喺現場買。部份魚塘規定要用佢提供嘅餌，確保水質。',
+    skill:'① 基本上唔使技術——拋出去就有魚；② 注意魚塘規則（某啲魚要放生、限攞幾多條）；③ 釣得多通常按斤收費，量力而為；④ 最緊要 enjoy，塘釣係休閒活動唔係競技。',
+    fish:['盲曹','黃鱲鯧','羅非','鯉魚','鯇魚']
+  }
+};
+
+function openMethod(key) {
+  var m = METHODS[key];
+  var html = '<button class="modal-close" onclick="closeModal()">✕</button>';
+  html += '<div class="modal-header">';
+  html += '<div class="m-emoji">'+m.emoji+'</div>';
+  html += '<div class="m-title">'+m.title+'</div>';
+  html += '<div class="m-loc">📍 '+m.location+'</div>';
+  html += '</div>';
+  html += '<div class="modal-body">';
+  html += '<h3>簡介</h3><p>'+m.intro+'</p>';
+  html += '<h3>裝備概覽</h3><p>'+m.gear+'</p>';
+  if(m.bait){ html += '<h3>常用魚餌</h3><p>'+m.bait+'</p>'; }
+  html += '<h3>操作技巧</h3><p>'+m.skill+'</p>';
+  if(m.fish){
+    html += '<h3>常見魚獲</h3><div class="tags">';
+    m.fish.forEach(function(f){ html += '<span class="tag">'+f+'</span>'; });
+    html += '</div>';
+  }
+  if(m.warn){
+    html += '<h3>⚠️ 注意事項</h3><div class="tags">';
+    m.warn.forEach(function(w){ html += '<span class="tag warn">'+w+'</span>'; });
+    html += '</div>';
+  }
+  html += '</div>';
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  document.body.style.overflow = '';
 }
 </script>
 </body>
