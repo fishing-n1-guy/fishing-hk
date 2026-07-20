@@ -134,12 +134,17 @@ function init(){
     if(now-lastTap<350 && img===lastTapTarget){
       e.preventDefault();
       img.classList.toggle('zoomed');
+      var v=document.getElementById('viewer');
       if(img.classList.contains('zoomed')){
         var rect=img.getBoundingClientRect();
         var cx=(e.clientX||(e.touches&&e.touches[0]&&e.touches[0].clientX)||rect.width/2)-rect.left;
         var cy=(e.clientY||(e.touches&&e.touches[0]&&e.touches[0].clientY)||rect.height/2)-rect.top;
         img.style.transformOrigin=(cx/rect.width*100)+'% '+(cy/rect.height*100)+'%';
-        toast('🔍 已放大 — 再 double-tap 縮細');
+        // Center horizontally so both sides scrollable
+        setTimeout(function(){
+          v.scrollLeft=(v.scrollWidth-v.clientWidth)/2;
+        },50);
+        toast('🔍 已放大 — 左右拉睇全圖');
       }else{
         toast('縮細');
       }
