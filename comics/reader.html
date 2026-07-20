@@ -24,9 +24,9 @@ body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text)
 .chitem .badge{font-size:.65em;padding:1px 5px;border-radius:2px;margin-left:auto}
 .chitem .badge.ok{background:#1a3a1a;color:var(--green)}
 .chitem .badge.pending{background:#1a1a1a;color:#666}
-.viewer{flex:1;overflow-y:auto;background:#000;display:flex;flex-direction:column;align-items:center;-webkit-overflow-scrolling:touch}
-.viewer img{display:block;width:100%;max-width:100vw;height:auto;touch-action:manipulation;-webkit-user-select:none}
-.viewer img.zoomed{transform:scale(2.5);z-index:10;position:relative;box-shadow:0 0 30px rgba(0,0,0,.8)}
+.viewer{flex:1;overflow-y:auto;overflow-x:auto;background:#000;display:flex;flex-direction:column;align-items:center;-webkit-overflow-scrolling:touch}
+.viewer img{display:block;width:100%;max-width:100vw;height:auto;touch-action:manipulation;-webkit-user-select:none;min-width:100vw}
+.viewer img.zoomed{transform:scale(2.5);z-index:10;position:relative;box-shadow:0 0 30px rgba(0,0,0,.8);min-width:250vw}
 .placeholder{flex:1;display:flex;align-items:center;justify-content:center;color:#444;flex-direction:column;gap:8px;text-align:center;padding:20px}
 .placeholder .icon{font-size:3em}
 .placeholder a{color:var(--accent)}
@@ -79,7 +79,7 @@ var CHAPTERS = [{"num": "1", "label": "第1回", "id": 202565}, {"num": "2", "la
 var SCRAPED = {"1": {"pages": 37, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/1/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "domain": "us3"}, "2": {"pages": 30, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/2/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=UOTKO0kCAQCCnAuCnvfi1w", "domain": "us3"}, "3": {"pages": 30, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/3/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=OIUamy7oyqnI1wGdaL1fuQ", "domain": "us3"}, "4": {"pages": 29, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/4/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=PQznVC-4Dq8oiPyOydJEvg", "domain": "us3"}, "5": {"pages": 30, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/5/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=qYi-VpxBqZj7B84TLkPDxA", "domain": "us3"}, "6": {"pages": 29, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/6/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=P1NFdQxKA6LhgtplSSO4Kw", "domain": "us3"}, "7": {"pages": 29, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/7/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=MZRU8ZKWurF0joK5ei-phQ", "domain": "us3"}, "8": {"pages": 27, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/8/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=agCqVSXr1hIV_CLU3XjiWQ", "domain": "us3"}, "9": {"pages": 28, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/9/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=TOa_vzmf-sCxcKPZVAl5mg", "domain": "us3"}, "10": {"pages": 28, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/10/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=5C1gLHumulN3DdR-tgvpLg", "domain": "us3"}, "11": {"pages": 27, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/11/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=RAZvxEEcOk1GM3WFTi2gug", "domain": "us3"}, "12": {"pages": 26, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/12/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=Ymec8plk0eEL_Owq0ziHBw", "domain": "us3"}, "13": {"pages": 26, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/13/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=OyYjOIXVOeNNc1a-EYCalA", "domain": "us3"}, "14": {"pages": 25, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/14/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=H1bVWWdXiQ_yGqV9qxt6nQ", "domain": "us3"}, "15": {"pages": 28, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/15/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=9E4r0Wm8R1aiLAl-LcD93A", "domain": "us3"}, "16": {"pages": 32, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/16/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=3TA22HnCfueRVLu6J8YBFQ", "domain": "us3"}, "17": {"pages": 23, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/17/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=yifcs8uVa5zgQhNy_RXSGA", "domain": "us3"}, "18": {"pages": 28, "base": "https://us3.hamreus.com/ps4/h/hwyy_qrx/18/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=C9eSobhqRj7FNK2hKopK2w", "domain": "us3"}, "19": {"pages": 26, "base": "https://eu2.hamreus.com/ps4/h/hwyy_qrx/19/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514077&m=hwTTtz2MSdAygMrD1YX3Hg", "domain": "eu2"}, "20": {"pages": 28, "base": "https://eu2.hamreus.com/ps4/h/hwyy_qrx/20/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514078&m=MSCvAKVa3gOSWslzoY7eYw", "domain": "eu2"}, "21": {"pages": 29, "base": "https://eu2.hamreus.com/ps4/h/hwyy_qrx/21/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514078&m=NZwLaUUamPiMVpVMi0xorw", "domain": "eu2"}, "22": {"pages": 25, "base": "https://eu2.hamreus.com/ps4/h/hwyy_qrx/22/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514078&m=Via1kNTjdaScGM6tWlBfIw", "domain": "eu2"}, "23": {"pages": 25, "base": "https://eu2.hamreus.com/ps4/h/hwyy_qrx/23/", "pattern": "{:03d}.jpg.webp", "token": "e=1785514078&m=OyUvfnCeoIbXGf89yfAYAA", "domain": "eu2"}};
 var PROXY = 'https://comic-proxy.kitlam729.workers.dev/?url=';
 var BK = 'hwyy_v4';
-var curIdx = -1, curPages = [], curPage = 0;
+var curIdx = -1, curPages = [], scrollPos = 0;
 
 // --- Merge ---
 for(var k in SCRAPED){
@@ -99,11 +99,12 @@ function loadBM(){
   try{
     var raw=localStorage.getItem(BK);
     if(!raw) raw=getCookie(BK);
-    if(raw){var d=JSON.parse(raw);curIdx=d.i;curPage=d.p||0;}
+    if(raw){var d=JSON.parse(raw);curIdx=d.i;scrollPos=d.s||0;}
   }catch(e){}
 }
 function saveBM(){
-  var data=JSON.stringify({i:curIdx,p:curPage,t:Date.now()});
+  var v=document.getElementById('viewer');
+  var data=JSON.stringify({i:curIdx,s:v.scrollTop,t:Date.now()});
   try{localStorage.setItem(BK,data);setCookie(BK,data,365);}catch(e){}
 }
 function setCookie(n,v,d){var e=new Date();e.setTime(e.getTime()+d*86400000);document.cookie=n+'='+encodeURIComponent(v)+';expires='+e.toUTCString()+';path=/;SameSite=Lax'}
@@ -122,7 +123,7 @@ function init(){
   document.getElementById('menuBtn').onclick=function(){document.getElementById('sidebar').classList.toggle('open')};
   loadBM();
   renderList();
-  if(curIdx>=0) openChapter(curIdx, curPage);
+  if(curIdx>=0) openChapter(curIdx, scrollPos);
 
   // Double-tap zoom (uses touchend for iOS, click for desktop)
   var lastTap=0, lastTapTarget=null;
@@ -167,9 +168,10 @@ function renderList(){
 }
 
 // --- Open chapter ---
-function openChapter(idx, savedPage){
+function openChapter(idx, savedScroll){
   curIdx=idx;
-  curPage=(typeof savedPage==='number')?savedPage:0;
+  if(typeof savedScroll==='number') scrollPos=savedScroll;
+  else scrollPos=0;
   curPages=[];
   var c=CHAPTERS[idx];
   document.getElementById('sidebar').classList.remove('open');
@@ -198,12 +200,10 @@ function openChapter(idx, savedPage){
 
   document.getElementById('navbar').style.display='flex';
   renderPages();
-  updateNav();
-  toast('📖 第'+c.num+'回 · '+maxPages+'頁'+(curPage>0?' · 跳到第'+(curPage+1)+'頁':''));
+  toast('📖 第'+c.num+'回 · '+maxPages+'頁'+(scrollPos>0?' · 恢復位置':''));
 }
 
 // --- Render pages ---
-var scrollTimeout;
 function renderPages(){
   var v=document.getElementById('viewer');
   for(var i=0;i<curPages.length;i++){
@@ -212,41 +212,51 @@ function renderPages(){
     img.alt='p'+(i+1);
     img.loading=i<3?'eager':'lazy';
     img.onerror=function(){this.style.opacity='0.3';this.alt='❌'};
-    img.onload=function(){
-      // After first few images load, scroll to saved page
-      var loaded=document.querySelectorAll('#viewer img[src]').length;
-      if(loaded>=Math.min(5,curPages.length) && curPage>0){
-        clearTimeout(scrollTimeout);
-        scrollTimeout=setTimeout(function(){
-          var imgs=document.querySelectorAll('#viewer img');
-          if(imgs[curPage]&&imgs[curPage].complete)imgs[curPage].scrollIntoView({block:'start'});
-        },500);
-      }
-    };
+    img.onload=(function(idx){
+      return function(){
+        var loaded=document.querySelectorAll('#viewer img[src]').length;
+        if(loaded>=Math.min(5,curPages.length) && scrollPos>0){
+          v.scrollTop=scrollPos;
+          scrollPos=0; // only restore once
+        }
+      };
+    })(i);
     v.appendChild(img);
   }
 }
 
 function updateNav(){
-  document.getElementById('pageInfo').textContent=(curPage+1)+'/'+curPages.length;
+  var v=document.getElementById('viewer');
+  var vh=v.clientHeight||window.innerHeight;
+  var approx=Math.floor(v.scrollTop/vh)+1;
+  document.getElementById('pageInfo').textContent='~'+approx+'/'+curPages.length;
 }
 
 function nextPage(){
-  if(curPage<curPages.length-1){curPage++;updateNav();saveBM();
-    var imgs=document.querySelectorAll('#viewer img');
-    if(imgs[curPage])imgs[curPage].scrollIntoView({behavior:'smooth'});}
+  var v=document.getElementById('viewer');
+  v.scrollBy({top:v.clientHeight||window.innerHeight,behavior:'smooth'});
+  setTimeout(function(){updateNav();saveBM();},400);
 }
 function prevPage(){
-  if(curPage>0){curPage--;updateNav();saveBM();
-    var imgs=document.querySelectorAll('#viewer img');
-    if(imgs[curPage])imgs[curPage].scrollIntoView({behavior:'smooth'});}
+  var v=document.getElementById('viewer');
+  v.scrollBy({top:-(v.clientHeight||window.innerHeight),behavior:'smooth'});
+  setTimeout(function(){updateNav();saveBM();},400);
 }
 function nextChapter(){if(curIdx<CHAPTERS.length-1)openChapter(curIdx+1)}
 function prevChapter(){if(curIdx>0)openChapter(curIdx-1)}
 function jumpBookmark(){
-  if(curIdx>=0)openChapter(curIdx,curPage);
+  if(curIdx>=0)openChapter(curIdx,scrollPos);
   else openChapter(0);
 }
+
+// Save bookmark on scroll (debounced)
+var scrollSaveTimer;
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('viewer').addEventListener('scroll',function(){
+    clearTimeout(scrollSaveTimer);
+    scrollSaveTimer=setTimeout(saveBM,1000);
+  });
+});
 
 document.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight')nextPage();
