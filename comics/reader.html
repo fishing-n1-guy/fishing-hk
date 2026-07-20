@@ -113,9 +113,9 @@ function init(){
 }
 
 function loadBM(){
-  try{var d=JSON.parse(localStorage.getItem(BK_KEY));if(d)curIdx=d.idx;}catch(e){}
+  try{var d=JSON.parse(localStorage.getItem(BK_KEY));if(d){curIdx=d.idx;curPage=d.page||0;}}catch(e){}
 }
-function saveBM(){try{localStorage.setItem(BK_KEY,JSON.stringify({idx:curIdx,ts:Date.now()}));}catch(e){}}
+function saveBM(){try{localStorage.setItem(BK_KEY,JSON.stringify({idx:curIdx,page:curPage,ts:Date.now()}));}catch(e){}}
 
 function renderList(){
   var h='';
@@ -134,8 +134,12 @@ function renderList(){
   }
 }
 
-function openChapter(idx){
-  curIdx=idx;curPage=0;curPages=[];
+function openChapter(idx, savedPage){
+  curIdx=idx;
+  // Only reset page if not restoring from bookmark
+  if(typeof savedPage==='number') curPage=savedPage;
+  else curPage=0;
+  curPages=[];
   var c=CHAPTERS[idx];
   document.getElementById('sidebar').classList.remove('open');
   renderList();saveBM();
@@ -164,7 +168,15 @@ function openChapter(idx){
   document.getElementById('navbar').style.display='flex';
   renderPages();
   updateNav();
-  v.scrollTop=0;
+  // Scroll to saved page
+  if(curPage>0){
+    setTimeout(function(){
+      var imgs=document.querySelectorAll('#viewer img');
+      if(imgs[curPage]) imgs[curPage].scrollIntoView({behavior:'smooth',block:'start'});
+    },300);
+  } else {
+    v.scrollTop=0;
+  }
 }
 
 function renderPages(){
@@ -183,11 +195,11 @@ function updateNav(){
   document.getElementById('pageInfo').textContent=(curPage+1)+'/'+curPages.length;
 }
 
-function nextPage(){if(curPage<curPages.length-1){curPage++;updateNav();var imgs=document.querySelectorAll('#viewer img');if(imgs[curPage])imgs[curPage].scrollIntoView({behavior:'smooth'})}}
-function prevPage(){if(curPage>0){curPage--;updateNav();var imgs=document.querySelectorAll('#viewer img');if(imgs[curPage])imgs[curPage].scrollIntoView({behavior:'smooth'})}}
+function nextPage(){if(curPage<curPages.length-1){curPage++;updateNav();saveBM();var imgs=document.querySelectorAll('#viewer img');if(imgs[curPage])imgs[curPage].scrollIntoView({behavior:'smooth'})}}
+function prevPage(){if(curPage>0){curPage--;updateNav();saveBM();var imgs=document.querySelectorAll('#viewer img');if(imgs[curPage])imgs[curPage].scrollIntoView({behavior:'smooth'})}}
 function nextChapter(){if(curIdx<CHAPTERS.length-1)openChapter(curIdx+1)}
 function prevChapter(){if(curIdx>0)openChapter(curIdx-1)}
-function jumpBookmark(){if(curIdx>=0)openChapter(curIdx);else openChapter(0)}
+function jumpBookmark(){if(curIdx>=0)openChapter(curIdx,curPage);else openChapter(0)}
 
 document.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight')nextPage();
