@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>火武耀揚 第1回</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:-apple-system,sans-serif}
+.top{background:#111;padding:10px 14px;text-align:center;position:sticky;top:0;z-index:10;border-bottom:1px solid #333;font-size:.9em}
+.top a{color:#e74c3c;text-decoration:none}
+.pages{display:flex;flex-direction:column;align-items:center;padding:0}
+.pages img{display:block;width:100%;max-width:100vw;height:auto;-webkit-user-select:none;user-select:none}
+.bottom{background:#111;padding:12px;text-align:center;border-top:1px solid #333;font-size:.85em}
+.bottom a{color:#e74c3c;text-decoration:none;margin:0 10px}
+</style>
+</head>
+<body>
+<div class="top">
+  🔥 火武耀揚 · <b>第1回</b> · 共37頁
+</div>
+<div class="pages" id="pages"></div>
+<div class="bottom">
+  <a href="https://fishing-n1-guy.github.io/fishing-hk/comics/">← 目錄</a>
+</div>
+<script>
+var IMAGES = ["https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/001.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/002.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/003.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/004.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/005.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/006.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/007.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/008.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/009.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/010.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/011.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/012.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/013.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/014.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/015.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/016.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/017.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/018.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/019.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/020.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/021.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/022.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/023.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/024.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/025.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/026.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/027.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/028.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/029.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/030.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/031.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/032.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/033.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/034.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/035.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/036.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw", "https://comic-proxy.kitlam729.workers.dev/?url=https://eu1.hamreus.com/ps4/h/hwyy_qrx/1/037.jpg.webp?e=1785514077&m=wDNda3jcXANbHnkxaiezaw"];
+var container = document.getElementById('pages');
+for(var i=0;i<IMAGES.length;i++){
+  var img = document.createElement('img');
+  img.src = IMAGES[i];
+  img.alt = '第'+(i+1)+'頁';
+  img.loading = i<5 ? 'eager' : 'lazy';
+  img.onerror = function(){ this.alt='❌ 載入失敗'; };
+  container.appendChild(img);
+}
+</script>
+</body>
+</html>
