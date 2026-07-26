@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
 <title>🔥 NG騎士檸檬汽水&40</title>
 <style>
-:root{--bg:#1a1a2e;--card:#16213e;--accent:#e94560;--text:#eaeaea;--muted:#888}
+:root{--bg:#1a1a2e;--card:#16213e;--accent:#e94560;--youtube:#ff0000;--green:#2ecc71;--text:#eaeaea;--muted:#888}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
 header{background:linear-gradient(135deg,var(--accent),#533483);padding:1.5rem 1rem;text-align:center}
@@ -13,46 +13,55 @@ header h1{font-size:clamp(1.2rem,5vw,1.8rem)}
 header .sub{font-size:.8rem;opacity:.85;margin-top:.3rem}
 .container{max-width:700px;margin:0 auto;padding:.8rem}
 .card{background:var(--card);border-radius:10px;padding:1rem;margin-bottom:.8rem}
-h2{font-size:1rem;color:var(--accent);margin-bottom:.6rem}
+h2{font-size:1rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
 .ep-list{display:flex;flex-direction:column;gap:4px}
-.ep-row{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.03);border-radius:8px;padding:.5rem .7rem;text-decoration:none;color:var(--text);transition:background .15s}
+.ep-row{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.03);border-radius:8px;padding:.4rem .6rem;text-decoration:none;color:var(--text);transition:background .15s;flex-wrap:wrap}
 .ep-row:hover{background:rgba(233,69,96,.15)}
-.ep-num{background:var(--accent);color:#fff;border-radius:6px;padding:.2rem .5rem;font-size:.7rem;font-weight:700;min-width:42px;text-align:center;flex-shrink:0}
-.ep-title{font-size:.8rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ep-arrow{color:var(--muted);font-size:.8rem;flex-shrink:0}
+.ep-num{background:var(--accent);color:#fff;border-radius:5px;padding:.2rem .4rem;font-size:.65rem;font-weight:700;min-width:36px;text-align:center;flex-shrink:0}
+.ep-title{font-size:.75rem;flex:1;min-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ep-btns{display:flex;gap:4px;flex-shrink:0}
+.btn-mini{display:inline-flex;align-items:center;gap:3px;padding:.3rem .5rem;border-radius:5px;font-size:.65rem;font-weight:600;text-decoration:none;white-space:nowrap}
+.btn-play{background:var(--accent);color:#fff}
+.btn-dl{background:rgba(46,204,113,.2);color:var(--green);border:1px solid var(--green)}
+.btn-yt{background:rgba(255,0,0,.15);color:#f66;border:1px solid #f66}
 .dl-box{background:linear-gradient(135deg,#1a3a1a,#0d2818);border:1px solid #2ecc71;border-radius:10px;padding:1rem;text-align:center}
-.dl-box h2{color:#2ecc71}
-.dl-box .big-btn{display:inline-block;background:#2ecc71;color:#000;padding:.8rem 2rem;border-radius:10px;font-size:1rem;font-weight:700;text-decoration:none;margin:.5rem 0}
+.dl-box h2{color:#2ecc71;justify-content:center}
+.dl-box .big-btn{display:inline-block;background:#2ecc71;color:#000;padding:.6rem 1.5rem;border-radius:8px;font-size:.9rem;font-weight:700;text-decoration:none;margin:.3rem}
+.dl-box .big-btn.yt{background:var(--youtube);color:#fff}
 .dl-info{font-size:.7rem;color:var(--muted);margin-top:.5rem}
 .footer{text-align:center;padding:1.5rem;color:var(--muted);font-size:.65rem}
+.tip{font-size:.7rem;color:var(--muted);padding:.5rem;background:rgba(255,255,255,.03);border-radius:8px;margin-bottom:.6rem}
 </style>
 </head>
 <body>
 
 <header>
   <h1>🔥 NG騎士檸檬汽水&40</h1>
-  <div class="sub">1990 年經典 · 全 38 話 · 機械人冒險</div>
+  <div class="sub">1990 年 · 全 38 話 · Click ▶ 即睇 · ⬇ 逐集下載</div>
 </header>
 
 <div class="container">
 
-  <!-- Download - super simple -->
+  <!-- Batch options -->
   <div class="dl-box">
-    <h2>📥 一鍵下載全 38 話</h2>
-    <a class="big-btn" href="magnet:?xt=urn:btih:11496e1e331181364a66daffd7b8be96abbbf3eb&dn=%5B1990-1997%5D%20Ramune_NG%E9%A8%8E%E5%A3%AB%E6%AA%B8%E6%AA%AC%E6%B1%BD%E6%B0%B4%28NG%E9%A8%8E%E5%A3%AB%E3%83%A9%E3%83%A0%E3%83%8D%2640%29_TV.OVA&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce">📥 Download（34.5GB Torrent）</a>
-    <div class="dl-info">Click 上面 → 自動開 BT App → Download 完就用 VLC 睇，唔使數據！</div>
+    <h2>📥 Download 選項</h2>
+    <a class="big-btn" href="magnet:?xt=urn:btih:11496e1e331181364a66daffd7b8be96abbbf3eb&dn=%5B1990-1997%5D%20Ramune_NG%E9%A8%8E%E5%A3%AB%E6%AA%B8%E6%AA%AC%E6%B1%BD%E6%B0%B4%28NG%E9%A8%8E%E5%A3%AB%E3%83%A9%E3%83%A0%E3%83%8D%2640%29_TV.OVA&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce">📦 全套 38 話（34GB）</a>
+    <a class="big-btn" href="https://nyaa.si/?f=0&c=0_0&q=NG+Knight+Lamune+and+40+1-19" target="_blank">📦 第 1-19 話 Batch</a>
+    <a class="big-btn yt" href="https://www.youtube.com/@ashi_production" target="_blank">▶ YouTube 官方頻道</a>
+    <div class="dl-info">💡 電話唔夠位？用下面逐集 download，每集 ~200-400MB</div>
   </div>
 
   <!-- Episode list -->
   <div class="card">
-    <h2>📺 線上即睇（38 話）</h2>
+    <h2>📺 38 話 — 逐集睇 / 逐集 DL</h2>
+    <div class="tip">💡 Click <b style="color:#e94560">▶</b> = HiAnime 即播 · Click <b style="color:#2ecc71">⬇</b> = Nyaa search 該集 torrent</div>
     <div class="ep-list" id="episodes"></div>
   </div>
 
 </div>
 
 <footer class="footer">
-  <p>© 葦プロダクション · 串流：HiAnime · Torrent：Nyaa</p>
+  <p>© 葦プロダクション · Stream: HiAnime · DL: Nyaa · 官方: YouTube @ashi_production</p>
 </footer>
 
 <script>
@@ -99,12 +108,17 @@ h2{font-size:1rem;color:var(--accent);margin-bottom:.6rem}
   ];
   var el=document.getElementById('episodes');
   eps.forEach(function(e){
-    var a=document.createElement('a');
-    a.className='ep-row';
-    a.href='https://hianime.ms/watch-ng-knight-lamune-40-episode-'+e[0]+'-bd89c';
-    a.target='_blank';
-    a.innerHTML='<span class="ep-num">第'+e[0]+'話</span><span class="ep-title">'+e[1]+'</span><span class="ep-arrow">▶</span>';
-    el.appendChild(a);
+    var ep=e[0], title=e[1];
+    var row=document.createElement('div');
+    row.className='ep-row';
+    row.innerHTML=
+      '<span class="ep-num">#'+ep+'</span>'+
+      '<span class="ep-title">'+title+'</span>'+
+      '<span class="ep-btns">'+
+        '<a class="btn-mini btn-play" href="https://hianime.ms/watch-ng-knight-lamune-40-episode-'+ep+'-bd89c" target="_blank">▶ 睇</a>'+
+        '<a class="btn-mini btn-dl" href="https://nyaa.si/?f=0&c=0_0&q=NG+Knight+Lamune+40+'+ep+'" target="_blank">⬇ DL</a>'+
+      '</span>';
+    el.appendChild(row);
   });
 })();
 </script>
