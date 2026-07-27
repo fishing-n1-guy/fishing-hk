@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>🔥 火鳳燎原</title>
+<style>
+:root{--bg:#1a1a2e;--card:#16213e;--accent:#e67e22;--text:#eaeaea;--muted:#888}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden}
+header{background:linear-gradient(135deg,var(--accent),#c0392b);padding:1.5rem 1rem;text-align:center}
+header h1{font-size:clamp(1.2rem,5vw,1.8rem)}
+header .sub{font-size:.8rem;opacity:.85;margin-top:.3rem}
+.container{max-width:800px;margin:0 auto;padding:.5rem}
+.top-bar{display:flex;align-items:center;gap:.5rem;padding:.5rem;background:var(--card);border-radius:10px;margin-bottom:.5rem;flex-wrap:wrap}
+.top-bar .count{font-size:.8rem;color:var(--accent);font-weight:700}
+.top-bar button,.top-bar a{background:var(--accent);color:#fff;border:none;padding:.4rem .8rem;border-radius:6px;font-size:.75rem;cursor:pointer;text-decoration:none}
+#toc{display:flex;flex-direction:column;gap:3px;max-height:70vh;overflow-y:auto;padding-right:5px}
+.toc-item{display:flex;align-items:center;gap:.4rem;padding:.35rem .5rem;border-radius:6px;cursor:pointer;font-size:.75rem;text-decoration:none;color:var(--text);background:rgba(255,255,255,.03);transition:background .15s}
+.toc-item:hover,.toc-item.active{background:rgba(230,126,34,.15)}
+.toc-item .badge{font-size:.6rem;padding:.15rem .4rem;border-radius:4px;min-width:28px;text-align:center;flex-shrink:0}
+.badge.scraped{background:rgba(46,204,113,.2);color:#2ecc71}
+.badge.pending{background:rgba(255,255,255,.1);color:var(--muted)}
+.toc-item .label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem}
+#viewer{display:none;text-align:center}
+#viewer.active{display:block}
+#viewer img{max-width:100%;height:auto;display:block;margin:0 auto;touch-action:manipulation;-webkit-user-select:none}
+#viewer img.zoomed{transform:scale(1.5);min-width:150vw}
+.placeholder{text-align:center;padding:3rem 1rem;color:var(--muted)}
+.placeholder .icon{font-size:3rem;margin-bottom:.5rem}
+#navbar{display:none;justify-content:center;gap:.5rem;padding:.5rem;position:sticky;top:0;background:var(--bg);z-index:10}
+#navbar.active{display:flex}
+#navbar button{background:var(--accent);color:#fff;border:none;padding:.4rem .8rem;border-radius:6px;font-size:.75rem;cursor:pointer}
+.footer{text-align:center;padding:1.5rem;color:var(--muted);font-size:.65rem}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔥 火鳳燎原</h1>
+  <div class="sub">陳某 · 三國策略漫畫 · <span id="chapCount">--</span></div>
+</header>
+
+<div class="container">
+  <div class="top-bar">
+    <span class="count" id="scrapedCount">🟢 --/279</span>
+    <button onclick="showTOC()">📖 目錄</button>
+    <button onclick="scrollToBookmark()" style="background:rgba(255,255,255,.1)">📍 繼續</button>
+    <a href="https://www.baozimh.com/comic/huofengliaoyuan-chenmou" target="_blank" style="background:rgba(255,255,255,.1)">🌐 包子漫畫</a>
+  </div>
+
+  <div id="toc"></div>
+  <div id="navbar"></div>
+  <div id="viewer"></div>
+  <div class="placeholder" id="ph">
+    <div class="icon">🔥</div>
+    <p>👈 揀一回開始睇</p>
+  </div>
+</div>
+
+<footer class="footer">火鳳燎原 © 陳某 · 資料來源：baozimh</footer>
+
+<script>
+// ── Data ──
+var CHAPTERS = [
+  {num:"02卷",id:0},{num:"03卷",id:1},{num:"05卷",id:2},{num:"06卷",id:3},{num:"07卷",id:4},{num:"08卷",id:5},
+  {num:"09卷",id:6},{num:"10卷",id:7},{num:"11卷",id:8},{num:"12卷",id:9},{num:"13卷",id:10},{num:"14卷",id:11},
+  {num:"15卷",id:12},{num:"16卷",id:13},{num:"17卷",id:14},{num:"18卷",id:15},{num:"19卷",id:16},{num:"20卷",id:17},
+  {num:"21卷",id:18},{num:"22卷",id:19},{num:"23卷",id:20},{num:"24卷",id:21},{num:"25卷",id:22},{num:"26卷",id:23},
+  {num:"27卷",id:24},{num:"28卷",id:25},{num:"29卷",id:26},{num:"30卷",id:27},{num:"31卷",id:28},{num:"32卷",id:29},
+  {num:"33卷",id:30},{num:"34卷",id:31},{num:"35卷",id:32},{num:"36卷",id:33},{num:"37卷",id:34},{num:"38卷",id:35},
+  {num:"39卷",id:36},{num:"40卷",id:37},{num:"41卷",id:38},{num:"42卷",id:39},{num:"43卷",id:40},{num:"44卷",id:41},
+  {num:"45卷",id:42},{num:"53卷",id:43},{num:"54卷",id:44},{num:"47卷",id:45},{num:"48卷",id:46},{num:"49卷",id:47},
+  {num:"55卷",id:48},{num:"56卷",id:49},{num:"57卷",id:50},{num:"50卷",id:51},{num:"51卷",id:52},{num:"52卷",id:53},
+  {num:"58卷",id:54},{num:"59卷",id:55},{num:"60卷",id:56},{num:"61卷",id:57}
+];
+
+// SCRAPED data injected during deploy
+var SCRAPED = {"0": {"pages": 200, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/1-3md9/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第02卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "1": {"pages": 209, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/2-c7pj/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第03卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "2": {"pages": 201, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/4-zcl2/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第05卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "3": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/5-oxy6/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第06卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "4": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/6-1bq5/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第07卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "5": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/7-vhxd/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第08卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "6": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/8-3pqd/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第09卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "7": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/9-d25s/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第10卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "8": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/10-l5eh/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第11卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "9": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/11-m1dh/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第12卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "10": {"pages": 195, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/12-gioz/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第13卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "11": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/13-dnjv/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第14卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "12": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/14-sgcr/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第15卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "13": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/15-egok/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第16卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "14": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/16-zpt6/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第17卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "15": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/17-4rbz/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第18卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "16": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/18-zni0/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第19卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "17": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/19-y8r4/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第20卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "18": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/20-m3dg/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第21卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "19": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/21-acb8/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第22卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "20": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/22-j9e3/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第23卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "21": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/23-1s4q/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第24卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "22": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/24-7l2d/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第25卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "23": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/25-bn45/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第26卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "24": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/26-6nex/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第27卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "25": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/27-yltw/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第28卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "26": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/28-2ubc/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第29卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "27": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/29-d85w/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第30卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "28": {"pages": 50, "base": "https://s1.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/30-am0f/", "pattern": "{:01d}.jpg", "cdn": "s1.bzcdn.net", "title": "第31卷(1/5) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}, "29": {"pages": 50, "base": "https://s2.bzcdn.net/scomic/huofengliaoyuan-chenmou/0/31-rch4/", "pattern": "{:01d}.jpg", "cdn": "s2.bzcdn.net", "title": "第32卷(1/4) - 火鳳燎原 - 包子漫畫", "source": "baozimh"}};
+
+var curIdx=-1, scrollPos=0, scrollTimer=null, KEY='huofeng_bm';
+
+// ── Init ──
+(function(){
+  CHAPTERS.forEach(function(c,i){
+    c.scraped=!!SCRAPED[''+c.id];
+    c.index=i;
+  });
+  var cnt=CHAPTERS.filter(function(c){return c.scraped}).length;
+  document.getElementById('scrapedCount').textContent='🟢 '+cnt+'/'+CHAPTERS.length;
+  document.getElementById('chapCount').textContent=cnt+' 章已掃描';
+  buildTOC();
+  loadBM();
+})();
+
+// ── TOC ──
+function buildTOC(){
+  var toc=document.getElementById('toc');
+  toc.innerHTML='';
+  CHAPTERS.forEach(function(c){
+    var d=document.createElement('div');
+    d.className='toc-item';
+    d.innerHTML='<span class="badge '+(c.scraped?'scraped':'pending')+'">'+(c.scraped?'🟢':'⚪')+'</span><span class="label">'+c.num+'</span>';
+    d.onclick=function(){loadChapter(c.index)};
+    toc.appendChild(d);
+  });
+}
+
+function showTOC(){
+  document.getElementById('toc').style.display='block';
+  document.getElementById('viewer').classList.remove('active');
+  document.getElementById('navbar').classList.remove('active');
+  document.getElementById('ph').style.display='block';
+}
+
+// ── Chapter loading ──
+function loadChapter(idx){
+  var c=CHAPTERS[idx];
+  curIdx=idx;
+  document.getElementById('toc').style.display='none';
+  document.getElementById('ph').style.display='none';
+
+  var v=document.getElementById('viewer');
+  v.innerHTML='';
+  v.classList.add('active');
+
+  if(!c.scraped){
+    v.innerHTML='<div class="placeholder"><div class="icon">⚪</div><p>呢回未掃描</p><a href="https://www.twmanga.com/comic/chapter/huofengliaoyuan-chenmou/0_'+c.id+'.html" target="_blank" style="color:#e67e22">👉 去包子漫畫睇</a></div>';
+    saveBM();
+    return;
+  }
+
+  var sc=SCRAPED[''+c.id];
+  var pages=sc.pages||50;
+  var imgs=[];
+  var base=sc.base;
+  
+  for(var p=1;p<=pages;p++){
+    imgs.push(base+p+'.jpg');
+  }
+
+  // Render images with lazy loading
+  var loaded=0;
+  for(var i=0;i<imgs.length;i++){
+    var img=document.createElement('img');
+    img.src=imgs[i];
+    img.loading='lazy';
+    img.onload=function(){
+      loaded++;
+      if(loaded===Math.min(5,pages) && scrollPos>0){
+        setTimeout(function(){v.scrollTop=scrollPos;scrollPos=0;},100);
+      }
+    };
+    v.appendChild(img);
+  }
+
+  // Navbar
+  var nb=document.getElementById('navbar');
+  nb.innerHTML='<button onclick="loadChapter('+(idx-1)+')" '+(idx<=0?'disabled':'')+'>◀ 上回</button>'+
+    '<span style="font-size:.75rem;padding:.4rem">'+c.num+' · '+pages+'頁</span>'+
+    '<button onclick="loadChapter('+(idx+1)+')" '+(idx>=CHAPTERS.length-1?'disabled':'')+'>下回 ▶</button>';
+  nb.classList.add('active');
+
+  saveBM();
+}
+
+// ── Bookmarks ──
+function saveBM(){
+  var v=document.getElementById('viewer');
+  var data=JSON.stringify({i:curIdx,s:v.scrollTop,t:Date.now()});
+  try{localStorage.setItem(KEY,data)}catch(e){}
+  document.cookie=KEY+'='+encodeURIComponent(data)+';expires='+new Date(Date.now()+365*86400000).toUTCString()+';path=/;SameSite=Lax';
+}
+
+function loadBM(){
+  var raw;
+  try{raw=localStorage.getItem(KEY)}catch(e){}
+  if(!raw) raw=(document.cookie.match('(^|;)\\s*'+KEY+'\\s*=\\s*([^;]+)')||[])[2];
+  if(raw){
+    try{var d=JSON.parse(decodeURIComponent(raw));curIdx=d.i;scrollPos=d.s||0}catch(e){}
+  }
+}
+
+function scrollToBookmark(){
+  if(curIdx>=0){loadChapter(curIdx);return}
+  showTOC();
+}
+
+// Scroll save
+document.addEventListener('scroll',function(){
+  clearTimeout(scrollTimer);
+  scrollTimer=setTimeout(function(){
+    var v=document.getElementById('viewer');
+    if(v.classList.contains('active')){scrollPos=v.scrollTop;saveBM();}
+  },1000);
+},{passive:true});
+
+// Double-tap zoom
+var lastTap=0,lastTarget=null;
+document.addEventListener('click',function(e){
+  var img=e.target.closest('img');
+  if(!img)return;
+  var now=Date.now();
+  if(now-lastTap<350&&img===lastTarget){
+    e.preventDefault();
+    img.classList.toggle('zoomed');
+    if(img.classList.contains('zoomed')){
+      var r=img.getBoundingClientRect();
+      img.style.transformOrigin=((e.clientX-r.left)/r.width*100)+'% '+((e.clientY-r.top)/r.height*100)+'%';
+    }
+  }
+  lastTap=now;lastTarget=img;
+},{passive:false});
+</script>
+
+</body>
+</html>
