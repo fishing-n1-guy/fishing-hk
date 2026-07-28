@@ -396,7 +396,6 @@ function loadChapter(idx){
 
   if(!c.scraped){
     v.innerHTML='<div class="placeholder"><div class="icon">⚪</div><p>呢回未掃描</p><a href="https://www.twmanga.com/comic/chapter/huofengliaoyuan-chenmou/0_'+c.id+'.html" target="_blank" style="color:#e67e22">👉 去包子漫畫睇</a></div>';
-    saveBM();
     return;
   }
 
@@ -415,17 +414,10 @@ function loadChapter(idx){
   }
 
   // Render images with lazy loading
-  var loaded=0;
   for(var i=0;i<imgs.length;i++){
     var img=document.createElement('img');
     img.src=imgs[i];
     img.loading='lazy';
-    img.onload=function(){
-      loaded++;
-      if(loaded===Math.min(5,pages) && scrollPos>0){
-        setTimeout(function(){v.scrollTop=scrollPos;scrollPos=0;},100);
-      }
-    };
     v.appendChild(img);
   }
 
@@ -436,7 +428,11 @@ function loadChapter(idx){
     '<button onclick="loadChapter('+(idx+1)+')" '+(idx>=CHAPTERS.length-1?'disabled':'')+'>下回 ▶</button>';
   nb.classList.add('active');
 
-  saveBM();
+  // Restore scroll position after images render
+  var _restorePos = scrollPos;
+  if(_restorePos > 0){
+    setTimeout(function(){ v.scrollTop = _restorePos; scrollPos = 0; }, 300);
+  }
 }
 
 // ── Bookmarks ──
