@@ -63,6 +63,7 @@ header .sub{font-size:.8rem;opacity:.85;margin-top:.3rem}
 <script>
 // ── Data ──
 var CHAPTERS = [
+  {num:"01卷",id:"v01"},
   {num:"02卷",id:0},
   {num:"03卷",id:1},
   {num:"05卷",id:2},
@@ -405,7 +406,12 @@ function loadChapter(idx){
   var base=sc.base;
   
   for(var p=1;p<=pages;p++){
-    imgs.push(base+p+'.jpg');
+    if(sc.token){
+      var fn=sc.pattern.replace(/\{:(\d+)d\}/,function(_,d){return String(p).padStart(parseInt(d),'0');});
+      imgs.push('https://comic-proxy.kitlam729.workers.dev/?url='+encodeURIComponent(sc.base+fn+'?'+sc.token));
+    } else {
+      imgs.push(base+p+'.jpg');
+    }
   }
 
   // Render images with lazy loading
