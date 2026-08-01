@@ -61,6 +61,7 @@ header .sub{font-size:.8rem;opacity:.85;margin-top:.3rem}
 <footer class="footer">火鳳燎原 © 陳某 · 資料來源：baozimh</footer>
 
 <script>
+
 // ── Data ──
 var CHAPTERS = [
   {num:"01卷",id:"v01"},
@@ -361,6 +362,8 @@ var curIdx=-1, scrollPos=0, scrollTimer=null, KEY='huofeng_bm';
   document.getElementById('chapCount').textContent=cnt+' 章已掃描';
   buildTOC();
   loadBM();
+  // Auto-open last chapter like 火武
+  if(curIdx>=0) loadChapter(curIdx, scrollPos);
 })();
 
 // ── TOC ──
@@ -384,9 +387,11 @@ function showTOC(){
 }
 
 // ── Chapter loading ──
-function loadChapter(idx){
+function loadChapter(idx, savedScroll){
   var c=CHAPTERS[idx];
   curIdx=idx;
+  if(typeof savedScroll==='number') scrollPos=savedScroll;
+  else scrollPos=0;
   document.getElementById('toc').style.display='none';
   document.getElementById('ph').style.display='none';
 
@@ -396,6 +401,7 @@ function loadChapter(idx){
 
   if(!c.scraped){
     v.innerHTML='<div class="placeholder"><div class="icon">⚪</div><p>呢回未掃描</p><a href="https://www.twmanga.com/comic/chapter/huofengliaoyuan-chenmou/0_'+c.id+'.html" target="_blank" style="color:#e67e22">👉 去包子漫畫睇</a></div>';
+    saveBM();
     return;
   }
 
@@ -413,14 +419,6 @@ function loadChapter(idx){
     }
   }
 
-  // Render images with lazy loading
-  for(var i=0;i<imgs.length;i++){
-    var img=document.createElement('img');
-    img.src=imgs[i];
-    img.loading='lazy';
-    v.appendChild(img);
-  }
-
   // Navbar
   var nb=document.getElementById('navbar');
   nb.innerHTML='<button onclick="loadChapter('+(idx-1)+')" '+(idx<=0?'disabled':'')+'>◀ 上回</button>'+
@@ -428,19 +426,25 @@ function loadChapter(idx){
     '<button onclick="loadChapter('+(idx+1)+')" '+(idx>=CHAPTERS.length-1?'disabled':'')+'>下回 ▶</button>';
   nb.classList.add('active');
 
-  // Restore scroll position — retry as images load
-  var _restorePos = scrollPos;
-  if(_restorePos > 0){
-    var _attempts = 0;
-    var _retry = setInterval(function(){
-      _attempts++;
-      v.scrollTop = _restorePos;
-      if(v.scrollTop >= _restorePos - 2 || _attempts > 25){
-        clearInterval(_retry);
-        scrollPos = 0;
-        if(v.scrollTop > 0) saveBM();
-      }
-    }, 200);
+  saveBM();
+  v.scrollTop=0;
+
+  // Render images with onload restore (火武 pattern)
+  for(var i=0;i<imgs.length;i++){
+    var img=document.createElement('img');
+    img.src=imgs[i];
+    img.loading=i<3?'eager':'lazy';
+    img.onerror=function(){this.style.opacity='0.3'};
+    img.onload=(function(idx){
+      return function(){
+        var loaded=v.querySelectorAll('img[src]').length;
+        if(loaded>=Math.min(5,imgs.length) && scrollPos>0){
+          v.scrollTop=scrollPos;
+          scrollPos=0;
+        }
+      };
+    })(i);
+    v.appendChild(img);
   }
 }
 
@@ -462,18 +466,20 @@ function loadBM(){
 }
 
 function scrollToBookmark(){
-  if(curIdx>=0){loadChapter(curIdx);return}
+  if(curIdx>=0){loadChapter(curIdx, scrollPos);return}
   showTOC();
 }
 
-// Scroll save
-document.addEventListener('scroll',function(){
-  clearTimeout(scrollTimer);
-  scrollTimer=setTimeout(function(){
-    var v=document.getElementById('viewer');
-    if(v.classList.contains('active')){scrollPos=v.scrollTop;saveBM();}
-  },1000);
-},{passive:true});
+// Scroll save (on viewer element — scroll events don't bubble!)
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('viewer').addEventListener('scroll',function(){
+    clearTimeout(scrollTimer);
+    scrollTimer=setTimeout(function(){
+      var v=document.getElementById('viewer');
+      if(v.classList.contains('active')){scrollPos=v.scrollTop;saveBM();}
+    },1000);
+  });
+});
 
 // Double-tap zoom
 var lastTap=0,lastTarget=null;
@@ -491,6 +497,7 @@ document.addEventListener('click',function(e){
   }
   lastTap=now;lastTarget=img;
 },{passive:false});
+
 </script>
 
 </body>
