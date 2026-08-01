@@ -428,10 +428,18 @@ function loadChapter(idx){
     '<button onclick="loadChapter('+(idx+1)+')" '+(idx>=CHAPTERS.length-1?'disabled':'')+'>下回 ▶</button>';
   nb.classList.add('active');
 
-  // Restore scroll position after images render
+  // Restore scroll position — retry as images load
   var _restorePos = scrollPos;
   if(_restorePos > 0){
-    setTimeout(function(){ v.scrollTop = _restorePos; scrollPos = 0; }, 300);
+    var _attempts = 0;
+    var _retry = setInterval(function(){
+      _attempts++;
+      v.scrollTop = _restorePos;
+      if(v.scrollTop >= _restorePos - 2 || _attempts > 25){
+        clearInterval(_retry);
+        scrollPos = 0;
+      }
+    }, 200);
   }
 }
 
