@@ -288,12 +288,19 @@ function init() {
   // Render chapter
   renderChapter(currentChapter);
   
-  // Restore scroll position
-  setTimeout(() => {
+  // Restore scroll position — retry until it sticks
+  updateCurrentTitle();
+  if (saved.scrollPos) {
+    let attempts = 0;
     const area = document.getElementById('content-area');
-    if (saved.scrollPos) area.scrollTop = saved.scrollPos;
-    updateCurrentTitle();
-  }, 100);
+    const retry = setInterval(() => {
+      attempts++;
+      area.scrollTop = saved.scrollPos;
+      if (area.scrollTop >= saved.scrollPos - 2 || attempts > 25) {
+        clearInterval(retry);
+      }
+    }, 100);
+  }
   
   // Scroll listener for back-to-top
   document.getElementById('content-area').addEventListener('scroll', function() {
@@ -360,14 +367,14 @@ function renderChapter(idx) {
   
   currentChapter = idx;
   updateCurrentTitle();
-  saveProgress();
+  // saveProgress handled by scroll listener
 }
 
 // ── Navigation ──
 function goChapter(idx) {
   if (idx < 0 || idx >= NOVEL.length) return;
-  renderChapter(idx);
   document.getElementById('content-area').scrollTop = 0;
+  renderChapter(idx);
   // Close sidebar on mobile
   if (window.innerWidth <= 768) toggleSidebar();
 }
@@ -375,16 +382,16 @@ function goChapter(idx) {
 function prevChapter() {
   if (currentChapter > 0) {
     currentChapter--;
-    renderChapter(currentChapter);
     document.getElementById('content-area').scrollTop = 0;
+    renderChapter(currentChapter);
   }
 }
 
 function nextChapter() {
   if (currentChapter < NOVEL.length - 1) {
     currentChapter++;
-    renderChapter(currentChapter);
     document.getElementById('content-area').scrollTop = 0;
+    renderChapter(currentChapter);
   }
 }
 
