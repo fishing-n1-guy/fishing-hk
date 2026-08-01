@@ -23,7 +23,7 @@ header .sub{font-size:.8rem;opacity:.85;margin-top:.3rem}
 .badge.pending{background:rgba(255,255,255,.1);color:var(--muted)}
 .toc-item .label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem}
 #viewer{display:none;text-align:center}
-#viewer.active{display:block}
+#viewer.active{display:block;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #viewer img{max-width:100%;height:auto;display:block;margin:0 auto;touch-action:manipulation;-webkit-user-select:none}
 #viewer img.zoomed{transform:scale(1.5);min-width:150vw}
 .placeholder{text-align:center;padding:3rem 1rem;color:var(--muted)}
