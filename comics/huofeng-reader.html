@@ -438,6 +438,7 @@ function loadChapter(idx){
       if(v.scrollTop >= _restorePos - 2 || _attempts > 25){
         clearInterval(_retry);
         scrollPos = 0;
+        if(v.scrollTop > 0) saveBM();
       }
     }, 200);
   }
